@@ -1074,10 +1074,11 @@ button{font:inherit;color:inherit}
 .seg button.on{background:var(--go);color:#fff}
 .seg button.off.on{background:${C.pomegranate}}
 .seg button.boost.on{background:${C.pumpkin}}
+.seg.icons button,.seg.stepbar button{min-height:36px}
 .seg.icons button{flex:1 1 0;min-width:0;padding:8px 4px;gap:0;transition:flex-grow .2s}
 .seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
 .seg button.manual.on{background:var(--cold)}
-.seg.stepbar{margin-top:0}.seg.stepbar button{padding:10px 4px;font-size:15px}
+.seg.stepbar{margin-top:0}
 .seg.stepbar button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
 .seg.stepbar button:active{background:color-mix(in srgb,var(--mut) 30%,transparent)}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
