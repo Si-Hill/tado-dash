@@ -19,7 +19,7 @@ Tado Dash has no account, no entities and no polling of its own. It reads the en
 
 | Tab | What it shows |
 | --- | --- |
-| **Rooms** | One card per room: temperature, humidity, target, 6-hour trend, heating state, and one-tap Schedule / Boost / Off. Header chips for heating rooms, outside temperature, home/away and open insights. |
+| **Rooms** | One card per room: temperature, humidity, target, 6-hour trend, heating state, and one-tap Schedule / Boost / Off. The Rooms and Heating chips filter the cards; further chips show outside temperature, open insights and (with more than one Tado home) home/away. |
 | **Room page** | Large temperature and trend, target stepper, hold for 30 min / 1 h / 2 h / until next block / until changed, Boost and Smart boost, what Tado has learned, comfort and air (mold, condensation, dew point), devices with battery and connection, room insights, early start. |
 | **Analytics** | Pick a room and 6 h to 7 days: temperature, target, heating power, outside temperature and humidity on shared-time charts with hover read-out, plus average, range, heating hours and time on target. |
 | **Schedules** | Today across every room, plus a week grid for one room, from Tado CE's schedule calendars. Read-only: edit schedules in the Tado app. |
@@ -54,20 +54,6 @@ Tado Dash is not in the HACS default store, so add it as a custom repository fir
 ## How it finds your rooms
 
 Tado CE entity IDs vary between installs (`climate.lounge_2`, `sensor.lounge_temp`), so Tado Dash doesn't guess them. It reads Tado CE's stable unique IDs from the entity registry and groups them into rooms, so renaming entities doesn't break it. It's exposed to the panel as the `tado_dash/map` WebSocket command.
-
-## Development
-
-```bash
-python -m http.server 8765      # from the repo root
-# open http://localhost:8765/dev/index.html
-```
-
-`dev/` is a harness with a mock Home Assistant connection shaped like a real Tado CE install, so the panel can be built without a live system. The panel is a single dependency-free web component in `custom_components/tado_dash/frontend/`, with no build step.
-
-```bash
-pip install pytest-homeassistant-custom-component
-pytest -q tests
-```
 
 ## Status
 

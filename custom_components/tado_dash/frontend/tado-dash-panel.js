@@ -6,7 +6,15 @@
  */
 
 const TCE = "tado_ce";
-const HEAT = "#ff7043";
+// Flat UI "Default" palette (flatuicolors.com/palette/defo)
+const C = {
+  turquoise: "#1abc9c", emerald: "#2ecc71", peter: "#3498db", amethyst: "#9b59b6", asphalt: "#34495e",
+  greensea: "#16a085", nephritis: "#27ae60", belize: "#2980b9", wisteria: "#8e44ad", midnight: "#2c3e50",
+  sunflower: "#f1c40f", carrot: "#e67e22", alizarin: "#e74c3c", clouds: "#ecf0f1", concrete: "#95a5a6",
+  orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b", silver: "#bdc3c7", asbestos: "#7f8c8d",
+};
+const HEAT = C.carrot;
+const COLD = C.peter;
 const MIN = 60000;
 const HOUR = 3600000;
 
@@ -69,23 +77,29 @@ function extent(seriesList, pad2 = 0.5) {
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
   const now = Date.now(), t0 = now - 6 * HOUR;
-  const [lo, hi] = extent([temp, target]);
+  // Scale: fitted to the last 6 h of readings and target, never tighter than 1 °C
+  // top to bottom, with the actual low and high printed on the chart.
+  const all = [...temp, ...target].map((p) => p[1]);
+  const dataLo = Math.min(...all), dataHi = Math.max(...all);
+  let lo = dataLo, hi = dataHi;
+  if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
+  const padv = (hi - lo) * 0.12;
+  lo -= padv; hi += padv;
   const W = 300, H = 70;
   const X = (t) => ((t - t0) / (now - t0)) * W;
-  const Y = (v) => H - 6 - ((v - lo) / (hi - lo)) * (H - 14);
-  const color = heating ? HEAT : "var(--secondary-text-color)";
+  const Y = (v) => H - 6 - ((v - lo) / (hi - lo)) * (H - 12);
+  const color = heating ? HEAT : COLD;
   const line = pathOf(temp, X, Y, false, now);
   const last = temp[temp.length - 1];
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
   const tgt = target.length ? pathOf(target, X, Y, true, now) : "";
-  const id = "g" + Math.random().toString(36).slice(2, 7);
-  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${color}" stop-opacity=".45"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
-    <path d="${area}" fill="url(#${id})"/>
-    <path d="${line}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
-    ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--secondary-text-color)" stroke-width="1" stroke-dasharray="4 3" vector-effect="non-scaling-stroke" opacity=".7"/>` : ""}
-  </svg>`;
+  return `<div class="sparkwrap" title="Last 6 hours, scaled ${f1(dataLo)}–${f1(dataHi)} °C">
+    <svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <path d="${area}" style="fill:color-mix(in srgb, ${color} 30%, var(--card))"/>
+      ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" opacity=".8"/>` : ""}
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    </svg>
+    <span class="sc hi">${f1(dataHi)}°</span><span class="sc lo">${f1(dataLo)}°</span></div>`;
 }
 
 /* ---------- the panel ---------- */
@@ -95,6 +109,7 @@ class TadoDashPanel extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this._tab = "rooms";
+    this._filter = "all"; // rooms filter: all | heating
     this._zone = null; // open room
     this._sel = null; // selected room for analytics / schedules
     this._range = 24;
@@ -112,6 +127,7 @@ class TadoDashPanel extends HTMLElement {
 
   set hass(h) {
     const first = !this._hass;
+    this.setAttribute("data-theme", h.themes?.darkMode === false ? "light" : "dark");
     this._hass = h;
     if (first) this._init();
     else this._maybeRender();
@@ -298,6 +314,7 @@ class TadoDashPanel extends HTMLElement {
       case "boost": if (zone?.ents.boost) this._call("button", "press", { entity_id: zone.ents.boost }); return;
       case "press": this._call("button", "press", { entity_id: v }); return;
       case "toggle": this._call("homeassistant", "toggle", { entity_id: v }); return;
+      case "filter": this._filter = v === "heating" && this._filter === "heating" ? "all" : v; break;
       case "range": this._range = parseInt(v, 10); break;
       case "pick": this._sel = z; break;
       case "refresh-sched": this._cal = {}; break;
@@ -372,14 +389,19 @@ class TadoDashPanel extends HTMLElement {
     const outside = hub.n("outside_temp");
     const away = hub.get("home")?.state === "off";
     const alerts = hub.n("home_insights");
+    const showHomeChip = (this._map?.homes?.length || 0) > 1;
+    const f = this._filter;
     const chips = [
-      chip("home-outline", "Rooms", zones.length),
-      chip("fire", "Heating", heating, heating ? "heat" : ""),
+      chip("home-outline", "Rooms", zones.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`),
+      chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
       outside != null ? chip("thermometer", "Outside", `${f1(outside)} °C`) : "",
-      hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
-      alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", "learning") : "",
+      showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
+      alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="learning"`) : "",
     ].join("");
-    return `<div class="chips">${chips}</div><div class="grid">${zones.map((z) => this._roomCard(z)).join("")}</div>`;
+    const shown = f === "heating" ? zones.filter((z) => z.heating) : zones;
+    const grid = shown.length ? `<div class="grid">${shown.map((z) => this._roomCard(z)).join("")}</div>`
+      : `<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
+    return `<div class="chips">${chips}</div>${grid}`;
   }
 
   _roomCard(z) {
@@ -396,10 +418,10 @@ class TadoDashPanel extends HTMLElement {
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
       ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : `<div class="note faint">${z.confidence != null ? `${icon("brain")}Learning ${f0(z.confidence)}%` : "&nbsp;"}</div>`}
-      <div class="seg" role="group">
-        <button class="${sched ? "on" : ""}" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}Schedule</button>
-        ${z.ents.boost ? `<button data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}Boost</button>` : ""}
-        <button class="${z.off ? "on" : ""}" data-a="hold" data-z="${z.id}" data-v="off">${icon("power")}Off</button>
+      <div class="seg icons" role="group">
+        <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
+        ${z.ents.boost ? `<button title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
+        <button class="${z.off ? "on" : ""}" title="Off" data-a="hold" data-z="${z.id}" data-v="off">${icon("power")}<span class="lb">Off</span></button>
       </div></div>`;
   }
 
@@ -481,7 +503,7 @@ class TadoDashPanel extends HTMLElement {
     const c = z.confidence;
     const rate = this._n(e.heating_rate), inertia = this._n(e.thermal_inertia), pre = this._n(e.preheat_time);
     const cycles = z.confAttrs.cycle_count;
-    const col = c == null ? "var(--secondary-text-color)" : c >= 70 ? "var(--success-color, #43a047)" : c >= 40 ? "var(--warning-color, #ffa726)" : "var(--error-color, #ef5350)";
+    const col = c == null ? "var(--mut)" : c >= 70 ? "var(--ok)" : c >= 40 ? "var(--warn)" : "var(--bad)";
     const ring = ringSVG(c, col);
     const rows = [
       ["Heating rate", rate != null ? `${f1(rate)} °C/h` : "–", "How fast this room warms while heating"],
@@ -536,8 +558,8 @@ class TadoDashPanel extends HTMLElement {
     return {
       title: "Temperature (°C)", height: 200, unit: "°C",
       series: [
-        { name: "Temperature", pts: d[e.temp] || [], color: "var(--primary-text-color)", w: 1.8 },
-        { name: "Target", pts: d[e.target] || [], color: "var(--success-color, #43a047)", step: true, dash: "5 3", w: 1.4 },
+        { name: "Temperature", pts: d[e.temp] || [], color: "var(--fg)", w: 1.8 },
+        { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, dash: "5 3", w: 1.4 },
       ],
       band: { name: "Heating", pts: d[e.heating] || [], color: HEAT },
     };
@@ -568,11 +590,11 @@ class TadoDashPanel extends HTMLElement {
     const outId = this._hub.ids.outside_temp;
     const panels = [this._tempPanel(z, d)];
     if (outId && d[outId]?.length) panels.push({ title: "Outside temperature (°C)", height: 100, unit: "°C",
-      series: [{ name: "Outside", pts: d[outId], color: "#90a4ae", w: 1.5 }] });
+      series: [{ name: "Outside", pts: d[outId], color: "var(--out)", w: 1.5 }] });
     if (d[z.ents.humidity]?.length) panels.push({ title: "Humidity (%)", height: 110, unit: "%", fixed: [20, 80], band2: [40, 60],
-      series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "#4fc3f7", w: 1.5 }] });
+      series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "var(--hum)", w: 1.5 }] });
     const stats = this._stats(z, d);
-    const legend = [["var(--primary-text-color)", "Temperature"], ["var(--success-color, #43a047)", "Target"], [HEAT, "Heating"], ["#90a4ae", "Outside"], ["#4fc3f7", "Humidity"]]
+    const legend = [["var(--fg)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating"], ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
       .map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
     return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div>
       <div class="card"><h3>History</h3><div class="chart" id="an">${this._chartSVG("an", { hours: this._range, panels })}</div>
@@ -626,7 +648,7 @@ class TadoDashPanel extends HTMLElement {
         const v = lo + ((hi - lo) * k) / ticks, yy = Y(v);
         out += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" class="grid"/><text x="${L - 6}" y="${yy + 3.5}" text-anchor="end" class="axis">${p.fixed ? Math.round(v) : v.toFixed(1)}</text>`;
       }
-      if (p.band2) out += `<rect x="${L}" width="${W - L - R}" y="${Y(p.band2[1])}" height="${Y(p.band2[0]) - Y(p.band2[1])}" fill="var(--success-color, #43a047)" opacity=".12"/>`;
+      if (p.band2) out += `<rect x="${L}" width="${W - L - R}" y="${Y(p.band2[1])}" height="${Y(p.band2[0]) - Y(p.band2[1])}" fill="var(--ok)" opacity=".12"/>`;
       if (p.band?.pts?.length) {
         const bh = (bot - top) * 0.16;
         const BY = (v) => bot - (Math.min(100, v) / 100) * bh;
@@ -753,7 +775,7 @@ class TadoDashPanel extends HTMLElement {
     const hub = this._hub, ha = hub.get("home_insights")?.attributes || {};
     const rows = zones.map((z) => {
       const e = z.ents, c = z.confidence;
-      const col = c == null ? "var(--secondary-text-color)" : c >= 70 ? "var(--success-color, #43a047)" : c >= 40 ? "var(--warning-color, #ffa726)" : "var(--error-color, #ef5350)";
+      const col = c == null ? "var(--mut)" : c >= 70 ? "var(--ok)" : c >= 40 ? "var(--warn)" : "var(--bad)";
       const m = (k, u = "", d = 1) => { const v = this._n(e[k]); return v == null ? "–" : v.toFixed(d) + u; };
       return `<div class="card lrow" data-a="open" data-z="${z.id}">
         ${ringSVG(c, col, 56)}
@@ -814,35 +836,40 @@ class TadoDashPanel extends HTMLElement {
   }
 }
 
-function chip(ic, label, value, cls = "", tab = "") {
-  return `<span class="chip ${cls}" ${tab ? `data-a="tab" data-v="${tab}"` : ""}>${icon(ic)}${label} <b>${esc(value)}</b></span>`;
+function chip(ic, label, value, cls = "", attrs = "") {
+  return `<span class="chip ${cls}" ${attrs}${attrs ? ' role="button"' : ""}>${icon(ic)}${label} <b>${esc(value)}</b></span>`;
 }
 
 function ringSVG(pct, color, size = 72) {
   const r = 30, c = 2 * Math.PI * r, v = pct == null ? 0 : Math.max(0, Math.min(100, pct));
-  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 72 72"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--divider-color)" stroke-width="7"/>
+  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 72 72"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--line)" stroke-width="7"/>
     <circle cx="36" cy="36" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(c * v) / 100} ${c}" transform="rotate(-90 36 36)"/>
     <text x="36" y="41" text-anchor="middle" class="rt">${pct == null ? "–" : Math.round(pct)}</text></svg>`;
 }
 
 const STYLE = `
-:host{display:block;height:100%;background:var(--primary-background-color);color:var(--primary-text-color);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);
-  --heat:${HEAT};--card:var(--card-background-color,#1c1c1c);--line:var(--divider-color,#3a3a3a);--mut:var(--secondary-text-color,#9a9a9a);--ok:var(--success-color,#43a047);--warn:var(--warning-color,#ffa726);--bad:var(--error-color,#ef5350)}
+:host{display:block;height:100%;background:var(--bg);color:var(--fg);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);
+  --heat:${HEAT};--cold:${C.peter};--ok:${C.emerald};--go:${C.nephritis};--warn:${C.orange};--bad:${C.alizarin};--accent:${C.turquoise};
+  --hum:${C.turquoise};--out:${C.concrete};--wis:${C.amethyst};
+  --bg:#1e2a36;--card:${C.midnight};--line:rgba(236,240,241,.14);--mut:${C.concrete};--fg:${C.clouds}}
+:host([data-theme=light]){--bg:${C.clouds};--card:#fff;--line:rgba(44,62,80,.14);--mut:${C.asbestos};--fg:${C.midnight}}
 *{box-sizing:border-box}
 .page{display:flex;flex-direction:column;height:100%}
-header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--app-header-background-color,var(--card));border-bottom:1px solid var(--line);flex:none}
+header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
 h1{font-size:20px;font-weight:400;margin:0}
-nav{display:flex;gap:4px;padding:0 12px;background:var(--app-header-background-color,var(--card));border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
+nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font:inherit;font-size:14px;font-weight:500;padding:14px 14px 12px;cursor:pointer;white-space:nowrap}
-nav button.on{color:var(--primary-color);border-bottom-color:var(--primary-color)}
+nav button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .content{flex:1;overflow:auto}
 .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 48px}
 button{font:inherit;color:inherit}
-.icon-btn{background:none;border:0;cursor:pointer;padding:8px;border-radius:50%;display:flex;color:var(--primary-text-color)}
+.icon-btn{background:none;border:0;cursor:pointer;padding:8px;border-radius:50%;display:flex;color:var(--fg)}
 ha-icon{--mdc-icon-size:18px;display:inline-flex;vertical-align:middle}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:13px;color:var(--mut)}
-.chip b{color:var(--primary-text-color)} .chip.heat ha-icon{color:var(--heat)} .chip.warn ha-icon{color:var(--warn)} .chip[data-a]{cursor:pointer}
+.chip b{color:var(--fg)} .chip.heat ha-icon{color:var(--heat)} .chip.warn ha-icon{color:var(--warn)} .chip[data-a]{cursor:pointer;font:inherit;font-size:13px}
+.chip[data-a]:hover{border-color:var(--mut)}
+.chip.on,.chip.on:hover{background:var(--accent);border-color:var(--accent);color:#fff}.chip.on b,.chip.on ha-icon{color:#fff}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--ha-card-border-radius,12px);padding:16px;margin-bottom:14px}
 .grid .card{margin:0}
@@ -854,19 +881,24 @@ ha-icon{--mdc-icon-size:18px;display:inline-flex;vertical-align:middle}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mut);padding:2px 8px;border-radius:999px}
 .pill.heating{color:var(--heat);background:color-mix(in srgb,var(--heat) 14%,transparent)}
 .pill.preheat{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
-.pill.window{color:#4fc3f7;background:rgba(79,195,247,.14)}.pill.over{color:#ba68c8;background:rgba(186,104,200,.14)}
+.pill.window{color:var(--cold);background:color-mix(in srgb,var(--cold) 16%,transparent)}.pill.over{color:var(--wis);background:color-mix(in srgb,var(--wis) 16%,transparent)}
 .pill.off{color:var(--mut)}
 .mid{align-items:flex-end}
 .temp{font-size:46px;font-weight:300;line-height:1.1}.temp small{font-size:18px;color:var(--mut);margin-left:2px;vertical-align:top}
 .hum{font-size:13px;color:var(--mut);margin-left:10px;vertical-align:middle}
-.tgt{text-align:right;display:flex;flex-direction:column;font-size:12px;color:var(--mut)}.tgt b{font-size:17px;color:var(--primary-text-color);font-weight:500}
-.spark{width:calc(100% + 32px);height:64px;margin:0 -16px;display:block}.spark.empty{height:24px}
-.note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--primary-text-color);background:color-mix(in srgb,var(--mut) 14%,transparent);padding:4px 10px;border-radius:999px;align-self:flex-start}
+.tgt{text-align:right;display:flex;flex-direction:column;font-size:12px;color:var(--mut)}.tgt b{font-size:17px;color:var(--fg);font-weight:500}
+.sparkwrap{position:relative;margin:0 -16px}.spark{width:100%;height:64px;display:block}.spark.empty{height:24px}
+.sc{position:absolute;left:16px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none}.sc.hi{top:2px}.sc.lo{bottom:3px}
+.note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent);padding:4px 10px;border-radius:999px;align-self:flex-start}
 .note.faint{background:none;color:var(--mut);padding-left:0}.note.adv{margin-top:12px;border-radius:8px;align-self:stretch;padding:8px 10px}
 .seg{display:flex;gap:4px;background:color-mix(in srgb,var(--mut) 10%,transparent);padding:4px;border-radius:12px;margin-top:6px}
-.seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:1px solid transparent;border-radius:8px;padding:8px 4px;color:var(--mut);font-size:13px;font-weight:500;cursor:pointer}
-.seg button:hover{color:var(--primary-text-color)}
-.seg button.on{background:color-mix(in srgb,var(--primary-color) 16%,transparent);border-color:var(--primary-color);color:var(--primary-text-color)}
+.seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:0;border-radius:8px;padding:8px 4px;color:var(--mut);font-size:13px;font-weight:500;cursor:pointer}
+.seg button:hover{color:var(--fg)}
+.seg button.on{background:var(--go);color:#fff}
+.seg.icons{justify-content:flex-start}.seg.icons button{flex:0 0 auto;min-width:42px;padding:8px 12px;gap:0}
+.seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
+.seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
+.seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
 .seg.wrap2{flex-wrap:wrap}.seg.wrap2 button{flex:1 1 30%}.seg.second{margin-top:4px}.seg.small button{padding:6px 12px}
 .cols{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:16px;align-items:start}
 .hero .bigtemp{font-size:72px;font-weight:300;line-height:1.1;margin:8px 0 0}.bigtemp small{font-size:26px;color:var(--mut);vertical-align:top}
@@ -876,15 +908,15 @@ ha-icon{--mdc-icon-size:18px;display:inline-flex;vertical-align:middle}
 .lbl{font-size:12px;color:var(--mut);display:block;margin-top:4px}
 .targetrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
 .stepper{display:flex;align-items:center;gap:12px;margin-top:4px}.stepper b{font-size:30px;font-weight:400;min-width:86px;text-align:center}.stepper small{font-size:14px;color:var(--mut)}
-.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}.round:hover{border-color:var(--primary-color);color:var(--primary-color)}
+.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}.round:hover{border-color:var(--accent);color:var(--accent)}
 .sub{font-size:12px;color:var(--mut);text-align:right;line-height:1.6}
 .learn{display:flex;align-items:center;gap:14px;margin:6px 0 10px}.lt b{display:block;font-size:17px;font-weight:500}.lt small{color:var(--mut);font-size:12px}
-.ring .rt{fill:var(--primary-text-color);font-size:20px;font-weight:500}
+.ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
 .kv span small{display:block;color:var(--mut);font-size:12px;word-break:break-all}.kv b{font-weight:500;white-space:nowrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .stat{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--mut) 5%,transparent);font-size:12px;color:var(--mut)}
-.stat ha-icon{color:var(--mut)}.stat b{font-size:15px;color:var(--primary-text-color);font-weight:500}
+.stat ha-icon{color:var(--mut)}.stat b{font-size:15px;color:var(--fg);font-weight:500}
 .stat.ok ha-icon{color:var(--ok)}.stat.warn ha-icon,.stat.warn b{color:var(--warn)}.stat.bad ha-icon,.stat.bad b{color:var(--bad)}
 .stats.big{margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 .line{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
@@ -893,19 +925,19 @@ ha-icon{--mdc-icon-size:18px;display:inline-flex;vertical-align:middle}
 .val{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--mut)}.val.bad{color:var(--bad)}
 .sw{width:42px;height:24px;border-radius:12px;border:0;background:var(--mut);position:relative;cursor:pointer;flex:none;opacity:.7}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
-.sw.on{background:var(--primary-color);opacity:1}.sw.on::after{left:21px}
-.btn,.link{background:none;border:0;color:var(--primary-color);cursor:pointer;font-weight:500;font-size:14px}.btn{border:1px solid var(--primary-color);border-radius:8px;padding:6px 14px}
+.sw.on{background:var(--accent);opacity:1}.sw.on::after{left:21px}
+.btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{border:1px solid var(--accent);border-radius:8px;padding:6px 14px}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
-.pick{font:inherit;color:var(--primary-text-color);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.pick{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .chart{position:relative}.chartsvg{width:100%;height:auto;display:block;touch-action:pan-y}
 .grid{}.chartsvg .grid{stroke:var(--line);stroke-width:1}.chartsvg .vgrid{stroke:var(--line);stroke-width:1;opacity:.45}
-.axis{fill:var(--mut);font-size:11px}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--primary-text-color);stroke-width:1;opacity:.5}
+.axis{fill:var(--mut);font-size:11px}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--fg);stroke-width:1;opacity:.5}
 .tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:2;white-space:nowrap}
 .tip i,.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mut);margin-top:6px}
 .hint{font-size:12px;color:var(--mut);margin:10px 0 0}.center{text-align:center}
-.empty{text-align:center;padding:48px 16px;color:var(--mut)}.empty ha-icon{--mdc-icon-size:48px}.empty h2{color:var(--primary-text-color);font-weight:400;margin:12px 0 6px}
+.empty{text-align:center;padding:48px 16px;color:var(--mut)}.empty ha-icon{--mdc-icon-size:48px}.empty h2{color:var(--fg);font-weight:400;margin:12px 0 6px}
 .ins{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:14px}.ins li{display:flex;gap:8px;line-height:1.4}.ins ha-icon{color:var(--warn);flex:none;margin-top:1px}
 .axisrow,.drow{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center}.drow{margin:6px 0}
 .hours{position:relative;height:14px}.hours i{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--mut);font-style:normal}
@@ -913,9 +945,9 @@ ha-icon{--mdc-icon-size:18px;display:inline-flex;vertical-align:middle}
 .track.thin{height:20px;border-radius:6px}
 .blk{position:absolute;top:2px;bottom:2px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;border:1px solid rgba(255,255,255,.18);overflow:hidden}
 .nowline{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.85}
-.dn{font-size:13px;font-weight:500}.dn.today{color:var(--primary-color)}.dn small{display:block;font-size:10px;font-weight:400}.dn.small{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dn{font-size:13px;font-weight:500}.dn.today{color:var(--accent)}.dn small{display:block;font-size:10px;font-weight:400}.dn.small{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .legend.grad{align-items:center;margin-top:14px}.legend.grad i{width:120px;height:10px;border-radius:5px;margin:0}.legend.grad em{flex-basis:100%;font-style:normal}
-.explain p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--primary-text-color)}
+.explain p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--fg)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.two div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.two b{display:block;font-weight:500}.two small{color:var(--mut)}
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:6px}
 .lrow{display:grid;grid-template-columns:56px 1.3fr repeat(4,1fr);gap:10px;align-items:center;margin:0;cursor:pointer;padding:12px}.lrow:hover{border-color:var(--mut)}
