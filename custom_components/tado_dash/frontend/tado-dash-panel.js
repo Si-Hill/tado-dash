@@ -213,14 +213,14 @@ let sparkN = 0;
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
   const now = Date.now(), t0 = now - 6 * HOUR;
-  // Scale: fitted to the last 6 h of readings and target, never tighter than 1 °C
-  // top to bottom, with the actual low and high printed on the chart.
-  const all = [...temp, ...target].map((p) => p[1]);
-  const dataLo = Math.min(...all), dataHi = Math.max(...all);
-  let lo = dataLo, hi = dataHi;
-  if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
-  const padv = (hi - lo) * 0.12;
-  lo -= padv; hi += padv;
+  // Scale: follows the room temperature over the last 6 h, with 1 °C of headroom either side.
+  // A target close to the readings stays in view; one far away (say 5 °C while the room is
+  // off) is left off the chart rather than stretching the scale. The bounds are printed.
+  const temps = temp.map((p) => p[1]);
+  const tLo = Math.min(...temps), tHi = Math.max(...temps);
+  const near = target.map((p) => p[1]).filter((v) => v >= tLo - 2 && v <= tHi + 2);
+  let lo = Math.min(tLo, ...near) - 1, hi = Math.max(tHi, ...near) + 1;
+  if (hi - lo < 3) { const m = (hi + lo) / 2; lo = m - 1.5; hi = m + 1.5; }
   const W = 300, H = 70;
   const X = (t) => ((t - t0) / (now - t0)) * W;
   const Y = (v) => H - 6 - ((v - lo) / (hi - lo)) * (H - 12);
@@ -228,16 +228,23 @@ function sparkline(temp, target, heating) {
   const line = pathOf(temp, X, Y, false, now);
   const last = temp[temp.length - 1];
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
-  const tgt = target.length ? pathOf(target, X, Y, true, now) : "";
+  // The target as a stepped line, skipping any stretch outside the scale.
+  let tgt = "", open = false;
+  target.forEach((p, i) => {
+    if (p[1] < lo || p[1] > hi) { open = false; return; }
+    const x = Math.max(0, X(p[0])), end = X(i + 1 < target.length ? target[i + 1][0] : now), y = Y(p[1]);
+    tgt += `${open ? `V${y.toFixed(1)}` : `M${x.toFixed(1)},${y.toFixed(1)}`}H${end.toFixed(1)}`;
+    open = true;
+  });
   const id = `sp${++sparkN}`;
   SPARKS[id] = { temp, target, t0, now, lo, hi, H, color };
-  return `<div class="sparkwrap" data-sp="${id}" title="Last 6 hours, scaled ${f1(dataLo)}–${f1(dataHi)} °C">
+  return `<div class="sparkwrap" data-sp="${id}" title="Last 6 hours, scaled ${f1(lo)}–${f1(hi)} °C">
     <svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
       <path d="${area}" style="fill:color-mix(in srgb, ${color} 30%, var(--card))"/>
       ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" opacity=".8"/>` : ""}
       <path d="${line}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     </svg>
-    <span class="sc hi">${f1(dataHi)}°</span><span class="sc lo">${f1(dataLo)}°</span>
+    <span class="sc hi">${f1(hi)}°</span><span class="sc lo">${f1(lo)}°</span>
     <div class="sline"></div><div class="sdot"></div><div class="stip"></div></div>`;
 }
 
