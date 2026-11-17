@@ -536,7 +536,7 @@ class TadoDashPanel extends HTMLElement {
     // Pull in data the visible tab needs, then re-render once it lands.
     if (this._zone || !this._home) return;
     if (this._tab === "analytics" && this._sel) this._loadAnalytics();
-    if (this._tab === "schedules") this._loadCalendars();
+    if (this._tab === "schedules" || this._tab === "rooms") this._loadCalendars();
   }
 
   _empty(ic, title, text) {
@@ -582,7 +582,7 @@ class TadoDashPanel extends HTMLElement {
         ${hasTemp ? `<div class="tgt"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
-      ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : ""}
+      ${this._infoPill(z)}
       <div class="seg icons" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
@@ -592,6 +592,29 @@ class TadoDashPanel extends HTMLElement {
       ${hasTemp ? `<div class="seg stepbar" role="group">
         <button title="Lower target" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
         <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}</div>`;
+  }
+
+  // One line of status under the chart, always present: the override if there is one,
+  // otherwise the schedule block that applies now (or comes next).
+  _infoPill(z) {
+    if (z.overlayType) return `<div class="infopill over">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>`;
+    if (z.off) return `<div class="infopill">${icon("power")}Heating off</div>`;
+    const range = (b) => `${hhmm(new Date(b.s))} – ${hhmm(new Date(b.e))}${b.temp != null ? ` · ${f1(b.temp)} °C` : ""}`;
+    const now = Date.now();
+    const blocks = (this._cal.data?.[z.id] || []).slice().sort((a, b) => a.s - b.s);
+    const i = blocks.findIndex((b) => b.s <= now && now < b.e);
+    if (i >= 0) {
+      // Join neighbouring events at the same temperature (e.g. one split at midnight).
+      let s = blocks[i].s, e = blocks[i].e;
+      for (let k = i - 1; k >= 0 && blocks[k].e === s && blocks[k].temp === blocks[i].temp; k--) s = blocks[k].s;
+      for (let k = i + 1; k < blocks.length && blocks[k].s === e && blocks[k].temp === blocks[i].temp; k++) e = blocks[k].e;
+      return `<div class="infopill">${icon("calendar-clock")}Schedule ${range({ s, e, temp: blocks[i].temp })}</div>`;
+    }
+    const next = blocks.find((b) => b.s > now);
+    if (next) return `<div class="infopill">${icon("calendar-clock")}Next ${range(next)}</div>`;
+    const change = this._st(z.ents.overlay)?.attributes?.next_change;
+    if (change) return `<div class="infopill">${icon("calendar-clock")}Schedule until ${hhmm(new Date(change))}</div>`;
+    return `<div class="infopill">${icon("calendar-clock")}Following schedule</div>`;
   }
 
   /* ----- room detail ----- */
@@ -1066,6 +1089,10 @@ button{font:inherit;color:inherit}
 .stip{position:absolute;top:2px;display:none;flex-direction:column;gap:1px;padding:4px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.3);font-size:11px;color:var(--mut);white-space:nowrap;pointer-events:none;z-index:3}
 .stip b{font-size:14px;color:var(--fg);font-weight:500}
 .sc{position:absolute;left:16px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none}.sc.hi{top:2px}.sc.lo{bottom:3px}
+.infopill{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:7px 12px;border-radius:999px;text-align:center;font-size:12px;
+  color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent)}
+.infopill .i{color:var(--mut);font-size:13px}
+.infopill.over{color:var(--fg);background:color-mix(in srgb,var(--wis) 22%,transparent)}.infopill.over .i{color:var(--wis)}
 .note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent);padding:4px 10px;border-radius:999px;align-self:flex-start}
 .note.faint{background:none;color:var(--mut);padding-left:0}.note.adv{margin-top:12px;border-radius:8px;align-self:stretch;padding:8px 10px}
 .seg{display:flex;gap:4px;background:color-mix(in srgb,var(--mut) 10%,transparent);padding:4px;border-radius:12px;margin-top:6px}
