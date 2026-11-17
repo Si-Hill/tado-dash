@@ -423,7 +423,7 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _hold(z, mode) {
-    const t = z.target ?? z.temp ?? 20;
+    const t = z.shownTarget ?? z.target ?? z.temp ?? 20;
     if (mode === "schedule") return this._call(TCE, "resume_schedule", { entity_id: z.main });
     if (mode === "off") return this._call("climate", "turn_off", { entity_id: z.main });
     if (mode === "block") return this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "next_time_block" });
@@ -568,8 +568,11 @@ class TadoDashPanel extends HTMLElement {
 
   _roomCard(z) {
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
-    const sched = !z.overlayType && !z.off;
     const hasTemp = z.type !== "hot_water";
+    const pending = !!this._pending[z.id];
+    const sched = !z.overlayType && !z.off && !pending;
+    // Manual = a hand-set temperature: any override that isn't a boost, or one still being adjusted here.
+    const manual = hasTemp && !z.off && !z.boosting && (!!z.overlayType || pending);
     return `<div class="card room ${z.status}" data-a="open" data-z="${z.id}">
       <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
         <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
@@ -583,8 +586,13 @@ class TadoDashPanel extends HTMLElement {
       <div class="seg icons" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
+        ${hasTemp ? `<button class="manual ${manual ? "on" : ""}" title="Manual" data-a="hold" data-z="${z.id}" data-v="manual">${icon("hand-back-right-outline")}<span class="lb">Manual</span></button>` : ""}
         <button class="off ${z.off ? "on" : ""}" title="Off" data-a="hold" data-z="${z.id}" data-v="off">${icon("power")}<span class="lb">Off</span></button>
-      </div></div>`;
+      </div>
+      ${hasTemp ? `<div class="cardstep">
+        <button class="round" title="Lower" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
+        <b>${z.shownTarget != null ? f1(z.shownTarget) : "–"}<small> °C</small></b>
+        <button class="round" title="Raise" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}</div>`;
   }
 
   /* ----- room detail ----- */
@@ -1067,7 +1075,12 @@ button{font:inherit;color:inherit}
 .seg button.on{background:var(--go);color:#fff}
 .seg button.off.on{background:${C.pomegranate}}
 .seg button.boost.on{background:${C.pumpkin}}
-.seg.icons{justify-content:space-evenly}.seg.icons button{flex:0 0 auto;min-width:42px;padding:8px 12px;gap:0}
+.seg.icons button{flex:1 1 0;min-width:0;padding:8px 4px;gap:0;transition:flex-grow .2s}
+.seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
+.seg button.manual.on{background:var(--cold)}
+.cardstep{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
+.cardstep b{font-size:17px;font-weight:500;min-width:76px;text-align:center}.cardstep small{font-size:12px;color:var(--mut);font-weight:400}
+.cardstep .round{width:32px;height:32px}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
 .seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
