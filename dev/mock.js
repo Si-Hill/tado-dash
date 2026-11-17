@@ -73,7 +73,7 @@
     for (let k = 0; k <= n; k++) {
       const t = Date.now() - span + (k / n) * span, h = new Date(t).getHours() + new Date(t).getMinutes() / 60;
       let v;
-      if (isTarget) v = h > 6.5 && h < 8.5 ? base + 1 : h > 17 && h < 22 ? base + 1.5 : base - 1.5;
+      if (isTarget) v = Date.now() - t > 30 * 36e5 && Date.now() - t < 38 * 36e5 ? 5 : h > 6.5 && h < 8.5 ? base + 1 : h > 17 && h < 22 ? base + 1.5 : base - 1.5; // 5 C = a room switched off for a while
       else if (isHeat) v = (h > 5 && h < 8.5) || (h > 15 && h < 22) ? 60 + 40 * Math.sin(k) ** 2 : 0;
       else if (isHum) v = base + 6 * Math.sin(t / 4e6);
       else if (isOut) v = base + 3 * Math.sin((t / 864e5) * 2 * Math.PI - 2);

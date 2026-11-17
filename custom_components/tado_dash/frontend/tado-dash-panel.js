@@ -207,20 +207,38 @@ function extent(seriesList, pad2 = 0.5) {
   return [lo - pad2, hi + pad2];
 }
 
+// Scale for a temperature chart: the room readings with 1 °C of headroom either side, never less
+// than minSpan °C top to bottom. A target close to the readings stays in view; one far away
+// (say 5 °C while the room is off) doesn't stretch the scale.
+function tempScale(temp, target, minSpan = 3) {
+  const temps = temp.map((p) => p[1]);
+  if (!temps.length) return null;
+  const tLo = Math.min(...temps), tHi = Math.max(...temps);
+  const near = target.map((p) => p[1]).filter((v) => v >= tLo - 2 && v <= tHi + 2);
+  let lo = Math.min(tLo, ...near) - 1, hi = Math.max(tHi, ...near) + 1;
+  if (hi - lo < minSpan) { const m = (hi + lo) / 2; lo = m - minSpan / 2; hi = m + minSpan / 2; }
+  return [lo, hi];
+}
+
+// A stepped line (each value holds until the next change) that skips stretches outside [lo, hi].
+function stepClipped(pts, X, Y, lo, hi, tEnd) {
+  let d = "", open = false;
+  pts.forEach((p, i) => {
+    if (p[1] < lo || p[1] > hi) { open = false; return; }
+    const x = Math.max(0, X(p[0])), end = X(i + 1 < pts.length ? pts[i + 1][0] : tEnd), y = Y(p[1]);
+    d += `${open ? `V${y.toFixed(1)}` : `M${x.toFixed(1)},${y.toFixed(1)}`}H${end.toFixed(1)}`;
+    open = true;
+  });
+  return d;
+}
+
 let SPARKS = {}; // hover data for the room-card charts, rebuilt on every render
 let sparkN = 0;
 
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
   const now = Date.now(), t0 = now - 6 * HOUR;
-  // Scale: follows the room temperature over the last 6 h, with 1 °C of headroom either side.
-  // A target close to the readings stays in view; one far away (say 5 °C while the room is
-  // off) is left off the chart rather than stretching the scale. The bounds are printed.
-  const temps = temp.map((p) => p[1]);
-  const tLo = Math.min(...temps), tHi = Math.max(...temps);
-  const near = target.map((p) => p[1]).filter((v) => v >= tLo - 2 && v <= tHi + 2);
-  let lo = Math.min(tLo, ...near) - 1, hi = Math.max(tHi, ...near) + 1;
-  if (hi - lo < 3) { const m = (hi + lo) / 2; lo = m - 1.5; hi = m + 1.5; }
+  const [lo, hi] = tempScale(temp, target);
   const W = 300, H = 70;
   const X = (t) => ((t - t0) / (now - t0)) * W;
   const Y = (v) => H - 6 - ((v - lo) / (hi - lo)) * (H - 12);
@@ -228,14 +246,7 @@ function sparkline(temp, target, heating) {
   const line = pathOf(temp, X, Y, false, now);
   const last = temp[temp.length - 1];
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
-  // The target as a stepped line, skipping any stretch outside the scale.
-  let tgt = "", open = false;
-  target.forEach((p, i) => {
-    if (p[1] < lo || p[1] > hi) { open = false; return; }
-    const x = Math.max(0, X(p[0])), end = X(i + 1 < target.length ? target[i + 1][0] : now), y = Y(p[1]);
-    tgt += `${open ? `V${y.toFixed(1)}` : `M${x.toFixed(1)},${y.toFixed(1)}`}H${end.toFixed(1)}`;
-    open = true;
-  });
+  const tgt = stepClipped(target, X, Y, lo, hi, now);
   const id = `sp${++sparkN}`;
   SPARKS[id] = { temp, target, t0, now, lo, hi, H, color };
   return `<div class="sparkwrap" data-sp="${id}" title="Last 6 hours, scaled ${f1(lo)}–${f1(hi)} °C">
@@ -939,9 +950,10 @@ class TadoDashPanel extends HTMLElement {
     const e = z.ents;
     return {
       title: "Temperature (°C)", height: 200, unit: "°C",
+      range: tempScale(d[e.temp] || [], d[e.target] || []),
       series: [
         { name: "Temperature", pts: d[e.temp] || [], color: "var(--cold)", w: 3.2, area: true },
-        { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, dash: "6 4", w: 2 },
+        { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, clip: true, dash: "6 4", w: 2 },
       ],
       band: { name: "Heating", pts: d[e.heating] || [], color: HEAT },
     };
@@ -976,7 +988,7 @@ class TadoDashPanel extends HTMLElement {
     if (d[z.ents.humidity]?.length) panels.push({ title: "Humidity (%)", height: 110, unit: "%", fixed: [20, 80], band2: [40, 60],
       series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "var(--hum)", w: 2.4 }] });
     const stats = this._stats(z, d);
-    const legend = [["var(--cold)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating"], ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
+    const legend = [["var(--cold)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating (right scale, %)"],["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
       .map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
     return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div>
       <div class="card"><h3>History</h3><div class="chart" id="an">${this._chartSVG("an", { hours: this._range, panels })}</div>
@@ -1016,14 +1028,15 @@ class TadoDashPanel extends HTMLElement {
 
   /* chart builder: returns SVG markup, registers hover metadata */
   _chartSVG(id, { hours, panels }) {
-    const W = 900, L = 42, R = 8;
+    const hasHeat = panels.some((p) => p.band?.pts?.length);
+    const W = 900, L = 42, R = hasHeat ? 50 : 8; // room for the right-hand heating % scale
     const now = Date.now(), t0 = now - hours * HOUR;
     const X = (t) => L + ((Math.max(t, t0) - t0) / (now - t0)) * (W - L - R);
     let y = 6, out = "";
     const meta = { L, R, W, t0, now, panels: [] };
     panels.forEach((p, i) => {
       const H = p.height, top = y, bot = y + H - 8;
-      const [lo, hi] = p.fixed || extent(p.series.map((s) => s.pts));
+      const [lo, hi] = p.fixed || p.range || extent(p.series.map((s) => s.pts));
       const Y = (v) => bot - ((Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) * (bot - top - 4);
       const ticks = 4;
       for (let k = 0; k <= ticks; k++) {
@@ -1037,14 +1050,16 @@ class TadoDashPanel extends HTMLElement {
         out += `<path d="${pathOf(s.pts, X, Y, false, now)}V${bot}H${X(s.pts[0][0])}Z" style="fill:color-mix(in srgb, ${s.color} 26%, var(--card))"/>`;
       }
       if (p.band?.pts?.length) {
-        const bh = (bot - top) * 0.16;
-        const BY = (v) => bot - (Math.min(100, v) / 100) * bh;
+        // Heating power on its own right-hand scale, 0 to 100% of the panel's height.
+        const BY = (v) => bot - (Math.min(100, Math.max(0, v)) / 100) * (bot - top - 4);
         const d = pathOf(p.band.pts, X, BY, true, now);
         out += `<path d="${d}V${bot}H${X(p.band.pts[0][0])}Z" style="fill:color-mix(in srgb, ${p.band.color} 40%, var(--card))"/>`;
-      }
+        for (const v of [0, 50, 100]) out += `<text x="${W - R + 8}" y="${BY(v) + 3.5}" class="axis heat">${v}%</text>`;      }
       for (const s of p.series) {
         if (!s.pts.length) continue;
-        out += `<path d="${pathOf(s.pts, X, Y, s.step, now)}" fill="none" stroke="${s.color}" stroke-width="${s.w || 1.5}" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
+        const d = s.clip ? stepClipped(s.pts, X, Y, lo, hi, now) : pathOf(s.pts, X, Y, s.step, now);
+        if (!d) continue;
+        out += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w || 1.5}" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
       }
       out += `<text x="${L}" y="${top + 11}" class="ptitle">${esc(p.title)}</text>`;
       meta.panels.push({ ...p, top, bot });
@@ -1369,7 +1384,7 @@ button{font:inherit;color:inherit}
 .pick{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .chart{position:relative}.chartsvg{width:100%;height:auto;display:block;touch-action:pan-y}
 .grid{}.chartsvg .grid{stroke:var(--line);stroke-width:1}.chartsvg .vgrid{stroke:var(--line);stroke-width:1;opacity:.45}
-.axis{fill:var(--mut);font-size:11px}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--fg);stroke-width:1;opacity:.5}
+.axis{fill:var(--mut);font-size:11px}.axis.heat{fill:var(--heat)}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--fg);stroke-width:1;opacity:.5}
 .tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:2;white-space:nowrap}
 .tip i,.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mut);margin-top:6px}
