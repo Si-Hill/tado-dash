@@ -1257,7 +1257,7 @@ h1{font-size:20px;font-weight:400;margin:0}
 .logo svg{position:absolute;left:0;top:0;width:100%;height:100%}.logo .ring2{left:25%;top:25%;width:50%;height:50%}
 nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font:inherit;font-size:14px;font-weight:500;padding:14px 14px 12px;cursor:pointer;white-space:nowrap}
-nav button.on{color:var(--accent);border-bottom-color:var(--accent)}
+nav button.on{color:var(--heat);border-bottom-color:var(--heat)}
 .content{flex:1;overflow:auto}
 .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 48px}
 button{font:inherit;color:inherit}
