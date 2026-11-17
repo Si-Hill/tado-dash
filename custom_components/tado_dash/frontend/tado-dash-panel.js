@@ -87,6 +87,8 @@ const FA_ALIAS = {
   "air-conditioner": "snowflake",
   "confidence": "gauge",
   "home-export-outline": "house",
+  "logo-square": "square",
+  "logo-ring": "regular-circle",
   "home-account": "house",
   "circle-question": "circle-question",
 };
@@ -128,9 +130,11 @@ const FA = {
   "minus": [448, "M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"],
   "plus": [448, "M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"],
   "power-off": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 224c0 17.7 14.3 32 32 32s32-14.3 32-32l0-224zM143.5 120.6c13.6-11.3 15.4-31.5 4.1-45.1s-31.5-15.4-45.1-4.1C49.7 115.4 16 181.8 16 256c0 132.5 107.5 240 240 240s240-107.5 240-240c0-74.2-33.8-140.6-86.6-184.6c-13.6-11.3-33.8-9.4-45.1 4.1s-9.4 33.8 4.1 45.1c38.9 32.3 63.5 81 63.5 135.4c0 97.2-78.8 176-176 176s-176-78.8-176-176c0-54.4 24.7-103.1 63.5-135.4z"],
+  "regular-circle": [512, "M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"],
   "rocket": [512, "M156.6 384.9L125.7 354c-8.5-8.5-11.5-20.8-7.7-32.2c3-8.9 7-20.5 11.8-33.8L24 288c-8.6 0-16.6-4.6-20.9-12.1s-4.2-16.7 .2-24.1l52.5-88.5c13-21.9 36.5-35.3 61.9-35.3l82.3 0c2.4-4 4.8-7.7 7.2-11.3C289.1-4.1 411.1-8.1 483.9 5.3c11.6 2.1 20.6 11.2 22.8 22.8c13.4 72.9 9.3 194.8-111.4 276.7c-3.5 2.4-7.3 4.8-11.3 7.2l0 82.3c0 25.4-13.4 49-35.3 61.9l-88.5 52.5c-7.4 4.4-16.6 4.5-24.1 .2s-12.1-12.2-12.1-20.9l0-107.2c-14.1 4.9-26.4 8.9-35.7 11.9c-11.2 3.6-23.4 .5-31.8-7.8zM384 168a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"],
   "rotate": [512, "M142.9 142.9c-17.5 17.5-30.1 38-37.8 59.8c-5.9 16.7-24.2 25.4-40.8 19.5s-25.4-24.2-19.5-40.8C55.6 150.7 73.2 122 97.6 97.6c87.2-87.2 228.3-87.5 315.8-1L455 55c6.9-6.9 17.2-8.9 26.2-5.2s14.8 12.5 14.8 22.2l0 128c0 13.3-10.7 24-24 24l-8.4 0c0 0 0 0 0 0L344 224c-9.7 0-18.5-5.8-22.2-14.8s-1.7-19.3 5.2-26.2l41.1-41.1c-62.6-61.5-163.1-61.2-225.3 1zM16 312c0-13.3 10.7-24 24-24l7.6 0 .7 0L168 288c9.7 0 18.5 5.8 22.2 14.8s1.7 19.3-5.2 26.2l-41.1 41.1c62.6 61.5 163.1 61.2 225.3-1c17.5-17.5 30.1-38 37.8-59.8c5.9-16.7 24.2-25.4 40.8-19.5s25.4 24.2 19.5 40.8c-10.8 30.6-28.4 59.3-52.9 83.8c-87.2 87.2-228.3 87.5-315.8 1L57 457c-6.9 6.9-17.2 8.9-26.2 5.2S16 449.7 16 440l0-119.6 0-.7 0-7.6z"],
   "snowflake": [448, "M224 0c17.7 0 32 14.3 32 32l0 30.1 15-15c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-49 49 0 70.3 61.4-35.8 17.7-66.1c3.4-12.8 16.6-20.4 29.4-17s20.4 16.6 17 29.4l-5.2 19.3 23.6-13.8c15.3-8.9 34.9-3.7 43.8 11.5s3.8 34.9-11.5 43.8l-25.3 14.8 21.7 5.8c12.8 3.4 20.4 16.6 17 29.4s-16.6 20.4-29.4 17l-67.7-18.1L287.5 256l60.9 35.5 67.7-18.1c12.8-3.4 26 4.2 29.4 17s-4.2 26-17 29.4l-21.7 5.8 25.3 14.8c15.3 8.9 20.4 28.5 11.5 43.8s-28.5 20.4-43.8 11.5l-23.6-13.8 5.2 19.3c3.4 12.8-4.2 26-17 29.4s-26-4.2-29.4-17l-17.7-66.1L256 311.7l0 70.3 49 49c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15 0 30.1c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-30.1-15 15c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l49-49 0-70.3-61.4 35.8-17.7 66.1c-3.4 12.8-16.6 20.4-29.4 17s-20.4-16.6-17-29.4l5.2-19.3L48.1 395.6c-15.3 8.9-34.9 3.7-43.8-11.5s-3.7-34.9 11.5-43.8l25.3-14.8-21.7-5.8c-12.8-3.4-20.4-16.6-17-29.4s16.6-20.4 29.4-17l67.7 18.1L160.5 256 99.6 220.5 31.9 238.6c-12.8 3.4-26-4.2-29.4-17s4.2-26 17-29.4l21.7-5.8L15.9 171.6C.6 162.7-4.5 143.1 4.4 127.9s28.5-20.4 43.8-11.5l23.6 13.8-5.2-19.3c-3.4-12.8 4.2-26 17-29.4s26 4.2 29.4 17l17.7 66.1L192 200.3l0-70.3L143 81c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l15 15L192 32c0-17.7 14.3-32 32-32z"],
+  "square": [448, "M0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z"],
   "stopwatch": [448, "M176 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l16 0 0 34.4C92.3 113.8 16 200 16 304c0 114.9 93.1 208 208 208s208-93.1 208-208c0-41.8-12.3-80.7-33.5-113.2l24.1-24.1c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L355.7 143c-28.1-23-62.2-38.8-99.7-44.6L256 64l16 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L224 0 176 0zm72 192l0 128c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-128c0-13.3 10.7-24 24-24s24 10.7 24 24z"],
   "temperature-arrow-down": [576, "M128 112c0-26.5 21.5-48 48-48s48 21.5 48 48l0 164.5c0 17.3 7.1 31.9 15.3 42.5C249.8 332.6 256 349.5 256 368c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-18.5 6.2-35.4 16.7-48.9c8.2-10.6 15.3-25.2 15.3-42.5L128 112zM176 0C114.1 0 64 50.1 64 112l0 164.4c0 .1-.1 .3-.2 .6c-.2 .6-.8 1.6-1.7 2.8C43.2 304.2 32 334.8 32 368c0 79.5 64.5 144 144 144s144-64.5 144-144c0-33.2-11.2-63.8-30.1-88.1c-.9-1.2-1.5-2.2-1.7-2.8c-.1-.3-.2-.5-.2-.6L288 112C288 50.1 237.9 0 176 0zm0 416c26.5 0 48-21.5 48-48c0-20.9-13.4-38.7-32-45.3l0-50.7c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 50.7c-18.6 6.6-32 24.4-32 45.3c0 26.5 21.5 48 48 48zm336-64l-32 0 0-288c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 288-32 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l64 64c6 6 14.1 9.4 22.6 9.4s16.6-3.4 22.6-9.4l64-64c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8z"],
   "temperature-empty": [320, "M112 112c0-26.5 21.5-48 48-48s48 21.5 48 48l0 164.5c0 17.3 7.1 31.9 15.3 42.5C233.8 332.6 240 349.5 240 368c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-18.5 6.2-35.4 16.7-48.9c8.2-10.6 15.3-25.2 15.3-42.5L112 112zM160 0C98.1 0 48 50.2 48 112l0 164.4c0 .1-.1 .3-.2 .6c-.2 .6-.8 1.6-1.7 2.8C27.2 304.2 16 334.8 16 368c0 79.5 64.5 144 144 144s144-64.5 144-144c0-33.2-11.2-63.8-30.1-88.1c-.9-1.2-1.5-2.2-1.7-2.8c-.1-.3-.2-.5-.2-.6L272 112C272 50.2 221.9 0 160 0zm0 416a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"],
@@ -141,6 +145,12 @@ const FA = {
   "wifi": [640, "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"],
 };
 /* FA-ICONS-END */
+// Brand mark: a ring stacked on a square, like a Font Awesome stacked icon.
+const logo = () => {
+  const sq = FA.square, ring = FA["regular-circle"];
+  return `<span class="logo" aria-hidden="true"><svg viewBox="0 0 ${sq[0]} 512"><path fill="${HEAT}" d="${sq[1]}"/></svg>`
+    + `<svg class="ring2" viewBox="0 0 ${ring[0]} 512"><path fill="#fff" d="${ring[1]}"/></svg></span>`;
+};
 const icon = (n) => {
   const i = FA[FA_ALIAS[n] || n] || FA["circle-question"];
   return `<svg class="i" viewBox="0 0 ${i[0]} 512" aria-hidden="true"><path fill="currentColor" d="${i[1]}"/></svg>`;
@@ -474,14 +484,14 @@ class TadoDashPanel extends HTMLElement {
       schedules: () => this._viewSchedules(), confidence: () => this._viewConfidence(), system: () => this._viewSystem() }[this._tab]();
 
     const inRoom = this._zone && this._zoneById(this._zone);
-    const title = inRoom ? this._zoneById(this._zone).name : "Tado";
+    const title = inRoom ? this._zoneById(this._zone).name : "Tado Dash";
     const tabs = [["rooms", "Rooms"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
     this.shadowRoot.innerHTML = `<style>${STYLE}</style>
       <div class="page">
         <header>
           ${inRoom ? `<button class="icon-btn" data-a="back" title="Back">${icon("arrow-left")}</button>`
             : this._narrow ? `<button class="icon-btn" data-a="menu" title="Menu">${icon("menu")}</button>` : ""}
-          <h1>${esc(title)}</h1>
+          ${inRoom ? "" : logo()}<h1>${esc(title)}</h1>
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
         <div class="content"><div class="wrap">${body}</div></div>
@@ -569,7 +579,7 @@ class TadoDashPanel extends HTMLElement {
         ${hasTemp ? `<div class="tgt"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
-      ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : `<div class="note faint">${z.confidence != null ? `${icon("confidence")}Confidence ${f0(z.confidence)}%` : "&nbsp;"}</div>`}
+      ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : ""}
       <div class="seg icons" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
@@ -1010,6 +1020,8 @@ const STYLE = `
 .page{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
 h1{font-size:20px;font-weight:400;margin:0}
+.logo{position:relative;width:28px;height:28px;flex:none;margin-right:2px}
+.logo svg{position:absolute;left:0;top:0;width:100%;height:100%}.logo .ring2{left:25%;top:25%;width:50%;height:50%}
 nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font:inherit;font-size:14px;font-weight:500;padding:14px 14px 12px;cursor:pointer;white-space:nowrap}
 nav button.on{color:var(--accent);border-bottom-color:var(--accent)}

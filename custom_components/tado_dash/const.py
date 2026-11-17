@@ -13,6 +13,6 @@ CONF_SIDEBAR_TITLE = "sidebar_title"
 CONF_SIDEBAR_ICON = "sidebar_icon"
 CONF_REQUIRE_ADMIN = "require_admin"
 
-DEFAULT_SIDEBAR_TITLE = "Tado"
+DEFAULT_SIDEBAR_TITLE = "Tado Dash"
 DEFAULT_SIDEBAR_ICON = "mdi:radiator"
 DEFAULT_REQUIRE_ADMIN = False

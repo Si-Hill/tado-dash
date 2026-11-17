@@ -1,4 +1,7 @@
-"""Generate the brand icons (needs Pillow). Run from the repo root."""
+"""Generate the brand icons (needs Pillow). Run from the repo root.
+
+Same mark as the panel header: a ring stacked on a rounded square.
+"""
 
 from pathlib import Path
 
@@ -6,19 +9,22 @@ from PIL import Image, ImageDraw
 
 OUT = Path("custom_components/tado_dash/brand")
 OUT.mkdir(parents=True, exist_ok=True)
+ORANGE = (230, 126, 34, 255)  # Flat UI carrot
+WHITE = (255, 255, 255, 255)
 
-for size, name in ((256, "icon.png"), (512, "icon@2x.png")):
-    im = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+
+def draw(size: int) -> Image.Image:
+    scale = 4  # draw big, then downsample for smooth edges
+    s = size * scale
+    im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    s = size / 256
-    d.rounded_rectangle([8 * s, 8 * s, 248 * s, 248 * s], radius=56 * s, fill=(255, 112, 67, 255))
-    for i in range(5):
-        x = (58 + i * 30) * s
-        d.rounded_rectangle([x, 64 * s, x + 18 * s, 192 * s], radius=9 * s, fill=(255, 255, 255, 255))
-    d.rounded_rectangle([46 * s, 52 * s, 210 * s, 64 * s], radius=6 * s, fill=(255, 255, 255, 255))
-    d.rounded_rectangle([46 * s, 192 * s, 210 * s, 204 * s], radius=6 * s, fill=(255, 255, 255, 255))
-    im.save(OUT / name)
+    pad = int(s * 0.04)
+    d.rounded_rectangle([pad, pad, s - pad, s - pad], radius=int(s * 0.22), fill=ORANGE)
+    c, r, w = s / 2, s * 0.26, int(s * 0.075)
+    d.ellipse([c - r, c - r, c + r, c + r], outline=WHITE, width=w)
+    return im.resize((size, size), Image.LANCZOS)
 
-logo = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
-logo.paste(Image.open(OUT / "icon.png"), (0, 0))
-logo.save(OUT / "logo.png")
+
+draw(256).save(OUT / "icon.png")
+draw(512).save(OUT / "icon@2x.png")
+draw(256).save(OUT / "logo.png")

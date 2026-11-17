@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/github/license/Si-Hill/tado-dash?style=for-the-badge&label=LICENSE" alt="License">
 </p>
 
-A **Tado** item in the Home Assistant sidebar: a room-by-room dashboard for heating that [Tado CE](https://github.com/hiall-fyi/tado_ce) already controls.
+A **Tado Dash** item in the Home Assistant sidebar: a room-by-room dashboard for heating that [Tado CE](https://github.com/hiall-fyi/tado_ce) already controls.
 
 Tado Dash has no account, no entities and no polling of its own. It reads the entities Tado CE creates and calls Tado CE's services, so if Tado CE works for you, Tado Dash works the moment you add it. Not affiliated with Tado or the Tado CE project. The layout is inspired by [RoomMind](https://github.com/snazzybean/roommind), but shares no code with it.
 
