@@ -33,7 +33,7 @@ ALIAS = {
     "water-thermometer-outline": "temperature-arrow-down", "water-outline": "water", "clock-start": "clock",
     "radiator": "temperature-half", "thermostat": "temperature-half", "battery": "battery-full",
     "battery-alert": "battery-quarter", "battery-unknown": "battery-half", "air-conditioner": "snowflake",
-    "confidence": "gauge", "home-export-outline": "house",
+    "chevron-up": "chevron-up", "chevron-down": "chevron-down", "confidence": "gauge", "home-export-outline": "house",
     # Header logo: a square with a ring stacked on top (regular/circle is saved as regular-circle.svg)
     "logo-square": "square", "logo-ring": "regular-circle", "home-account": "house", "circle-question": "circle-question",
 }

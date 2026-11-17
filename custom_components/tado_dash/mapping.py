@@ -30,6 +30,12 @@ class _Entry(Protocol):
     entity_id: str
     unique_id: str | None
     device_id: str | None
+    # Optional: the area the entity (or, failing that, its device) is in.
+    # area_id: str | None
+
+
+# The entity whose area says which room (and so which floor) a zone is in.
+_MAIN_KEYS = ("climate", "ac_climate", "water_heater")
 
 
 def build_map(entries: Iterable[_Entry]) -> dict[str, Any]:
@@ -53,6 +59,8 @@ def build_map(entries: Iterable[_Entry]) -> dict[str, Any]:
                 match["zone"], {"id": match["zone"], "entities": {}}
             )
             zone["entities"][match["key"]] = entry.entity_id
+            if match["key"] in _MAIN_KEYS and (area := getattr(entry, "area_id", None)):
+                zone["area"] = area
             # The calendar lives on its own device, so it can't identify the room's.
             if entry.device_id and match["key"] != "schedule":
                 device_to_zone[(h["id"], entry.device_id)] = match["zone"]

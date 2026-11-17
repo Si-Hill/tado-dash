@@ -19,7 +19,7 @@ Tado Dash has no account, no entities and no polling of its own. It reads the en
 
 | Tab | What it shows |
 | --- | --- |
-| **Rooms** | One card per room: temperature, humidity, target, 6-hour trend, heating state, and one-tap Schedule / Boost / Off. The Rooms and Heating chips filter the cards; further chips show outside temperature, open insights and (with more than one Tado home) home/away. |
+| **Rooms** | One card per room: temperature, humidity, target, 6-hour trend, heating state, and one-tap Schedule / Boost / Off. Rooms are grouped by the floors set up in Home Assistant: use the arrows on a floor heading to reorder floors, and drag a card to reorder rooms within its floor (cards never move between floors). Your order is saved with your Home Assistant user. The Rooms and Heating chips filter the cards; further chips show outside temperature, open insights and (with more than one Tado home) home/away. |
 | **Room page** | Large temperature and trend, target stepper, hold for 30 min / 1 h / 2 h / until next block / until changed, Boost and Smart boost, what Tado has learned, comfort and air (mold, condensation, dew point), devices with battery and connection, room insights, early start. |
 | **Analytics** | Pick a room and 6 h to 7 days: temperature, target, heating power, outside temperature and humidity on shared-time charts with hover read-out, plus average, range, heating hours and time on target. |
 | **Schedules** | Today across every room, plus a week grid for one room, from Tado CE's schedule calendars. Read-only: edit schedules in the Tado app. |

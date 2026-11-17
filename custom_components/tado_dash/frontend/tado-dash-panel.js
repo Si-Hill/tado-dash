@@ -85,6 +85,8 @@ const FA_ALIAS = {
   "battery-alert": "battery-quarter",
   "battery-unknown": "battery-half",
   "air-conditioner": "snowflake",
+  "chevron-up": "chevron-up",
+  "chevron-down": "chevron-down",
   "confidence": "gauge",
   "home-export-outline": "house",
   "logo-square": "square",
@@ -106,6 +108,8 @@ const FA = {
   "calendar-check": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zM329 305c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-95 95-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L329 305z"],
   "calendar-days": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"],
   "calendar-xmark": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zM305 305c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47z"],
+  "chevron-down": [512, "M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"],
+  "chevron-up": [512, "M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"],
   "circle-exclamation": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"],
   "circle-question": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM169.8 165.3c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"],
   "clipboard-check": [384, "M192 0c-41.8 0-77.4 26.7-90.5 64L64 64C28.7 64 0 92.7 0 128L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64l-37.5 0C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM305 273L177 401c-9.4 9.4-24.6 9.4-33.9 0L79 337c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L271 239c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"],
@@ -255,8 +259,130 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
+    this._layout = { floors: [], rooms: {} }; // user's floor order and room order within each floor
+    this._drag = null;
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
+    this.shadowRoot.addEventListener("dragstart", (e) => this._onDragStart(e));
+    this.shadowRoot.addEventListener("dragover", (e) => this._onDragOver(e));
+    this.shadowRoot.addEventListener("drop", (e) => { if (this._drag) e.preventDefault(); });
+    this.shadowRoot.addEventListener("dragend", () => this._onDragEnd());
+  }
+
+  /* ----- layout: floor order and room order, saved per user ----- */
+
+  async _loadLayout() {
+    let v = null;
+    try {
+      v = (await this._hass.callWS({ type: "frontend/get_user_data", key: "tado_dash_layout" }))?.value;
+    } catch (e) { /* older HA, or not allowed: fall back to this browser */ }
+    if (!v) { try { v = JSON.parse(localStorage.getItem("tado_dash_layout")); } catch (e) { /* none */ } }
+    if (!v || typeof v !== "object") return;
+    const ids = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === "string") : []);
+    const rooms = {};
+    for (const [k, a] of Object.entries(v.rooms && typeof v.rooms === "object" ? v.rooms : {})) rooms[k] = ids(a);
+    this._layout = { floors: ids(v.floors), rooms };
+  }
+
+  _saveLayout() {
+    try { localStorage.setItem("tado_dash_layout", JSON.stringify(this._layout)); } catch (e) { /* private mode */ }
+    this._hass.callWS({ type: "frontend/set_user_data", key: "tado_dash_layout", value: this._layout }).catch(() => {});
+  }
+
+  // Rooms grouped by floor, in the user's order. Floors from Home Assistant; rooms with no
+  // floor go in a last group. With no floors set up at all, one group without a heading.
+  _groups(zones) {
+    const floors = new Map((this._map?.floors || []).map((f) => [f.id, f]));
+    const byKey = new Map();
+    for (const z of zones) {
+      const k = z.floorId && floors.has(z.floorId) ? z.floorId : "_none";
+      if (!byKey.has(k)) byKey.set(k, []);
+      byKey.get(k).push(z);
+    }
+    const named = [...byKey.keys()].some((k) => k !== "_none");
+    const meta = (k) => (k === "_none" ? { name: named ? "Other rooms" : "", level: Infinity } : floors.get(k));
+    const saved = this._layout.floors;
+    const keys = [...byKey.keys()].sort((a, b) => {
+      const ia = saved.indexOf(a), ib = saved.indexOf(b);
+      if (ia >= 0 && ib >= 0) return ia - ib;
+      if (ia >= 0) return -1;
+      if (ib >= 0) return 1;
+      return (meta(a).level ?? 0) - (meta(b).level ?? 0) || meta(a).name.localeCompare(meta(b).name);
+    });
+    return keys.map((k) => {
+      const order = this._layout.rooms[k] || [];
+      const list = byKey.get(k).slice().sort((a, b) => {
+        const ia = order.indexOf(a.id), ib = order.indexOf(b.id);
+        if (ia >= 0 && ib >= 0) return ia - ib;
+        if (ia >= 0) return -1;
+        if (ib >= 0) return 1;
+        return a.name.localeCompare(b.name);
+      });
+      return { id: k, name: meta(k).name, zones: list, titled: named };
+    });
+  }
+
+  _moveFloor(id, dir) {
+    const all = this._groups(this._zones).map((g) => g.id);
+    const shown = this._groups(this._visibleZones()).map((g) => g.id);
+    const other = shown[shown.indexOf(id) + dir];
+    if (other == null) return;
+    const i = all.indexOf(id), j = all.indexOf(other);
+    [all[i], all[j]] = [all[j], all[i]];
+    this._layout.floors = all;
+    this._saveLayout();
+  }
+
+  _visibleZones() {
+    return this._filter === "heating" ? this._zones.filter((z) => z.heating) : this._zones;
+  }
+
+  /* ----- drag a card to reorder it within its own floor ----- */
+
+  _onDragStart(e) {
+    const card = e.target.closest?.(".card.room[draggable]");
+    if (!card) return;
+    this._drag = { el: card, floor: card.dataset.floor };
+    card.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", card.dataset.z);
+  }
+
+  _onDragOver(e) {
+    const d = this._drag;
+    if (!d) return;
+    const grid = e.target.closest?.(".grid");
+    // Only this floor's grid accepts the card, so it can never be dropped on another floor.
+    if (!grid || grid.dataset.floor !== d.floor) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const over = e.target.closest(".card.room");
+    if (!over || over === d.el || over.dataset.floor !== d.floor) return;
+    const r = over.getBoundingClientRect(), dr = d.el.getBoundingClientRect();
+    const sameRow = Math.abs(r.top - dr.top) < 20;
+    const before = sameRow ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
+    grid.insertBefore(d.el, before ? over : over.nextSibling);
+  }
+
+  _onDragEnd() {
+    const d = this._drag;
+    if (!d) return;
+    this._drag = null;
+    d.el.classList.remove("dragging");
+    const grid = d.el.closest(".grid");
+    if (grid) {
+      const dom = [...grid.querySelectorAll(".card.room")].map((c) => c.dataset.z);
+      // Keep rooms hidden by the Heating filter where they were; reorder only the visible ones.
+      const full = this._groups(this._zones).find((g) => g.id === d.floor)?.zones.map((z) => z.id) || dom;
+      const domSet = new Set(dom);
+      const slots = full.map((id, i) => (domSet.has(id) ? i : -1)).filter((i) => i >= 0);
+      const next = full.slice();
+      slots.forEach((slot, n) => { next[slot] = dom[n]; });
+      this._layout.rooms[d.floor] = next;
+      this._saveLayout();
+    }
+    if (this._pendingRender) { this._pendingRender = false; }
+    this._render();
   }
 
   set hass(h) {
@@ -284,6 +410,7 @@ class TadoDashPanel extends HTMLElement {
     }
     const home = this._map?.homes?.[0];
     this._home = home || null;
+    if (home) await this._loadLayout();
     this._render();
     if (home) this._refreshHistory();
   }
@@ -331,6 +458,7 @@ class TadoDashPanel extends HTMLElement {
       step: num(a.target_temp_step) || 0.5, min: num(a.min_temp) ?? 5, max: num(a.max_temp) ?? 25,
       confidence: this._n(e.confidence), confAttrs: this._st(e.confidence)?.attributes || {},
       devices: Object.values(this._home.devices || {}).filter((d) => d.zone === z.id),
+      floorId: this._map?.areas?.[z.area]?.floor_id || null,
     };
   }
 
@@ -438,6 +566,7 @@ class TadoDashPanel extends HTMLElement {
     const { a, z, v } = el.dataset;
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
+      case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
       case "tab": this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
       case "open": this._zone = z; this._sel = z; break;
       case "back": this._zone = null; break;
@@ -469,6 +598,7 @@ class TadoDashPanel extends HTMLElement {
 
   _render() {
     if (!this._hass) return;
+    if (this._drag) { this._pendingRender = true; return; } // don't rebuild the page under a card being dragged
     const scroller = this.shadowRoot.querySelector(".content");
     const top = scroller ? scroller.scrollTop : 0;
     const prevTab = this._renderedKey;
@@ -560,20 +690,27 @@ class TadoDashPanel extends HTMLElement {
       showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
       alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : "",
     ].join("");
-    const shown = f === "heating" ? zones.filter((z) => z.heating) : zones;
-    const grid = shown.length ? `<div class="grid">${shown.map((z) => this._roomCard(z)).join("")}</div>`
-      : `<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
-    return `<div class="chips">${chips}</div>${grid}`;
+    const shown = this._visibleZones();
+    const groups = this._groups(shown);
+    const body = !shown.length
+      ? `<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`
+      : groups.map((g, i) => {
+        const head = g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} room${g.zones.length === 1 ? "" : "s"}</small><span class="sp"></span>
+          ${groups.length > 1 ? `<button class="mv" title="Move this floor up" data-a="floor-mv" data-f="${g.id}" data-v="-1" ${i === 0 ? "disabled" : ""}>${icon("chevron-up")}</button>
+          <button class="mv" title="Move this floor down" data-a="floor-mv" data-f="${g.id}" data-v="1" ${i === groups.length - 1 ? "disabled" : ""}>${icon("chevron-down")}</button>` : ""}</div>` : "";
+        return `<section class="floor">${head}<div class="grid" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
+      }).join("");
+    return `<div class="chips">${chips}</div>${body}`;
   }
 
-  _roomCard(z) {
+  _roomCard(z, floor) {
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
     const pending = !!this._pending[z.id];
     const sched = !z.overlayType && !z.off && !pending;
     // Manual = a hand-set temperature: any override that isn't a boost, or one still being adjusted here.
     const manual = hasTemp && !z.off && !z.boosting && (!!z.overlayType || pending);
-    return `<div class="card room ${z.status}" data-a="open" data-z="${z.id}">
+    return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}">
       <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
         <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
       <div class="row mid">
@@ -1106,6 +1243,11 @@ button{font:inherit;color:inherit}
 .seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
 .seg button.manual.on{background:var(--cold)}
 .card.room .seg{margin-top:0}
+.floor{margin-bottom:24px}
+.floorhead{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.floorhead h2{font-size:17px;font-weight:500;margin:0}.floorhead small{color:var(--mut);font-size:12px}.floorhead .sp{flex:1}
+.mv{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mv:hover:not(:disabled){color:var(--fg);border-color:var(--mut)}.mv:disabled{opacity:.3;cursor:default}
+.card.room[draggable]{cursor:grab;user-select:none}.card.room.dragging{opacity:.4;border-style:dashed;cursor:grabbing}
 .seg.stepbar button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
 .seg.stepbar button:active{background:color-mix(in srgb,var(--mut) 30%,transparent)}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}

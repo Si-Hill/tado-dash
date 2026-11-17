@@ -6,7 +6,9 @@ import pytest
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import floor_registry as fr
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.tado_dash.const import (
@@ -98,10 +100,13 @@ async def test_ws_map_returns_rooms(hass: HomeAssistant) -> None:
     registry = er.async_get(hass)
     ce = _tado_ce_entry()
     ce.add_to_hass(hass)
-    registry.async_get_or_create(
+    entity = registry.async_get_or_create(
         "climate", "tado_ce", "tado_ce_123_zone_9_climate",
         suggested_object_id="lounge_2", config_entry=ce,
     )
+    floor = fr.async_get(hass).async_create("Downstairs", level=0)
+    area = ar.async_get(hass).async_create("Lounge", floor_id=floor.floor_id)
+    registry.async_update_entity(entity.entity_id, area_id=area.id)
     sent = {}
 
     class Conn:
@@ -112,3 +117,6 @@ async def test_ws_map_returns_rooms(hass: HomeAssistant) -> None:
     assert sent["id"] == 7
     (home,) = sent["result"]["homes"]
     assert home["zones"]["9"]["entities"]["climate"] == "climate.lounge_2"
+    assert home["zones"]["9"]["area"] == area.id
+    assert sent["result"]["areas"][area.id] == {"name": "Lounge", "floor_id": floor.floor_id}
+    assert {"id": floor.floor_id, "name": "Downstairs", "level": 0} in sent["result"]["floors"]

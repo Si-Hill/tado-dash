@@ -7,8 +7,10 @@ from custom_components.tado_dash.mapping import build_map
 HOME = "1837208"
 
 
-def entry(entity_id, unique_id, device_id=None):
-    return SimpleNamespace(entity_id=entity_id, unique_id=unique_id, device_id=device_id)
+def entry(entity_id, unique_id, device_id=None, area_id=None):
+    return SimpleNamespace(
+        entity_id=entity_id, unique_id=unique_id, device_id=device_id, area_id=area_id
+    )
 
 
 ENTRIES = [
@@ -81,6 +83,17 @@ def test_older_installs_without_a_home_id() -> None:
     (home,) = build_map([entry("climate.x", "tado_ce_zone_1_climate", "d")])["homes"]
     assert home["id"] == "unknown"
     assert home["zones"]["1"]["entities"]["climate"] == "climate.x"
+
+
+def test_room_area_comes_from_the_main_entity_only() -> None:
+    entries = [
+        entry("sensor.lounge_temp", f"tado_ce_{HOME}_zone_9_temp", "d", area_id="wrong"),
+        entry("climate.lounge_2", f"tado_ce_{HOME}_zone_9_climate", "d", area_id="lounge"),
+        entry("climate.office_2", f"tado_ce_{HOME}_zone_3_climate", "d2"),
+    ]
+    (home,) = build_map(entries)["homes"]
+    assert home["zones"]["9"]["area"] == "lounge"
+    assert "area" not in home["zones"]["3"]
 
 
 def test_no_entries_gives_no_homes() -> None:

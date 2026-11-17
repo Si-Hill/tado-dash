@@ -8,7 +8,9 @@
     { id: "5", name: "Master", slug: "master_bedroom_2", temp: 16.2, target: 17, hum: 71, power: 40, conf: 40, cycles: 4, rate: 0.7, inertia: 31, pre: 180, mold: "Critical", over: "Timer" },
     { id: "6", name: "Dining", slug: "dining_room_2", temp: 18.9, target: 19, hum: 58, power: 0, conf: 60, cycles: 7, rate: 0.9, inertia: 20, pre: 110, mold: "High", over: "None" },
   ];
-  const states = {}, registry = { homes: [{ id: HOME, zones: {}, hub: {}, devices: {}, trackers: [] }] };
+  const states = {}, registry = { homes: [{ id: HOME, zones: {}, hub: {}, devices: {}, trackers: [] }],
+    floors: [{ id: "down", name: "Downstairs", level: 0 }, { id: "up", name: "Upstairs", level: 1 }],
+    areas: { lounge: { name: "Lounge", floor_id: "down" }, dining: { name: "Dining", floor_id: "down" }, master: { name: "Master", floor_id: "up" }, office: { name: "Office", floor_id: "up" } } };
   const home = registry.homes[0];
   const put = (id, state, attributes = {}) => (states[id] = { entity_id: id, state: String(state), attributes, last_updated: now, last_changed: now });
 
@@ -35,7 +37,7 @@
     e.early_start = `switch.${z.name.toLowerCase()}_early_start`; put(e.early_start, "on", { friendly_name: "Early start" });
     e.schedule = `calendar.sched_${z.id}`; put(e.schedule, "off");
     e.open_window = `binary_sensor.${z.name.toLowerCase()}_window`; put(e.open_window, i === 3 ? "on" : "off");
-    home.zones[z.id] = { id: z.id, entities: e };
+    home.zones[z.id] = { id: z.id, entities: e, area: { Lounge: "lounge", Dining: "dining", Master: "master", Office: "office" }[z.name] };
     const serial = `VA${z.id}000`;
     const bat = `sensor.${z.name.toLowerCase()}_battery`, con = `binary_sensor.${z.name.toLowerCase()}_connection`;
     put(bat, i === 2 ? "Low" : "Normal"); put(con, "on");
@@ -85,6 +87,8 @@
     states,
     callWS: async (msg) => {
       if (msg.type === "tado_dash/map") return registry;
+      if (msg.type === "frontend/get_user_data") return { value: window.__userData?.[msg.key] ?? null };
+      if (msg.type === "frontend/set_user_data") { (window.__userData ||= {})[msg.key] = msg.value; return null; }
       if (msg.type === "history/history_during_period") {
         const from = new Date(msg.start_time).getTime(), out = {};
         msg.entity_ids.forEach((id) => (out[id] = series(id).filter((p) => p.lu * 1000 >= from)));

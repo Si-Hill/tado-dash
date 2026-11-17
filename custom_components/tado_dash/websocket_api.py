@@ -2,16 +2,28 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import voluptuous as vol
 
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import floor_registry as fr
 
 from .const import TADO_CE_DOMAIN
 from .mapping import build_map
+
+
+@dataclass(frozen=True)
+class _Entry:
+    entity_id: str
+    unique_id: str | None
+    device_id: str | None
+    area_id: str | None
 
 
 @callback
@@ -25,11 +37,29 @@ def async_register(hass: HomeAssistant) -> None:
 def ws_map(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
-    """Return which Tado CE entities belong to which room."""
-    registry = er.async_get(hass)
-    entries = [
-        entry
-        for entry in registry.entities.values()
-        if entry.platform == TADO_CE_DOMAIN and not entry.disabled_by
+    """Return which Tado CE entities belong to which room, and which floor that is on."""
+    entity_reg = er.async_get(hass)
+    device_reg = dr.async_get(hass)
+    area_reg = ar.async_get(hass)
+    floor_reg = fr.async_get(hass)
+
+    entries = []
+    for entry in entity_reg.entities.values():
+        if entry.platform != TADO_CE_DOMAIN or entry.disabled_by:
+            continue
+        area_id = entry.area_id
+        if area_id is None and entry.device_id:
+            device = device_reg.async_get(entry.device_id)
+            area_id = device.area_id if device else None
+        entries.append(_Entry(entry.entity_id, entry.unique_id, entry.device_id, area_id))
+
+    result = build_map(entries)
+    result["floors"] = [
+        {"id": floor.floor_id, "name": floor.name, "level": floor.level}
+        for floor in floor_reg.async_list_floors()
     ]
-    connection.send_result(msg["id"], build_map(entries))
+    result["areas"] = {
+        area.id: {"name": area.name, "floor_id": area.floor_id}
+        for area in area_reg.async_list_areas()
+    }
+    connection.send_result(msg["id"], result)
