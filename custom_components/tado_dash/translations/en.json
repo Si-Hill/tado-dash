@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Tado Dash",
+        "description": "Adds a Tado item to the sidebar. It reads the rooms and sensors that Tado CE already provides, so there is nothing to sign in to."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Tado Dash is already set up.",
+      "tado_ce_missing": "Tado CE isn't set up yet. Add the Tado CE integration first, then come back."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sidebar",
+        "data": {
+          "sidebar_title": "Sidebar title",
+          "sidebar_icon": "Sidebar icon",
+          "require_admin": "Only show to administrators"
+        }
+      }
+    }
+  }
+}
