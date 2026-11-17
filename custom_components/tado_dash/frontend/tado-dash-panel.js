@@ -259,6 +259,25 @@ function sparkline(temp, target, heating) {
     <div class="sline"></div><div class="sdot"></div><div class="stip"></div></div>`;
 }
 
+// A radiator valve head that fills from the bottom with how far the valve is open.
+let trvN = 0;
+function trvSVG(pct) {
+  const p = pct == null ? 0 : Math.max(0, Math.min(100, pct));
+  const id = `trv${++trvN}`, top = 14, h = 84, y = top + h * (1 - p / 100);
+  return `<svg class="trv" viewBox="0 0 120 160" role="img" aria-label="${pct == null ? "Valve position unknown" : `Valve ${Math.round(p)}% open`}">
+    <defs><clipPath id="${id}"><rect x="28" y="${top}" width="64" height="${h}" rx="16"/></clipPath></defs>
+    <rect x="6" y="133" width="108" height="11" rx="5" fill="var(--mut)" opacity=".35"/>
+    <rect x="48" y="98" width="24" height="18" fill="var(--mut)" opacity=".55"/>
+    <rect x="36" y="114" width="48" height="14" rx="4" fill="var(--mut)" opacity=".75"/>
+    <rect x="32" y="126" width="56" height="26" rx="6" fill="var(--mut)" opacity=".5"/>
+    <rect x="28" y="${top}" width="64" height="${h}" rx="16" style="fill:color-mix(in srgb, var(--mut) 14%, var(--card))"/>
+    <g clip-path="url(#${id})"><rect x="28" y="${y.toFixed(1)}" width="64" height="${(top + h - y).toFixed(1)}" style="fill:color-mix(in srgb, ${HEAT} 62%, var(--card))"/></g>
+    <rect x="28" y="${top}" width="64" height="${h}" rx="16" fill="none" stroke="var(--mut)" stroke-width="3"/>
+    <text x="60" y="${top + 48}" text-anchor="middle" class="trvpct">${pct == null ? "–" : `${Math.round(p)}%`}</text>
+    <text x="60" y="${top + 66}" text-anchor="middle" class="trvlbl">open</text>
+  </svg>`;
+}
+
 /* ---------- the panel ---------- */
 
 class TadoDashPanel extends HTMLElement {
@@ -508,7 +527,12 @@ class TadoDashPanel extends HTMLElement {
   _trackedIds() {
     if (!this._home) return [];
     const ids = [];
-    for (const z of Object.values(this._home.zones)) ids.push(...Object.values(z.entities));
+    for (const z of Object.values(this._home.zones)) {
+      ids.push(...Object.values(z.entities));
+      // An external room sensor isn't a Tado CE entity, but the TRV cards show it.
+      const ext = this._st(z.entities.climate || z.entities.ac_climate)?.attributes?.external_temp_sensor;
+      if (ext) ids.push(ext);
+    }
     ids.push(...Object.values(this._home.hub));
     for (const d of Object.values(this._home.devices || {})) ids.push(...Object.values(d.entities));
     return ids;
@@ -679,12 +703,12 @@ class TadoDashPanel extends HTMLElement {
     else if (!this._zones.length) body = this._empty("radiator-off", "No Tado CE rooms found",
       "Tado Dash reads the entities Tado CE creates. Make sure Tado CE is set up and has finished its first sync.");
     else if (this._zone && this._zoneById(this._zone)) body = this._viewRoom(this._zoneById(this._zone));
-    else body = { rooms: () => this._viewRooms(), analytics: () => this._viewAnalytics(),
+    else body = { rooms: () => this._viewRooms(), trvs: () => this._viewTrvs(), analytics: () => this._viewAnalytics(),
       schedules: () => this._viewSchedules(), confidence: () => this._viewConfidence(), system: () => this._viewSystem() }[this._tab]();
 
     const inRoom = this._zone && this._zoneById(this._zone);
     const title = inRoom ? this._zoneById(this._zone).name : "Tado Dash";
-    const tabs = [["rooms", "Rooms"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
+    const tabs = [["rooms", "Rooms"], ["trvs", "TRV's"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
     this.shadowRoot.innerHTML = `<style>${STYLE}</style>
       <div class="page">
         <header>
@@ -771,6 +795,46 @@ class TadoDashPanel extends HTMLElement {
         return `<section class="floor">${head}<div class="grid" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
       }).join("");
     return `<div class="chips">${chips}</div>${body}`;
+  }
+
+  /* ----- TRVs ----- */
+
+  _viewTrvs() {
+    // Heating rooms with at least one radiator valve (Tado serials starting VA).
+    const zones = this._zones.filter((z) => z.type === "heating" && z.devices.some((d) => /^VA/i.test(d.serial)));
+    if (!zones.length) {
+      return `<div class="card">${this._empty("temperature-empty", "No radiator valves found", "Tado Dash shows rooms that have a Tado radiator valve (TRV). None were found in Tado CE.")}</div>`;
+    }
+    const body = this._groups(zones).map((g) => `<section class="floor">
+      ${g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} room${g.zones.length === 1 ? "" : "s"}</small></div>` : ""}
+      <div class="grid trvs">${g.zones.map((z) => this._trvCard(z)).join("")}</div></section>`).join("");
+    return `${body}<p class="hint center">The TRV figure is the valve's own reading before any offset: the temperature Tado reports, minus the offset applied to it.</p>`;
+  }
+
+  _trvCard(z) {
+    const a = z.attrs, e = z.ents;
+    const trvs = z.devices.filter((d) => /^VA/i.test(d.serial));
+    const pct = z.power == null ? null : Math.max(0, Math.min(100, z.power));
+    // Tado's reported temperature has the device offset applied (Tado CE's Offset Sync works out
+    // the raw reading as reported minus offset), so take the offset off to get the valve's own.
+    const reported = this._n(e.temp) ?? (a.temperature_source !== "external" ? z.temp : null);
+    const offset = num(a.offset_celsius);
+    const raw = reported != null ? reported - (offset ?? 0) : null;
+    const extId = a.external_temp_sensor;
+    const ext = extId ? this._n(extId) : null;
+    const sign = (v) => (v == null ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}`);
+    const offline = trvs.some((d) => this._st(d.entities.connection)?.state === "off");
+    const lowBat = trvs.some((d) => /low|crit/i.test(this._val(d.entities.battery) || ""));
+    const flag = offline ? `<span class="pill bad">Offline</span>` : lowBat ? `<span class="pill preheat">${icon("battery-alert")}Battery low</span>` : "";
+    const rawTip = reported != null ? `Reported ${f1(reported)} °C − offset ${f1(offset ?? 0)} °C` : "No reading from Tado";
+    return `<div class="card trvcard" data-a="open" data-z="${z.id}">
+      <div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? "Valve open" : "Valve closed"}</span>`}</div>
+      ${trvSVG(pct)}
+      <div class="trvtemps">
+        <div class="trvt" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}<small>°C</small>` : "–"}</b><em>before offset</em></div>
+        <div class="trvt"><span>Room sensor</span><b>${ext != null ? `${f1(ext)}<small>°C</small>` : "–"}</b><em>${extId ? "external" : "none set up"}</em></div>
+        <div class="trvt"><span>Offset</span><b>${offset != null ? `${sign(offset)}<small>°C</small>` : "–"}</b><em>${offset != null ? "applied" : "not enabled"}</em></div>
+      </div></div>`;
   }
 
   _roomCard(z, floor) {
@@ -1345,6 +1409,15 @@ button{font:inherit;color:inherit}
 .hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
 .hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
 .hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
+.grid.trvs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.trvcard{cursor:pointer;display:flex;flex-direction:column;gap:8px}.trvcard:hover{border-color:var(--mut)}
+.trv{width:120px;height:160px;align-self:center;display:block}
+.trvpct{font-size:26px;font-weight:500;fill:var(--fg)}.trvlbl{font-size:11px;fill:var(--mut)}
+.trvtemps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.trvt{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:8px 4px;text-align:center;min-width:0}
+.trvt span{display:block;font-size:11px;color:var(--mut)}.trvt b{display:block;font-size:19px;font-weight:500;margin:2px 0}.trvt b small{font-size:11px;color:var(--mut);font-weight:400;margin-left:1px}
+.trvt em{display:block;font-size:10px;color:var(--mut);font-style:normal}
+.pill.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 16%,transparent)}
 .floor{margin-bottom:24px}
 .floorhead{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.floorhead h2{font-size:17px;font-weight:500;margin:0}.floorhead small{color:var(--mut);font-size:12px}.floorhead .sp{flex:1}
 .mv{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center}

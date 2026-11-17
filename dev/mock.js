@@ -3,9 +3,9 @@
   const HOME = "1837208";
   const now = new Date().toISOString();
   const zonesDef = [
-    { id: "9", name: "Lounge", slug: "lounge_2", temp: 17.8, target: 19, hum: 62, power: 100, conf: 60, cycles: 6, rate: 0.51, inertia: 25, pre: 248, mold: "Medium", over: "None" },
-    { id: "3", name: "Office", slug: "office_2", temp: 20.6, target: 20.5, hum: 48, power: 0, conf: 82, cycles: 9, rate: 1.4, inertia: 14, pre: 62, mold: "Low", over: "None" },
-    { id: "5", name: "Master", slug: "master_bedroom_2", temp: 16.2, target: 17, hum: 71, power: 40, conf: 40, cycles: 4, rate: 0.7, inertia: 31, pre: 180, mold: "Critical", over: "Timer" },
+    { id: "9", name: "Lounge", slug: "lounge_2", ext: 17.9, off: -0.4, temp: 17.8, target: 19, hum: 62, power: 100, conf: 60, cycles: 6, rate: 0.51, inertia: 25, pre: 248, mold: "Medium", over: "None" },
+    { id: "3", name: "Office", slug: "office_2", ext: 20.4, off: 0, temp: 20.6, target: 20.5, hum: 48, power: 0, conf: 82, cycles: 9, rate: 1.4, inertia: 14, pre: 62, mold: "Low", over: "None" },
+    { id: "5", name: "Master", slug: "master_bedroom_2", ext: 15.6, off: 1.2, temp: 16.2, target: 17, hum: 71, power: 40, conf: 40, cycles: 4, rate: 0.7, inertia: 31, pre: 180, mold: "Critical", over: "Timer" },
     { id: "6", name: "Dining", slug: "dining_room_2", temp: 18.9, target: 19, hum: 58, power: 0, conf: 60, cycles: 7, rate: 0.9, inertia: 20, pre: 110, mold: "High", over: "None" },
   ];
   const states = {}, registry = { homes: [{ id: HOME, zones: {}, hub: {}, devices: {}, trackers: [] }],
@@ -22,7 +22,9 @@
       friendly_name: z.name, current_temperature: z.temp, temperature: z.target, current_humidity: z.hum,
       hvac_action: z.power > 0 ? "heating" : "idle", overlay_type: z.over, heating_power: z.power, zone_id: z.id,
       min_temp: 5, max_temp: 25, target_temp_step: 0.5, scheduled_target_temperature: 19,
+      ...(z.ext != null ? { external_temp_sensor: `sensor.ext_${z.id}`, offset_celsius: z.off, temperature_source: "external" } : {}),
     });
+    if (z.ext != null) put(`sensor.ext_${z.id}`, z.ext, { friendly_name: `${z.name} room sensor`, unit_of_measurement: "°C" });
     const sensor = (key, val, attrs = {}, name = key) => { const id = `sensor.${z.name.toLowerCase()}_${key}`; e[key] = id; put(id, val, { friendly_name: `${z.name} ${name}`, ...attrs }); };
     sensor("temp", z.temp); sensor("target", z.target); sensor("heating", z.power); sensor("humidity", z.hum);
     sensor("confidence", z.conf, { cycle_count: z.cycles, unit_of_measurement: "%" });
