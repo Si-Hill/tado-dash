@@ -18,7 +18,9 @@ from custom_components.tado_dash.websocket_api import ws_map
 
 
 @pytest.fixture(autouse=True)
-def _enable(enable_custom_integrations):
+async def _enable(enable_custom_integrations, hass: HomeAssistant):
+    # The panel needs HA's http/frontend; the test sandbox can't set them up.
+    hass.config.components.update({"http", "frontend"})
     yield
 
 
