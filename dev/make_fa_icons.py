@@ -33,7 +33,7 @@ ALIAS = {
     "water-thermometer-outline": "temperature-arrow-down", "water-outline": "water", "clock-start": "clock",
     "radiator": "temperature-half", "thermostat": "temperature-half", "battery": "battery-full",
     "battery-alert": "battery-quarter", "battery-unknown": "battery-half", "air-conditioner": "snowflake",
-    "home-export-outline": "house", "home-account": "house", "circle-question": "circle-question",
+    "confidence": "gauge", "home-export-outline": "house", "home-account": "house", "circle-question": "circle-question",
 }
 
 

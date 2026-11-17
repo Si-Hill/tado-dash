@@ -23,7 +23,7 @@ Tado Dash has no account, no entities and no polling of its own. It reads the en
 | **Room page** | Large temperature and trend, target stepper, hold for 30 min / 1 h / 2 h / until next block / until changed, Boost and Smart boost, what Tado has learned, comfort and air (mold, condensation, dew point), devices with battery and connection, room insights, early start. |
 | **Analytics** | Pick a room and 6 h to 7 days: temperature, target, heating power, outside temperature and humidity on shared-time charts with hover read-out, plus average, range, heating hours and time on target. |
 | **Schedules** | Today across every room, plus a week grid for one room, from Tado CE's schedule calendars. Read-only: edit schedules in the Tado app. |
-| **Learning** | Confidence, cycle count, heating rate, thermal inertia and preheat time for every room, an explanation of how confidence is scored, and Tado CE's home-wide insights. |
+| **Confidence** | Confidence, cycle count, heating rate, thermal inertia and preheat time for every room, an explanation of how confidence is scored, and Tado CE's home-wide insights. |
 | **System** | API usage against the daily limit, token and sync status, bridge, HomeKit and geofencing, presence mode and override settings, resume-all, and every hub entity. |
 
 ### About the confidence score
@@ -34,7 +34,7 @@ Tado CE learns from completed heating cycles. Per its source, the score is up to
 
 - Home Assistant 2025.3 or newer
 - [Tado CE](https://github.com/hiall-fyi/tado_ce) installed and set up
-- For the Learning tab: enable Tado CE's *Confidence*, *Heating Rate*, *Thermal Inertia* and *Preheat Time* sensors (disabled by default). Missing sensors are simply left out. Outside temperature likewise needs Tado CE's *Outside Temp* sensor.
+- For the Confidence tab: enable Tado CE's *Confidence*, *Heating Rate*, *Thermal Inertia* and *Preheat Time* sensors (disabled by default). Missing sensors are simply left out. Outside temperature likewise needs Tado CE's *Outside Temp* sensor.
 
 ## 1. Install via HACS
 

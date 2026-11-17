@@ -85,6 +85,7 @@ const FA_ALIAS = {
   "battery-alert": "battery-quarter",
   "battery-unknown": "battery-half",
   "air-conditioner": "snowflake",
+  "confidence": "gauge",
   "home-export-outline": "house",
   "home-account": "house",
   "circle-question": "circle-question",
@@ -114,6 +115,7 @@ const FA = {
   "faucet-drip": [512, "M224 0c17.7 0 32 14.3 32 32l0 12 96-12c17.7 0 32 14.3 32 32s-14.3 32-32 32L256 84l-31-3.9-1-.1-1 .1L192 84 96 96C78.3 96 64 81.7 64 64s14.3-32 32-32l96 12 0-12c0-17.7 14.3-32 32-32zM0 224c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-43.8 32-4 32 4 0 43.8 18.7 0c8.5 0 16.6 3.4 22.6 9.4L320 192l32 0c88.4 0 160 71.6 160 160c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 320c-17.7 0-32-14.3-32-32l0-64zM436.8 423.4c1.9-4.5 6.3-7.4 11.2-7.4s9.2 2.9 11.2 7.4l18.2 42.4c1.8 4.1 2.7 8.6 2.7 13.1l0 1.2c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-1.2c0-4.5 .9-8.9 2.7-13.1l18.2-42.4z"],
   "fire": [448, "M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.5 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-4.5-9-16-9.6-22.5-2l-25.2 29.3c-6.6 7.6-18.5 7.4-24.7-.5c-16.5-21-46-58.5-62.8-79.8c-6.3-8-18.3-8.1-24.7-.1c-33.8 42.5-50.8 69.3-50.8 99.4C112 375.4 162.6 416 225.7 416z"],
   "fire-burner": [640, "M345.7 48.3L358 34.5c5.4-6.1 13.3-8.8 20.9-8.9c7.2 0 14.3 2.6 19.9 7.8c19.7 18.3 39.8 43.2 55 70.6C469 131.2 480 162.2 480 192.2C480 280.8 408.7 352 320 352c-89.6 0-160-71.3-160-159.8c0-37.3 16-73.4 36.8-104.5c20.9-31.3 47.5-59 70.9-80.2C273.4 2.3 280.7-.2 288 0c14.1 .3 23.8 11.4 32.7 21.6c0 0 0 0 0 0c2 2.3 4 4.6 6 6.7l19 19.9zM384 240.2c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C293 167.1 256 203.6 256 240.2c0 35.3 28.7 64 64 64s64-28.7 64-64zM32 288c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 64 448 0 0-64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l0-96zM320 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm160-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM192 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"],
+  "gauge": [512, "M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm320 96c0-26.9-16.5-49.9-40-59.3L280 88c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 204.7c-23.5 9.5-40 32.5-40 59.3c0 35.3 28.7 64 64 64s64-28.7 64-64zM144 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm-16 80a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM400 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"],
   "hand": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 272c0 1.5 0 3.1 .1 4.6L67.6 283c-16-15.2-41.3-14.6-56.6 1.4s-14.6 41.3 1.4 56.6L124.8 448c43.1 41.1 100.4 64 160 64l19.2 0c97.2 0 176-78.8 176-176l0-208c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 176c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208z"],
   "hourglass-half": [384, "M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 256 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32s-14.3-32-32-32L320 0 64 0 32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9L192 301.3l67.9 67.9c4.6 4.6 8.6 9.6 12.1 14.9L112 384z"],
   "house": [576, "M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"],
@@ -190,6 +192,9 @@ function extent(seriesList, pad2 = 0.5) {
   return [lo - pad2, hi + pad2];
 }
 
+let SPARKS = {}; // hover data for the room-card charts, rebuilt on every render
+let sparkN = 0;
+
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
   const now = Date.now(), t0 = now - 6 * HOUR;
@@ -209,13 +214,16 @@ function sparkline(temp, target, heating) {
   const last = temp[temp.length - 1];
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
   const tgt = target.length ? pathOf(target, X, Y, true, now) : "";
-  return `<div class="sparkwrap" title="Last 6 hours, scaled ${f1(dataLo)}–${f1(dataHi)} °C">
+  const id = `sp${++sparkN}`;
+  SPARKS[id] = { temp, target, t0, now, lo, hi, H, color };
+  return `<div class="sparkwrap" data-sp="${id}" title="Last 6 hours, scaled ${f1(dataLo)}–${f1(dataHi)} °C">
     <svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
       <path d="${area}" style="fill:color-mix(in srgb, ${color} 30%, var(--card))"/>
       ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" opacity=".8"/>` : ""}
       <path d="${line}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     </svg>
-    <span class="sc hi">${f1(dataHi)}°</span><span class="sc lo">${f1(dataLo)}°</span></div>`;
+    <span class="sc hi">${f1(dataHi)}°</span><span class="sc lo">${f1(dataLo)}°</span>
+    <div class="sline"></div><div class="sdot"></div><div class="stip"></div></div>`;
 }
 
 /* ---------- the panel ---------- */
@@ -455,6 +463,7 @@ class TadoDashPanel extends HTMLElement {
     const top = scroller ? scroller.scrollTop : 0;
     const prevTab = this._renderedKey;
     this._charts = {};
+    SPARKS = {};
     let body;
     if (this._mapError) body = this._empty("alert-circle-outline", "Couldn't read Tado CE", esc(this._mapError));
     else if (!this._map) body = this._empty("timer-sand", "Loading…", "");
@@ -462,11 +471,11 @@ class TadoDashPanel extends HTMLElement {
       "Tado Dash reads the entities Tado CE creates. Make sure Tado CE is set up and has finished its first sync.");
     else if (this._zone && this._zoneById(this._zone)) body = this._viewRoom(this._zoneById(this._zone));
     else body = { rooms: () => this._viewRooms(), analytics: () => this._viewAnalytics(),
-      schedules: () => this._viewSchedules(), learning: () => this._viewLearning(), system: () => this._viewSystem() }[this._tab]();
+      schedules: () => this._viewSchedules(), confidence: () => this._viewConfidence(), system: () => this._viewSystem() }[this._tab]();
 
     const inRoom = this._zone && this._zoneById(this._zone);
     const title = inRoom ? this._zoneById(this._zone).name : "Tado";
-    const tabs = [["rooms", "Rooms"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["learning", "Learning"], ["system", "System"]];
+    const tabs = [["rooms", "Rooms"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
     this.shadowRoot.innerHTML = `<style>${STYLE}</style>
       <div class="page">
         <header>
@@ -482,7 +491,35 @@ class TadoDashPanel extends HTMLElement {
     if (sc) sc.scrollTop = prevTab === key ? top : 0;
     this._renderedKey = key;
     this._bindCharts();
+    this._bindSparks();
     this._afterRender();
+  }
+
+  _bindSparks() {
+    for (const host of this.shadowRoot.querySelectorAll(".sparkwrap[data-sp]")) {
+      const m = SPARKS[host.dataset.sp];
+      if (!m) continue;
+      const line = host.querySelector(".sline"), dot = host.querySelector(".sdot"), tip = host.querySelector(".stip");
+      const hide = () => { line.style.display = dot.style.display = tip.style.display = "none"; };
+      const move = (ev) => {
+        const r = host.getBoundingClientRect();
+        const frac = Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width));
+        const t = m.t0 + frac * (m.now - m.t0);
+        const v = valueAt(m.temp, t);
+        if (v == null) return hide();
+        const goal = valueAt(m.target, t);
+        const yPct = ((m.H - 6 - ((v - m.lo) / (m.hi - m.lo)) * (m.H - 12)) / m.H) * 100;
+        line.style.cssText = `display:block;left:${frac * 100}%`;
+        dot.style.cssText = `display:block;left:${frac * 100}%;top:${yPct}%;background:${m.color}`;
+        tip.innerHTML = `<b>${f1(v)} °C</b><span>${hhmm(new Date(t))}${goal != null ? ` · target ${f1(goal)}` : ""}</span>`;
+        tip.style.display = "flex";
+        const w = tip.offsetWidth, x = frac * r.width;
+        tip.style.left = `${Math.min(r.width - w - 4, Math.max(4, x - w / 2))}px`;
+      };
+      host.addEventListener("pointermove", move);
+      host.addEventListener("pointerdown", move);
+      host.addEventListener("pointerleave", hide);
+    }
   }
 
   _afterRender() {
@@ -511,7 +548,7 @@ class TadoDashPanel extends HTMLElement {
       chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
       outside != null ? chip("thermometer", "Outside", `${f1(outside)} °C`) : "",
       showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
-      alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="learning"`) : "",
+      alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : "",
     ].join("");
     const shown = f === "heating" ? zones.filter((z) => z.heating) : zones;
     const grid = shown.length ? `<div class="grid">${shown.map((z) => this._roomCard(z)).join("")}</div>`
@@ -532,7 +569,7 @@ class TadoDashPanel extends HTMLElement {
         ${hasTemp ? `<div class="tgt"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
-      ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : `<div class="note faint">${z.confidence != null ? `${icon("brain")}Learning ${f0(z.confidence)}%` : "&nbsp;"}</div>`}
+      ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : `<div class="note faint">${z.confidence != null ? `${icon("confidence")}Confidence ${f0(z.confidence)}%` : "&nbsp;"}</div>`}
       <div class="seg icons" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
@@ -625,7 +662,7 @@ class TadoDashPanel extends HTMLElement {
       ["Thermal inertia", inertia != null ? `${f0(inertia)} min` : "–", "Delay before the room responds to heat"],
       ["Preheat time", pre != null ? `${f0(pre)} min` : "–", "Learned lead time for the next target"],
     ].map(([l, v, d]) => `<div class="kv"><span>${l}<small>${d}</small></span><b>${v}</b></div>`).join("");
-    return `<div class="card"><div class="cardhead"><h3>What Tado has learned</h3><button class="link" data-a="tab" data-v="learning">How it works</button></div>
+    return `<div class="card"><div class="cardhead"><h3>Confidence</h3><button class="link" data-a="tab" data-v="confidence">How it works</button></div>
       <div class="learn">${ring}<div class="lt"><b>${c == null ? "Not available" : `${f0(c)}% confidence`}</b>
         <small>${cycles != null ? `${cycles} heating cycle${cycles === 1 ? "" : "s"} analysed` : "Enable the Confidence sensor in Tado CE to see this"}</small></div></div>
       ${rows}${adv.summary ? `<div class="note adv">${icon("clock-check-outline")}${esc(adv.summary)}</div>` : ""}</div>`;
@@ -883,9 +920,9 @@ class TadoDashPanel extends HTMLElement {
         <p class="hint">Read-only view of the Tado schedule. Edit schedules in the Tado app; Tado CE picks changes up on its next sync.</p></div>`;
   }
 
-  /* ----- learning ----- */
+  /* ----- confidence ----- */
 
-  _viewLearning() {
+  _viewConfidence() {
     const zones = this._zones.filter((z) => z.type !== "hot_water");
     const hub = this._hub, ha = hub.get("home_insights")?.attributes || {};
     const rows = zones.map((z) => {
@@ -985,7 +1022,7 @@ button{font:inherit;color:inherit}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:13px;color:var(--mut)}
 .chip b{color:var(--fg)} .chip.heat .i{color:var(--heat)} .chip.warn .i{color:var(--warn)} .chip[data-a]{cursor:pointer;font:inherit;font-size:13px}
 .chip[data-a]:hover{border-color:var(--mut)}
-.chip.on,.chip.on:hover{background:var(--accent);border-color:var(--accent);color:#fff}.chip.on b,.chip.on .i{color:#fff}
+.chip.on,.chip.on:hover{background:var(--go);border-color:var(--go);color:#fff}.chip.on b,.chip.on .i{color:#fff}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--ha-card-border-radius,12px);padding:16px;margin-bottom:14px}
 .grid .card{margin:0}
@@ -1004,6 +1041,11 @@ button{font:inherit;color:inherit}
 .hum{font-size:13px;color:var(--mut);margin-left:10px;vertical-align:middle}
 .tgt{text-align:right;display:flex;flex-direction:column;font-size:12px;color:var(--mut)}.tgt b{font-size:17px;color:var(--fg);font-weight:500}
 .sparkwrap{position:relative;margin:0 -16px}.spark{width:100%;height:64px;display:block}.spark.empty{height:24px}
+.sparkwrap{cursor:crosshair}
+.sline{position:absolute;top:0;bottom:0;width:1px;background:var(--fg);opacity:.45;display:none;pointer-events:none}
+.sdot{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid var(--card);transform:translate(-50%,-50%);display:none;pointer-events:none}
+.stip{position:absolute;top:2px;display:none;flex-direction:column;gap:1px;padding:4px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.3);font-size:11px;color:var(--mut);white-space:nowrap;pointer-events:none;z-index:3}
+.stip b{font-size:14px;color:var(--fg);font-weight:500}
 .sc{position:absolute;left:16px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none}.sc.hi{top:2px}.sc.lo{bottom:3px}
 .note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent);padding:4px 10px;border-radius:999px;align-self:flex-start}
 .note.faint{background:none;color:var(--mut);padding-left:0}.note.adv{margin-top:12px;border-radius:8px;align-self:stretch;padding:8px 10px}
@@ -1011,7 +1053,7 @@ button{font:inherit;color:inherit}
 .seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:0;border-radius:8px;padding:8px 4px;color:var(--mut);font-size:13px;font-weight:500;cursor:pointer}
 .seg button:hover{color:var(--fg)}
 .seg button.on{background:var(--go);color:#fff}
-.seg.icons{justify-content:flex-start}.seg.icons button{flex:0 0 auto;min-width:42px;padding:8px 12px;gap:0}
+.seg.icons{justify-content:space-evenly}.seg.icons button{flex:0 0 auto;min-width:42px;padding:8px 12px;gap:0}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
 .seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
