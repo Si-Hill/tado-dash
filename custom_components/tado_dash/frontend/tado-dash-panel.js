@@ -589,10 +589,9 @@ class TadoDashPanel extends HTMLElement {
         ${hasTemp ? `<button class="manual ${manual ? "on" : ""}" title="Manual" data-a="hold" data-z="${z.id}" data-v="manual">${icon("hand-back-right-outline")}<span class="lb">Manual</span></button>` : ""}
         <button class="off ${z.off ? "on" : ""}" title="Off" data-a="hold" data-z="${z.id}" data-v="off">${icon("power")}<span class="lb">Off</span></button>
       </div>
-      ${hasTemp ? `<div class="cardstep">
-        <button class="round" title="Lower" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
-        <b>${z.shownTarget != null ? f1(z.shownTarget) : "–"}<small> °C</small></b>
-        <button class="round" title="Raise" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}</div>`;
+      ${hasTemp ? `<div class="seg stepbar" role="group">
+        <button title="Lower target" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
+        <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}</div>`;
   }
 
   /* ----- room detail ----- */
@@ -1078,9 +1077,9 @@ button{font:inherit;color:inherit}
 .seg.icons button{flex:1 1 0;min-width:0;padding:8px 4px;gap:0;transition:flex-grow .2s}
 .seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
 .seg button.manual.on{background:var(--cold)}
-.cardstep{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
-.cardstep b{font-size:17px;font-weight:500;min-width:76px;text-align:center}.cardstep small{font-size:12px;color:var(--mut);font-weight:400}
-.cardstep .round{width:32px;height:32px}
+.seg.stepbar{margin-top:0}.seg.stepbar button{padding:10px 4px;font-size:15px}
+.seg.stepbar button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
+.seg.stepbar button:active{background:color-mix(in srgb,var(--mut) 30%,transparent)}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
 .seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
