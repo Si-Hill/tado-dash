@@ -13,6 +13,7 @@ const C = {
   sunflower: "#f1c40f", carrot: "#e67e22", alizarin: "#e74c3c", clouds: "#ecf0f1", concrete: "#95a5a6",
   orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b", silver: "#bdc3c7", asbestos: "#7f8c8d",
 };
+const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
 const HEAT = C.carrot;
 const COLD = C.peter;
 const MIN = 60000;
@@ -255,7 +256,8 @@ class TadoDashPanel extends HTMLElement {
     this._mapError = null;
     this._hist = {};
     this._cal = {};
-    this._pending = {};
+    this._pending = {}; // a target being adjusted with - / +, not yet sent
+    this._opt = {}; // a change that was sent but not yet confirmed by Tado CE
     this._charts = {};
     this._sig = "";
     this._narrow = false;
@@ -436,11 +438,27 @@ class TadoDashPanel extends HTMLElement {
     const a = main?.attributes || {};
     const type = e.water_heater ? "hot_water" : e.ac_climate ? "ac" : "heating";
     const temp = num(a.current_temperature) ?? this._n(e.temp);
-    const target = num(a.temperature) ?? this._n(e.target);
+    const rawTarget = num(a.temperature) ?? this._n(e.target);
+    let target = rawTarget;
     const pend = this._pending[z.id];
     const power = num(a.heating_power) ?? this._n(e.heating) ?? this._n(e.ac);
-    const overlayType = a.overlay_type && a.overlay_type !== "None" ? a.overlay_type : null;
-    const off = main?.state === "off";
+    let overlayType = a.overlay_type && a.overlay_type !== "None" ? a.overlay_type : null;
+    let off = main?.state === "off";
+    // Tado CE takes a while to confirm a change. Until it does, show what was asked for.
+    const opt = this._opt[z.id];
+    let busy = false;
+    if (opt) {
+      const confirmed = opt.kind === "schedule" ? !overlayType && !off
+        : opt.kind === "off" ? off
+          : !!overlayType && !off && (opt.t == null || Math.abs((rawTarget ?? 0) - opt.t) < 0.05);
+      if (confirmed || Date.now() - opt.at > OPT_MS) delete this._opt[z.id];
+      else {
+        busy = true;
+        if (opt.kind === "schedule") { overlayType = null; off = false; target = num(a.scheduled_target_temperature) ?? target; }
+        else if (opt.kind === "off") off = true;
+        else { off = false; overlayType = overlayType || "Manual"; if (opt.t != null) target = opt.t; }
+      }
+    }
     const unavailable = !main || main.state === "unavailable";
     const window = this._st(e.open_window)?.state === "on";
     const preheat = this._st(e.preheat_now)?.state === "on";
@@ -454,7 +472,7 @@ class TadoDashPanel extends HTMLElement {
     return {
       id: z.id, ents: e, name: a.friendly_name || `Zone ${z.id}`, main: mainId, mainState: main, attrs: a, type,
       temp, target, shownTarget: pend ? pend.t : target, humidity: num(a.current_humidity) ?? this._n(e.humidity),
-      power, overlayType, boosting: !!overlayType && target != null && target >= 25, off, unavailable, window, preheat, heating, status, label,
+      busy, power, overlayType, boosting: !!overlayType && target != null && target >= 25, off, unavailable, window, preheat, heating, status, label,
       step: num(a.target_temp_step) || 0.5, min: num(a.min_temp) ?? 5, max: num(a.max_temp) ?? 25,
       confidence: this._n(e.confidence), confAttrs: this._st(e.confidence)?.attributes || {},
       devices: Object.values(this._home.devices || {}).filter((d) => d.zone === z.id),
@@ -524,9 +542,11 @@ class TadoDashPanel extends HTMLElement {
 
   /* ----- actions ----- */
 
+  // Resolves true if the service call worked, false (after a notification) if not.
   _call(domain, service, data) {
-    return this._hass.callService(domain, service, data).catch((err) => {
+    return this._hass.callService(domain, service, data).then(() => true, (err) => {
       this._toast(err?.message || `${domain}.${service} failed`);
+      return false;
     });
   }
 
@@ -541,23 +561,47 @@ class TadoDashPanel extends HTMLElement {
     const p = this._pending[z.id] || {};
     clearTimeout(p.timer);
     p.t = t;
-    p.timer = setTimeout(async () => {
-      await this._call("climate", "set_temperature", { entity_id: z.main, temperature: t });
-      delete this._pending[z.id];
-      this._render();
+    p.timer = setTimeout(() => {
+      p.timer = null;
+      p.inflight = this._call("climate", "set_temperature", { entity_id: z.main, temperature: t }).then((ok) => {
+        if (this._pending[z.id] === p) delete this._pending[z.id];
+        if (ok) this._expect(z.id, { kind: "manual", t });
+        this._render();
+      });
     }, 900);
     this._pending[z.id] = p;
     this._render();
   }
 
-  _hold(z, mode) {
-    const t = z.shownTarget ?? z.target ?? z.temp ?? 20;
-    if (mode === "schedule") return this._call(TCE, "resume_schedule", { entity_id: z.main });
-    if (mode === "off") return this._call("climate", "turn_off", { entity_id: z.main });
-    if (mode === "block") return this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "next_time_block" });
-    if (mode === "manual") return this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "manual" });
-    const mins = { "30": "00:30:00", "60": "01:00:00", "120": "02:00:00" }[mode];
-    if (mins) return this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, time_period: mins });
+  // Show the requested state straight away; it is dropped once Tado CE confirms it (or after OPT_MS).
+  _expect(zoneId, opt) {
+    this._opt[zoneId] = { ...opt, at: Date.now() };
+    setTimeout(() => this._render(), OPT_MS + 500);
+  }
+
+  async _hold(z, mode) {
+    // A temperature still being adjusted here would otherwise land after this change and undo it.
+    // Resume/Off discard it; the others apply it.
+    const p = this._pending[z.id];
+    if (p) {
+      clearTimeout(p.timer);
+      delete this._pending[z.id];
+      if (p.inflight) await p.inflight;
+    }
+    const t = p?.t ?? z.shownTarget ?? z.target ?? z.temp ?? 20;
+    const kind = mode === "schedule" || mode === "off" ? mode : "manual";
+    this._expect(z.id, { kind, t: kind === "manual" ? t : undefined });
+    this._render();
+    let ok = true;
+    if (mode === "schedule") ok = await this._call(TCE, "resume_schedule", { entity_id: z.main });
+    else if (mode === "off") ok = await this._call("climate", "turn_off", { entity_id: z.main });
+    else if (mode === "block") ok = await this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "next_time_block" });
+    else if (mode === "manual") ok = await this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "manual" });
+    else {
+      const mins = { "30": "00:30:00", "60": "01:00:00", "120": "02:00:00" }[mode];
+      if (mins) ok = await this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, time_period: mins });
+    }
+    if (!ok) { delete this._opt[z.id]; this._render(); }
   }
 
   _onClick(e) {
@@ -720,7 +764,7 @@ class TadoDashPanel extends HTMLElement {
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
       ${this._infoPill(z)}
-      <div class="seg icons" role="group">
+      <div class="seg icons ${z.busy ? "busy" : ""}" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
         ${hasTemp ? `<button class="manual ${manual ? "on" : ""}" title="Manual" data-a="hold" data-z="${z.id}" data-v="manual">${icon("hand-back-right-outline")}<span class="lb">Manual</span></button>` : ""}
@@ -1243,6 +1287,8 @@ button{font:inherit;color:inherit}
 .seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
 .seg button.manual.on{background:var(--cold)}
 .card.room .seg{margin-top:0}
+@keyframes applying{50%{opacity:.55}}
+.seg.busy button.on{animation:applying 1s ease-in-out infinite}
 .floor{margin-bottom:24px}
 .floorhead{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.floorhead h2{font-size:17px;font-weight:500;margin:0}.floorhead small{color:var(--mut);font-size:12px}.floorhead .sp{flex:1}
 .mv{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center}
