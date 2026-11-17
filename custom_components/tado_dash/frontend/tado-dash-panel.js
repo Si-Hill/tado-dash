@@ -317,7 +317,7 @@ class TadoDashPanel extends HTMLElement {
     return {
       id: z.id, ents: e, name: a.friendly_name || `Zone ${z.id}`, main: mainId, mainState: main, attrs: a, type,
       temp, target, shownTarget: pend ? pend.t : target, humidity: num(a.current_humidity) ?? this._n(e.humidity),
-      power, overlayType, off, unavailable, window, preheat, heating, status, label,
+      power, overlayType, boosting: !!overlayType && target != null && target >= 25, off, unavailable, window, preheat, heating, status, label,
       step: num(a.target_temp_step) || 0.5, min: num(a.min_temp) ?? 5, max: num(a.max_temp) ?? 25,
       confidence: this._n(e.confidence), confAttrs: this._st(e.confidence)?.attributes || {},
       devices: Object.values(this._home.devices || {}).filter((d) => d.zone === z.id),
@@ -572,7 +572,7 @@ class TadoDashPanel extends HTMLElement {
       ${z.overlayType ? `<div class="note">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>` : z.preheat ? `<div class="note">${icon("clock-fast")}Preheat due</div>` : `<div class="note faint">${z.confidence != null ? `${icon("confidence")}Confidence ${f0(z.confidence)}%` : "&nbsp;"}</div>`}
       <div class="seg icons" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
-        ${z.ents.boost ? `<button class="boost" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
+        ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
         <button class="off ${z.off ? "on" : ""}" title="Off" data-a="hold" data-z="${z.id}" data-v="off">${icon("power")}<span class="lb">Off</span></button>
       </div></div>`;
   }
@@ -645,8 +645,8 @@ class TadoDashPanel extends HTMLElement {
     if (z.type === "hot_water") return `<div class="seg wrap2">${b("schedule", "Schedule", "calendar-clock")}${b("off", "Off", "power")}</div>`;
     return `<div class="seg wrap2">${b("schedule", "Schedule", "calendar-clock")}${b("block", "Until next block", "calendar-arrow-right")}
       ${b("30", "30 min", "timer-outline")}${b("60", "1 hour", "timer-outline")}${b("120", "2 hours", "timer-outline")}${b("manual", "Until changed", "infinity")}${b("off", "Off", "power")}</div>
-      ${z.ents.boost || z.ents.smart_boost ? `<div class="seg wrap2 second">${z.ents.boost ? `<button class="boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}Boost</button>` : ""}
-        ${z.ents.smart_boost ? `<button class="boost" data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost</button>` : ""}</div>` : ""}`;
+      ${z.ents.boost || z.ents.smart_boost ? `<div class="seg wrap2 second">${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}Boost</button>` : ""}
+        ${z.ents.smart_boost ? `<button data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost</button>` : ""}</div>` : ""}`;
   }
 
   _learnPanel(z, adv) {
@@ -1054,8 +1054,7 @@ button{font:inherit;color:inherit}
 .seg button:hover{color:var(--fg)}
 .seg button.on{background:var(--go);color:#fff}
 .seg button.off.on{background:${C.pomegranate}}
-.seg button.boost .i{color:${C.pumpkin}}
-.seg button.boost:hover,.seg.icons button.boost:not(.on):hover{background:${C.pumpkin};color:#fff}.seg button.boost:hover .i{color:#fff}
+.seg button.boost.on{background:${C.pumpkin}}
 .seg.icons{justify-content:space-evenly}.seg.icons button{flex:0 0 auto;min-width:42px;padding:8px 12px;gap:0}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
