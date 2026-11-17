@@ -11,15 +11,6 @@
 </style>
 </head>
 <body>
-<script>
-  // Stand-in for HA's <ha-icon>: shows a small dot with the icon name as a tooltip.
-  customElements.define("ha-icon", class extends HTMLElement {
-    static get observedAttributes() { return ["icon"]; }
-    connectedCallback() { this.render(); }
-    attributeChangedCallback() { this.render(); }
-    render() { this.style.cssText = "width:1em;height:1em;font-size:18px;display:inline-flex;align-items:center;justify-content:center"; this.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="4.5" fill="currentColor" opacity=".55"/></svg>`; this.title = this.getAttribute("icon"); }
-  });
-</script>
 <script src="mock.js"></script>
 <script type="module">
   await import("../custom_components/tado_dash/frontend/tado-dash-panel.js");

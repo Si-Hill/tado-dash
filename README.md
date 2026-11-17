@@ -59,6 +59,10 @@ Tado CE entity IDs vary between installs (`climate.lounge_2`, `sensor.lounge_tem
 
 Early version. Not yet reviewed against a live Home Assistant instance, so expect rough edges and please open an issue.
 
+## Credits
+
+Icons are from [Font Awesome Free](https://fontawesome.com) 6.7.2 (solid), licensed [CC BY 4.0](https://fontawesome.com/license/free). They are embedded in the panel, so nothing is loaded from the internet. Colours are from the [Flat UI palette](https://flatuicolors.com/palette/defo).
+
 ## Licence
 
 MIT
