@@ -258,6 +258,7 @@ class TadoDashPanel extends HTMLElement {
     this._cal = {};
     this._pending = {}; // a target being adjusted with - / +, not yet sent
     this._opt = {}; // a change that was sent but not yet confirmed by Tado CE
+    this._selOpt = {}; // a select option chosen on the System tab, until the entity confirms it
     this._charts = {};
     this._sig = "";
     this._narrow = false;
@@ -611,6 +612,12 @@ class TadoDashPanel extends HTMLElement {
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
+      case "opt": {
+        const id = el.dataset.id;
+        this._selOpt[id] = v;
+        this._call("select", "select_option", { entity_id: id, option: v }).then((ok) => { if (!ok) { delete this._selOpt[id]; this._render(); } });
+        break;
+      }
       case "tab": this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
       case "open": this._zone = z; this._sel = z; break;
       case "back": this._zone = null; break;
@@ -708,7 +715,8 @@ class TadoDashPanel extends HTMLElement {
 
   _afterRender() {
     // Pull in data the visible tab needs, then re-render once it lands.
-    if (this._zone || !this._home) return;
+    if (!this._home) return;
+    if (this._zone) { this._loadCalendars(); return; } // the room page shows the current schedule block
     if (this._tab === "analytics" && this._sel) this._loadAnalytics();
     if (this._tab === "schedules" || this._tab === "rooms") this._loadCalendars();
   }
@@ -750,10 +758,6 @@ class TadoDashPanel extends HTMLElement {
   _roomCard(z, floor) {
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
-    const pending = !!this._pending[z.id];
-    const sched = !z.overlayType && !z.off && !pending;
-    // Manual = a hand-set temperature: any override that isn't a boost, or one still being adjusted here.
-    const manual = hasTemp && !z.off && !z.boosting && (!!z.overlayType || pending);
     return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}">
       <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
         <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
@@ -764,7 +768,17 @@ class TadoDashPanel extends HTMLElement {
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
       ${this._infoPill(z)}
-      <div class="seg icons ${z.busy ? "busy" : ""}" role="group">
+      ${this._controls(z)}</div>`;
+  }
+
+  // Schedule / Boost / Manual / Off, and the target - / + bar. Shared by the room card and room page.
+  _controls(z) {
+    const hasTemp = z.type !== "hot_water";
+    const pending = !!this._pending[z.id];
+    const sched = !z.overlayType && !z.off && !pending;
+    // Manual = a hand-set temperature: any override that isn't a boost, or one still being adjusted here.
+    const manual = hasTemp && !z.off && !z.boosting && (!!z.overlayType || pending);
+    return `<div class="seg icons ${z.busy ? "busy" : ""}" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
         ${hasTemp ? `<button class="manual ${manual ? "on" : ""}" title="Manual" data-a="hold" data-z="${z.id}" data-v="manual">${icon("hand-back-right-outline")}<span class="lb">Manual</span></button>` : ""}
@@ -772,7 +786,7 @@ class TadoDashPanel extends HTMLElement {
       </div>
       ${hasTemp ? `<div class="seg stepbar" role="group">
         <button title="Lower target" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
-        <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}</div>`;
+        <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}`;
   }
 
   // One line of status under the chart, always present: the override if there is one,
@@ -811,30 +825,31 @@ class TadoDashPanel extends HTMLElement {
     const ov = st("overlay")?.attributes || {};
     const insightsList = st("insights")?.attributes?.recommendations || [];
 
+    const next = ov.next_change ? new Date(ov.next_change) : null;
+    const nextTemp = ov.next_temperature ?? this._n(e.next_sched_temp);
     const hero = `<div class="card hero">
-      <div class="row top"><span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span>
-        ${z.overlayType ? `<span class="pill over">${icon("hand-back-right-outline")}${esc(z.overlayType)}</span>` : ""}</div>
-      <div class="bigtemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
+      <div class="row top"><span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
+      <div class="row mid">
+        <div class="bigtemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
+        ${hasTemp ? `<div class="tgt big"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
+      </div>
       ${hasTemp ? sparkline(sp[e.temp] || [], sp[e.target] || [], z.heating) : ""}
       <div class="facts">
         ${z.humidity != null ? `<span>${icon("water-percent")}${f0(z.humidity)}% humidity</span>` : ""}
         ${outside != null ? `<span>${icon("thermometer")}${f1(outside)} °C outside</span>` : ""}
         ${surface != null ? `<span>${icon("wall")}wall ${f1(surface)} °C</span>` : ""}
         ${z.power != null ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
+        ${next && nextTemp != null ? `<span>${icon("calendar-clock")}next ${f1(nextTemp)} °C at ${hhmm(next)}</span>` : ""}
       </div>
-      ${hasTemp ? `<div class="divider"></div>
-      <div class="targetrow"><div><span class="lbl">Target</span><div class="stepper">
-        <button class="round" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
-        <b>${z.shownTarget != null ? f1(z.shownTarget) : "–"}<small> °C</small></b>
-        <button class="round" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div></div>
-        <div class="sub">${this._scheduleLine(z, ov)}</div></div>` : ""}
-      <span class="lbl">Change the temperature for a while</span>${timeline}
+      ${this._infoPill(z)}
+      ${this._controls(z)}
+      ${timeline}
     </div>`;
 
     const learn = this._learnPanel(z, adv);
     const air = this._airPanel(z);
     const devs = this._devicePanel(z);
-    const ins = insightsList.length ? `<div class="card"><h3>Insights for this room</h3><ul class="ins">${insightsList.map((i) => `<li>${icon("lightbulb-on-outline")}${esc(i)}</li>`).join("")}</ul></div>` : "";
+    const ins = insightsList.length ? `<div class="card"><h3>Insights for this room</h3>${insRows(insightsList, "lightbulb-on-outline", "warn")}</div>` : "";
     const ctrl = [["early_start", "Early start", "Let Tado start heating ahead of the schedule", "clock-start"]]
       .filter(([k]) => e[k]).map(([k, l, d, ic]) => `<div class="line"><span class="ic">${icon(ic)}</span><div class="tx"><b>${l}</b><small>${d}</small></div>
         <button class="sw ${st(k)?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${e[k]}" aria-label="${l}"></button></div>`).join("");
@@ -848,26 +863,13 @@ class TadoDashPanel extends HTMLElement {
       </div></div>${hasTemp ? this._deferRoomChart(z, chartId) : ""}`;
   }
 
-  _scheduleLine(z, ov) {
-    const e = z.ents;
-    const next = ov.next_change ? new Date(ov.next_change) : null;
-    const nt = ov.next_temperature ?? this._n(e.next_sched_temp);
-    const sched = z.attrs.scheduled_target_temperature;
-    const bits = [];
-    if (!z.overlayType && sched != null) bits.push(`Schedule: ${f1(sched)} °C`);
-    if (z.overlayType) bits.push(`Schedule would be ${sched != null ? f1(sched) + " °C" : "set by Tado"}`);
-    if (next && nt != null) bits.push(`Next: ${f1(nt)} °C at ${hhmm(next)}`);
-    return bits.map(esc).join("<br>");
-  }
-
+  // Extra ways to hold a temperature, on the room page only (the card has Manual for the simple case).
   _holdBar(z) {
-    const cur = z.off ? "off" : !z.overlayType ? "schedule" : "";
-    const b = (v, label, ic) => `<button class="${v === "off" ? "off " : ""}${cur === v ? "on" : ""}" data-a="hold" data-z="${z.id}" data-v="${v}">${icon(ic)}${label}</button>`;
-    if (z.type === "hot_water") return `<div class="seg wrap2">${b("schedule", "Schedule", "calendar-clock")}${b("off", "Off", "power")}</div>`;
-    return `<div class="seg wrap2">${b("schedule", "Schedule", "calendar-clock")}${b("block", "Until next block", "calendar-arrow-right")}
-      ${b("30", "30 min", "timer-outline")}${b("60", "1 hour", "timer-outline")}${b("120", "2 hours", "timer-outline")}${b("manual", "Until changed", "infinity")}${b("off", "Off", "power")}</div>
-      ${z.ents.boost || z.ents.smart_boost ? `<div class="seg wrap2 second">${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}Boost</button>` : ""}
-        ${z.ents.smart_boost ? `<button data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost</button>` : ""}</div>` : ""}`;
+    if (z.type === "hot_water") return "";
+    const b = (v, label, ic) => `<button data-a="hold" data-z="${z.id}" data-v="${v}">${icon(ic)}${label}</button>`;
+    return `<span class="lbl">Hold the target for</span>
+      <div class="seg hold" role="group">${b("block", "Until next block", "calendar-arrow-right")}${b("30", "30 min", "timer-outline")}${b("60", "1 hour", "timer-outline")}${b("120", "2 hours", "timer-outline")}${b("manual", "Until changed", "infinity")}</div>
+      ${z.ents.smart_boost ? `<div class="seg hold" role="group"><button data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost: reach the schedule target in the time it needs</button></div>` : ""}`;
   }
 
   _learnPanel(z, adv) {
@@ -931,8 +933,8 @@ class TadoDashPanel extends HTMLElement {
     return {
       title: "Temperature (°C)", height: 200, unit: "°C",
       series: [
-        { name: "Temperature", pts: d[e.temp] || [], color: "var(--fg)", w: 1.8 },
-        { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, dash: "5 3", w: 1.4 },
+        { name: "Temperature", pts: d[e.temp] || [], color: "var(--cold)", w: 3.2, area: true },
+        { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, dash: "6 4", w: 2 },
       ],
       band: { name: "Heating", pts: d[e.heating] || [], color: HEAT },
     };
@@ -956,18 +958,18 @@ class TadoDashPanel extends HTMLElement {
     if (!z) return "";
     const d = this._analytics && this._analyticsKey === `${z.id}:${this._range}` ? this._analytics : null;
     const picker = this._picker(z.id);
-    const ranges = [[6, "6 h"], [24, "24 h"], [72, "3 days"], [168, "7 days"]]
+    const ranges = [[6, "6 h"], [24, "24 h"], [72, "3 d"], [168, "7 d"]]
       .map(([h, l]) => `<button class="${this._range === h ? "on" : ""}" data-a="range" data-v="${h}">${l}</button>`).join("");
     if (!d) return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div><div class="card">${this._empty("timer-sand", "Loading history…", "")}</div>`;
 
     const outId = this._hub.ids.outside_temp;
     const panels = [this._tempPanel(z, d)];
     if (outId && d[outId]?.length) panels.push({ title: "Outside temperature (°C)", height: 100, unit: "°C",
-      series: [{ name: "Outside", pts: d[outId], color: "var(--out)", w: 1.5 }] });
+      series: [{ name: "Outside", pts: d[outId], color: "var(--out)", w: 2.4 }] });
     if (d[z.ents.humidity]?.length) panels.push({ title: "Humidity (%)", height: 110, unit: "%", fixed: [20, 80], band2: [40, 60],
-      series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "var(--hum)", w: 1.5 }] });
+      series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "var(--hum)", w: 2.4 }] });
     const stats = this._stats(z, d);
-    const legend = [["var(--fg)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating"], ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
+    const legend = [["var(--cold)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating"], ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
       .map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
     return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div>
       <div class="card"><h3>History</h3><div class="chart" id="an">${this._chartSVG("an", { hours: this._range, panels })}</div>
@@ -1002,7 +1004,7 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _picker(sel) {
-    return `<select class="pick" data-c="sel">${this._zones.map((z) => `<option value="${z.id}" ${z.id === sel ? "selected" : ""}>${esc(z.name)}</option>`).join("")}</select>`;
+    return `<div class="chips pickers">${this._zones.map((z) => `<span class="chip ${z.id === sel ? "on" : ""}" role="button" data-a="pick" data-z="${z.id}">${esc(z.name)}</span>`).join("")}</div>`;
   }
 
   /* chart builder: returns SVG markup, registers hover metadata */
@@ -1022,11 +1024,16 @@ class TadoDashPanel extends HTMLElement {
         out += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" class="grid"/><text x="${L - 6}" y="${yy + 3.5}" text-anchor="end" class="axis">${p.fixed ? Math.round(v) : v.toFixed(1)}</text>`;
       }
       if (p.band2) out += `<rect x="${L}" width="${W - L - R}" y="${Y(p.band2[1])}" height="${Y(p.band2[0]) - Y(p.band2[1])}" fill="var(--ok)" opacity=".12"/>`;
+      // Solid, muted fill under a line, as on the room cards.
+      for (const s of p.series) {
+        if (!s.area || !s.pts.length) continue;
+        out += `<path d="${pathOf(s.pts, X, Y, false, now)}V${bot}H${X(s.pts[0][0])}Z" style="fill:color-mix(in srgb, ${s.color} 26%, var(--card))"/>`;
+      }
       if (p.band?.pts?.length) {
         const bh = (bot - top) * 0.16;
         const BY = (v) => bot - (Math.min(100, v) / 100) * bh;
         const d = pathOf(p.band.pts, X, BY, true, now);
-        out += `<path d="${d}V${bot}H${X(p.band.pts[0][0])}Z" fill="${p.band.color}" opacity=".55"/>`;
+        out += `<path d="${d}V${bot}H${X(p.band.pts[0][0])}Z" style="fill:color-mix(in srgb, ${p.band.color} 40%, var(--card))"/>`;
       }
       for (const s of p.series) {
         if (!s.pts.length) continue;
@@ -1118,7 +1125,8 @@ class TadoDashPanel extends HTMLElement {
     const todayIdx = (now.getDay() + 6) % 7;
     const temps = Object.values(this._cal.data).flat().map((b) => b.temp).filter((t) => t != null);
     const lo = Math.min(...temps, 15), hi = Math.max(...temps, 22);
-    const color = (t) => { const k = t == null ? 0.5 : (t - lo) / (hi - lo || 1); return `hsl(${Math.round(30 - 22 * k)} ${55 + 25 * k}% ${28 + 10 * k}%)`; };
+    // Flat palette: orange at the cooler end of the range, deepening to pomegranate at the warmest.
+    const color = (t) => { const k = t == null ? 0.4 : (t - lo) / (hi - lo || 1); return `color-mix(in srgb, ${C.pomegranate} ${Math.round(k * 100)}%, ${C.orange})`; };
     const blocksFor = (zid, day) => {
       const d0 = monday + day * 86400000, d1 = d0 + 86400000;
       return (this._cal.data[zid] || []).filter((b) => b.e > d0 && b.s < d1).map((b) => {
@@ -1136,7 +1144,7 @@ class TadoDashPanel extends HTMLElement {
     const all = zones.map((zz) => `<div class="drow"><span class="dn small">${esc(zz.name)}</span><div class="track thin">${blocksFor(zz.id, todayIdx)}<div class="nowline" style="left:${nowPct}%"></div></div></div>`).join("");
     const legend = `<div class="legend grad"><span>${f1(lo)}°</span><i style="background:linear-gradient(90deg,${color(lo)},${color(hi)})"></i><span>${f1(hi)}°</span><em>Blocks are periods Tado CE reports in the room's schedule calendar</em></div>`;
     return `<div class="card"><h3>Today across rooms</h3>${axis}${all}</div>
-      <div class="toolbar">${this._picker(z.id)}<button class="link" data-a="refresh-sched">${icon("refresh")} Reload</button></div>
+      <div class="toolbar">${this._picker(z.id)}<span class="chip" role="button" data-a="refresh-sched">${icon("refresh")}Reload</span></div>
       <div class="card"><h3>${esc(z.name)} · week</h3>${axis}${week}${legend}
         <p class="hint">Read-only view of the Tado schedule. Edit schedules in the Tado app; Tado CE picks changes up on its next sync.</p></div>`;
   }
@@ -1158,9 +1166,9 @@ class TadoDashPanel extends HTMLElement {
         <div class="lm"><span>Preheat</span><b>${m("preheat_time", " min", 0)}</b></div>
         <div class="lm"><span>Schedule dev.</span><b>${m("schedule_deviation", " °C")}</b></div></div>`;
     }).join("");
-    const lists = [["actions_needed", "Actions needed", "clipboard-check-outline"], ["persistent_insights", "Ongoing", "history"], ["cross_zone_insights", "Whole house", "home-analytics"]]
+    const lists = [["actions_needed", "Actions needed", "clipboard-check-outline", "warn"], ["persistent_insights", "Ongoing", "history", "cold"], ["cross_zone_insights", "Whole house", "home-analytics", "go"]]
       .filter(([k]) => Array.isArray(ha[k]) && ha[k].length)
-      .map(([k, l, ic]) => `<div class="card"><h3>${icon(ic)} ${l}</h3><ul class="ins">${ha[k].map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+      .map(([k, l, ic, tone]) => `<div class="card"><h3>${icon(ic)} ${l}</h3>${insRows(ha[k], ic, tone)}</div>`).join("");
     return `<div class="card explain"><h3>How the confidence score works</h3>
       <p>Tado CE watches every heating cycle in each room: how long the room takes to start responding, and how quickly it then warms. The confidence score says how far those learned numbers can be trusted for preheat estimates.</p>
       <div class="two"><div><b>Up to 60% from experience</b><small>10% for each completed heating cycle, reaching the cap at 6 cycles.</small></div>
@@ -1186,7 +1194,16 @@ class TadoDashPanel extends HTMLElement {
     const selects = ["presence_mode", "overlay_mode", "overlay_timer"].filter((k) => ids[k]).map((k) => {
       const s = h.get(k), opts = s?.attributes?.options || [];
       const label = { presence_mode: "Presence mode", overlay_mode: "Override duration", overlay_timer: "Override timer" }[k];
-      return `<div class="line"><div class="tx"><b>${label}</b></div><select class="pick" data-c="select" data-id="${ids[k]}">${opts.map((o) => `<option ${o === s.state ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></div>`;
+      const id = ids[k];
+      if (this._selOpt[id] === s?.state) delete this._selOpt[id];
+      const cur = this._selOpt[id] ?? s?.state;
+      const pretty = (o) => String(o).replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+      // A few choices read best as a bar; a long list (e.g. minutes) stays a dropdown.
+      if (opts.length > 0 && opts.length <= 4) {
+        return `<div class="optrow"><b>${label}</b><div class="seg" role="group">${opts.map((o) =>
+          `<button class="${o === cur ? "on" : ""}" data-a="opt" data-id="${id}" data-v="${esc(o)}">${esc(pretty(o))}</button>`).join("")}</div></div>`;
+      }
+      return `<div class="line"><div class="tx"><b>${label}</b></div><select class="pick" data-c="select" data-id="${id}">${opts.map((o) => `<option ${o === s?.state ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></div>`;
     }).join("");
     const quota = ids.quota_reserve_enabled ? `<div class="line"><div class="tx"><b>Quota reserve</b><small>Keep some API calls back for manual actions</small></div>
       <button class="sw ${h.get("quota_reserve_enabled")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${ids.quota_reserve_enabled}" aria-label="Quota reserve"></button></div>` : "";
@@ -1207,6 +1224,11 @@ class TadoDashPanel extends HTMLElement {
       }).join("")}</div></div>
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
   }
+}
+
+// A list of notes as soft rows, like the info pill on the room cards.
+function insRows(list, ic, tone = "") {
+  return `<div class="insrows">${list.map((i) => `<div class="insrow ${tone}">${icon(ic)}<span>${esc(i)}</span></div>`).join("")}</div>`;
 }
 
 function chip(ic, label, value, cls = "", attrs = "") {
@@ -1289,6 +1311,18 @@ button{font:inherit;color:inherit}
 .card.room .seg{margin-top:0}
 @keyframes applying{50%{opacity:.55}}
 .seg.busy button.on{animation:applying 1s ease-in-out infinite}
+/* shared pieces used outside the room cards */
+.insrows{display:flex;flex-direction:column;gap:6px}
+.insrow{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+.insrow .i{margin-top:2px;color:var(--mut)}.insrow.warn .i{color:var(--warn)}.insrow.cold .i{color:var(--cold)}.insrow.go .i{color:var(--go)}
+.seg.hold{flex-wrap:wrap;margin-top:4px}.seg.hold button{flex:1 1 30%;white-space:nowrap;min-height:36px;padding:8px 10px;font-size:13px}
+.seg.hold button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
+.optrow{padding:10px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px;margin-bottom:2px}
+.optrow .seg button{min-height:36px}.optrow .seg button:hover:not(.on){background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
+.chips.pickers{margin-bottom:0}.toolbar .chips{flex:1}
+.hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
+.hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
+.hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
 .floor{margin-bottom:24px}
 .floorhead{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.floorhead h2{font-size:17px;font-weight:500;margin:0}.floorhead small{color:var(--mut);font-size:12px}.floorhead .sp{flex:1}
 .mv{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -1299,23 +1333,19 @@ button{font:inherit;color:inherit}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
 .seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
-.seg.wrap2{flex-wrap:wrap}.seg.wrap2 button{flex:1 1 30%}.seg.second{margin-top:4px}.seg.small button{padding:6px 12px}
+.seg.small button{padding:6px 12px;white-space:nowrap}
 .cols{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:16px;align-items:start}
 .hero .bigtemp{font-size:72px;font-weight:300;line-height:1.1;margin:8px 0 0}.bigtemp small{font-size:26px;color:var(--mut);vertical-align:top}
 .hero .spark{height:70px}
 .facts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin:8px 0}.facts span{display:inline-flex;align-items:center;gap:4px}
 .divider{border-top:1px solid var(--line);margin:12px 0}
 .lbl{font-size:12px;color:var(--mut);display:block;margin-top:4px}
-.targetrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-.stepper{display:flex;align-items:center;gap:12px;margin-top:4px}.stepper b{font-size:30px;font-weight:400;min-width:86px;text-align:center}.stepper small{font-size:14px;color:var(--mut)}
-.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}.round:hover{border-color:var(--accent);color:var(--accent)}
-.sub{font-size:12px;color:var(--mut);text-align:right;line-height:1.6}
 .learn{display:flex;align-items:center;gap:14px;margin:6px 0 10px}.lt b{display:block;font-size:17px;font-weight:500}.lt small{color:var(--mut);font-size:12px}
 .ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
 .kv span small{display:block;color:var(--mut);font-size:12px;word-break:break-all}.kv b{font-weight:500;white-space:nowrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.stat{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--mut) 5%,transparent);font-size:12px;color:var(--mut)}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--mut) 12%,transparent);font-size:12px;color:var(--mut)}
 .stat .i{color:var(--mut)}.stat b{font-size:15px;color:var(--fg);font-weight:500}
 .stat.ok .i{color:var(--ok)}.stat.warn .i,.stat.warn b{color:var(--warn)}.stat.bad .i,.stat.bad b{color:var(--bad)}
 .stats.big{margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
@@ -1325,8 +1355,8 @@ button{font:inherit;color:inherit}
 .val{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--mut)}.val.bad{color:var(--bad)}
 .sw{width:42px;height:24px;border-radius:12px;border:0;background:var(--mut);position:relative;cursor:pointer;flex:none;opacity:.7}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
-.sw.on{background:var(--accent);opacity:1}.sw.on::after{left:21px}
-.btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{border:1px solid var(--accent);border-radius:8px;padding:6px 14px}
+.sw.on{background:var(--go);opacity:1}.sw.on::after{left:21px}
+.btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{background:var(--go);color:#fff;border-radius:10px;padding:9px 16px}.btn:hover{filter:brightness(1.1)}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
 .pick{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
@@ -1343,12 +1373,12 @@ button{font:inherit;color:inherit}
 .hours{position:relative;height:14px}.hours i{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--mut);font-style:normal}
 .track{position:relative;height:34px;background:color-mix(in srgb,var(--mut) 10%,transparent);border-radius:8px;overflow:hidden;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:12.5% 100%}
 .track.thin{height:20px;border-radius:6px}
-.blk{position:absolute;top:2px;bottom:2px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;border:1px solid rgba(255,255,255,.18);overflow:hidden}
+.blk{position:absolute;top:2px;bottom:2px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;overflow:hidden}
 .nowline{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.85}
-.dn{font-size:13px;font-weight:500}.dn.today{color:var(--accent)}.dn small{display:block;font-size:10px;font-weight:400}.dn.small{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dn{font-size:13px;font-weight:500}.dn.today{color:var(--go)}.dn small{display:block;font-size:10px;font-weight:400}.dn.small{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .legend.grad{align-items:center;margin-top:14px}.legend.grad i{width:120px;height:10px;border-radius:5px;margin:0}.legend.grad em{flex-basis:100%;font-style:normal}
 .explain p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--fg)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.two div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.two b{display:block;font-weight:500}.two small{color:var(--mut)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.two div{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:10px 12px}.two b{display:block;font-weight:500}.two small{color:var(--mut)}
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:6px}
 .lrow{display:grid;grid-template-columns:56px 1.3fr repeat(4,1fr);gap:10px;align-items:center;margin:0;cursor:pointer;padding:12px}.lrow:hover{border-color:var(--mut)}
 .lname small,.lm span{display:block;font-size:11px;color:var(--mut)}.lm b{font-size:13px;font-weight:500}
