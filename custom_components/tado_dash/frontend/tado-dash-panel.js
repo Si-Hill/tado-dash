@@ -930,14 +930,10 @@ class TadoDashPanel extends HTMLElement {
   }
 
   // Is any heating room calling for heat? Inferred from the rooms: Tado CE has no burner or flame
-  // signal, so this says the boiler is being asked to run, not that it is. Hot water is separate: heating
-  // the cylinder fires the boiler but sends nothing to the radiators.
+  // signal, so this says the boiler is being asked to run, not that it is. Hot water is left out: its
+  // "power" only says the zone is switched on (it stays on all day), not that the cylinder is heating.
   _callingForHeat() {
     return this._zones.some((z) => z.type === "heating" && z.heating && !z.off);
-  }
-
-  _heatingWater() {
-    return this._zones.some((z) => z.type === "hot_water" && z.heating && !z.off);
   }
 
   // The settings pill: opens a small modal with what the current tab can show.
@@ -985,7 +981,7 @@ class TadoDashPanel extends HTMLElement {
   // for heat, thicker the more open its valve is; thin and dashed when it isn't.
   _boilerCard(rooms) {
     const h = this._hub, temp = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
-    const rooms_ = this._callingForHeat(), water = this._heatingWater(), calling = rooms_ || water;
+    const calling = this._callingForHeat();
     const groups = this._groups(rooms), n = groups.length, split = n >= 2 ? Math.ceil(n / 2) : 0;
     const node = (z, side) => {
       const on = z.heating && !z.off, pct = on ? Math.round(z.power ?? 40) : 0;
@@ -1000,7 +996,7 @@ class TadoDashPanel extends HTMLElement {
     }).join("")}</div>`;
     return `<div class="card boilercard ${this._layout.compact ? "compact" : ""}">
       <div class="row top"><span class="name">${icon("fire-burner")}Boiler</span>
-        <span class="pill ${calling ? "heating" : ""}" title="Inferred from the rooms and hot water; Tado CE has no flame signal">${rooms_ ? icon("fire") + "Calling for heat" : water ? icon("fire") + "Heating hot water" : "Idle"}</span></div>
+        <span class="pill ${calling ? "heating" : ""}" title="Inferred from the rooms; Tado CE has no flame signal">${calling ? icon("fire") + "Calling for heat" : "Idle"}</span></div>
       <div class="bflow"><svg class="bwires" aria-hidden="true"></svg>
         ${side(groups.slice(0, split), "top")}<div class="bimg">${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
   }
@@ -1101,13 +1097,11 @@ class TadoDashPanel extends HTMLElement {
     const h = this._hub;
     const v = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
     if (v == null) return "";
-    const rooms = this._callingForHeat(), water = this._heatingWater();
-    const tip = rooms
+    const calling = this._callingForHeat();
+    const tip = calling
       ? "Boiler output temperature. Orange: at least one room is calling for heat (inferred from the rooms, not a flame sensor)."
-      : water
-        ? "Boiler output temperature. Orange: the hot water cylinder is heating; no room is calling for heat (inferred, not a flame sensor)."
-        : "Boiler output temperature. Grey: no room is calling for heat right now.";
-    return chip("fire-burner", "Boiler", `${f1(v)} °C`, rooms || water ? "fire" : "", `title="${tip}"`);
+      : "Boiler output temperature. Grey: no room is calling for heat right now.";
+    return chip("fire-burner", "Boiler", `${f1(v)} °C`, calling ? "fire" : "", `title="${tip}"`);
   }
 
   /* ----- TRVs ----- */
