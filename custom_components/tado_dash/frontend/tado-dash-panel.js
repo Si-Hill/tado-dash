@@ -13,7 +13,14 @@ const C = {
   sunflower: "#f1c40f", carrot: "#e67e22", alizarin: "#e74c3c", clouds: "#ecf0f1", concrete: "#95a5a6",
   orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b", silver: "#bdc3c7", asbestos: "#7f8c8d",
 };
+// The panel's header shows the same logo as the brand images, served next to the panel by the
+// integration (/tado_dash/brand/). Find them from where this script was loaded; the dev harness
+// has no such path, so it sets TADO_DASH_BASE.
+const SELF = document.currentScript?.src || "";
+const BASE = SELF ? SELF.replace(/[^/?]*(\?.*)?$/, "") : window.TADO_DASH_BASE || "/tado_dash/";
+const VERSION_Q = SELF.includes("?") ? SELF.slice(SELF.indexOf("?")) : "";
 const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
+const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true }; // what the Rooms / TRV's tabs show
 const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
@@ -87,6 +94,8 @@ const FA_ALIAS = {
   "battery-alert": "battery-quarter",
   "battery-unknown": "battery-half",
   "air-conditioner": "snowflake",
+  "settings": "gear",
+  "close": "xmark",
   "compact": "table-cells",
   "trend-up": "caret-up",
   "trend-down": "caret-down",
@@ -95,8 +104,6 @@ const FA_ALIAS = {
   "chevron-down": "chevron-down",
   "confidence": "gauge",
   "home-export-outline": "house",
-  "logo-square": "square",
-  "logo-ring": "regular-circle",
   "home-account": "house",
   "circle-question": "circle-question",
 };
@@ -130,6 +137,7 @@ const FA = {
   "fire": [448, "M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.5 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-4.5-9-16-9.6-22.5-2l-25.2 29.3c-6.6 7.6-18.5 7.4-24.7-.5c-16.5-21-46-58.5-62.8-79.8c-6.3-8-18.3-8.1-24.7-.1c-33.8 42.5-50.8 69.3-50.8 99.4C112 375.4 162.6 416 225.7 416z"],
   "fire-burner": [640, "M345.7 48.3L358 34.5c5.4-6.1 13.3-8.8 20.9-8.9c7.2 0 14.3 2.6 19.9 7.8c19.7 18.3 39.8 43.2 55 70.6C469 131.2 480 162.2 480 192.2C480 280.8 408.7 352 320 352c-89.6 0-160-71.3-160-159.8c0-37.3 16-73.4 36.8-104.5c20.9-31.3 47.5-59 70.9-80.2C273.4 2.3 280.7-.2 288 0c14.1 .3 23.8 11.4 32.7 21.6c0 0 0 0 0 0c2 2.3 4 4.6 6 6.7l19 19.9zM384 240.2c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C293 167.1 256 203.6 256 240.2c0 35.3 28.7 64 64 64s64-28.7 64-64zM32 288c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 64 448 0 0-64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l0-96zM320 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm160-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM192 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"],
   "gauge": [512, "M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm320 96c0-26.9-16.5-49.9-40-59.3L280 88c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 204.7c-23.5 9.5-40 32.5-40 59.3c0 35.3 28.7 64 64 64s64-28.7 64-64zM144 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm-16 80a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM400 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"],
+  "gear": [512, "M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"],
   "hand": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 272c0 1.5 0 3.1 .1 4.6L67.6 283c-16-15.2-41.3-14.6-56.6 1.4s-14.6 41.3 1.4 56.6L124.8 448c43.1 41.1 100.4 64 160 64l19.2 0c97.2 0 176-78.8 176-176l0-208c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 176c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208z"],
   "hourglass-half": [384, "M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 256 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32s-14.3-32-32-32L320 0 64 0 32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9L192 301.3l67.9 67.9c4.6 4.6 8.6 9.6 12.1 14.9L112 384z"],
   "house": [576, "M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"],
@@ -142,11 +150,9 @@ const FA = {
   "minus": [448, "M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"],
   "plus": [448, "M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"],
   "power-off": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 224c0 17.7 14.3 32 32 32s32-14.3 32-32l0-224zM143.5 120.6c13.6-11.3 15.4-31.5 4.1-45.1s-31.5-15.4-45.1-4.1C49.7 115.4 16 181.8 16 256c0 132.5 107.5 240 240 240s240-107.5 240-240c0-74.2-33.8-140.6-86.6-184.6c-13.6-11.3-33.8-9.4-45.1 4.1s-9.4 33.8 4.1 45.1c38.9 32.3 63.5 81 63.5 135.4c0 97.2-78.8 176-176 176s-176-78.8-176-176c0-54.4 24.7-103.1 63.5-135.4z"],
-  "regular-circle": [512, "M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"],
   "rocket": [512, "M156.6 384.9L125.7 354c-8.5-8.5-11.5-20.8-7.7-32.2c3-8.9 7-20.5 11.8-33.8L24 288c-8.6 0-16.6-4.6-20.9-12.1s-4.2-16.7 .2-24.1l52.5-88.5c13-21.9 36.5-35.3 61.9-35.3l82.3 0c2.4-4 4.8-7.7 7.2-11.3C289.1-4.1 411.1-8.1 483.9 5.3c11.6 2.1 20.6 11.2 22.8 22.8c13.4 72.9 9.3 194.8-111.4 276.7c-3.5 2.4-7.3 4.8-11.3 7.2l0 82.3c0 25.4-13.4 49-35.3 61.9l-88.5 52.5c-7.4 4.4-16.6 4.5-24.1 .2s-12.1-12.2-12.1-20.9l0-107.2c-14.1 4.9-26.4 8.9-35.7 11.9c-11.2 3.6-23.4 .5-31.8-7.8zM384 168a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"],
   "rotate": [512, "M142.9 142.9c-17.5 17.5-30.1 38-37.8 59.8c-5.9 16.7-24.2 25.4-40.8 19.5s-25.4-24.2-19.5-40.8C55.6 150.7 73.2 122 97.6 97.6c87.2-87.2 228.3-87.5 315.8-1L455 55c6.9-6.9 17.2-8.9 26.2-5.2s14.8 12.5 14.8 22.2l0 128c0 13.3-10.7 24-24 24l-8.4 0c0 0 0 0 0 0L344 224c-9.7 0-18.5-5.8-22.2-14.8s-1.7-19.3 5.2-26.2l41.1-41.1c-62.6-61.5-163.1-61.2-225.3 1zM16 312c0-13.3 10.7-24 24-24l7.6 0 .7 0L168 288c9.7 0 18.5 5.8 22.2 14.8s1.7 19.3-5.2 26.2l-41.1 41.1c62.6 61.5 163.1 61.2 225.3-1c17.5-17.5 30.1-38 37.8-59.8c5.9-16.7 24.2-25.4 40.8-19.5s25.4 24.2 19.5 40.8c-10.8 30.6-28.4 59.3-52.9 83.8c-87.2 87.2-228.3 87.5-315.8 1L57 457c-6.9 6.9-17.2 8.9-26.2 5.2S16 449.7 16 440l0-119.6 0-.7 0-7.6z"],
   "snowflake": [448, "M224 0c17.7 0 32 14.3 32 32l0 30.1 15-15c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-49 49 0 70.3 61.4-35.8 17.7-66.1c3.4-12.8 16.6-20.4 29.4-17s20.4 16.6 17 29.4l-5.2 19.3 23.6-13.8c15.3-8.9 34.9-3.7 43.8 11.5s3.8 34.9-11.5 43.8l-25.3 14.8 21.7 5.8c12.8 3.4 20.4 16.6 17 29.4s-16.6 20.4-29.4 17l-67.7-18.1L287.5 256l60.9 35.5 67.7-18.1c12.8-3.4 26 4.2 29.4 17s-4.2 26-17 29.4l-21.7 5.8 25.3 14.8c15.3 8.9 20.4 28.5 11.5 43.8s-28.5 20.4-43.8 11.5l-23.6-13.8 5.2 19.3c3.4 12.8-4.2 26-17 29.4s-26-4.2-29.4-17l-17.7-66.1L256 311.7l0 70.3 49 49c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15 0 30.1c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-30.1-15 15c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l49-49 0-70.3-61.4 35.8-17.7 66.1c-3.4 12.8-16.6 20.4-29.4 17s-20.4-16.6-17-29.4l5.2-19.3L48.1 395.6c-15.3 8.9-34.9 3.7-43.8-11.5s-3.7-34.9 11.5-43.8l25.3-14.8-21.7-5.8c-12.8-3.4-20.4-16.6-17-29.4s16.6-20.4 29.4-17l67.7 18.1L160.5 256 99.6 220.5 31.9 238.6c-12.8 3.4-26-4.2-29.4-17s4.2-26 17-29.4l21.7-5.8L15.9 171.6C.6 162.7-4.5 143.1 4.4 127.9s28.5-20.4 43.8-11.5l23.6 13.8-5.2-19.3c-3.4-12.8 4.2-26 17-29.4s26 4.2 29.4 17l17.7 66.1L192 200.3l0-70.3L143 81c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l15 15L192 32c0-17.7 14.3-32 32-32z"],
-  "square": [448, "M0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z"],
   "stopwatch": [448, "M176 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l16 0 0 34.4C92.3 113.8 16 200 16 304c0 114.9 93.1 208 208 208s208-93.1 208-208c0-41.8-12.3-80.7-33.5-113.2l24.1-24.1c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L355.7 143c-28.1-23-62.2-38.8-99.7-44.6L256 64l16 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L224 0 176 0zm72 192l0 128c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-128c0-13.3 10.7-24 24-24s24 10.7 24 24z"],
   "table-cells": [512, "M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm88 64l0 64-88 0 0-64 88 0zm56 0l88 0 0 64-88 0 0-64zm240 0l0 64-88 0 0-64 88 0zM64 224l88 0 0 64-88 0 0-64zm232 0l0 64-88 0 0-64 88 0zm64 0l88 0 0 64-88 0 0-64zM152 352l0 64-88 0 0-64 88 0zm56 0l88 0 0 64-88 0 0-64zm240 0l0 64-88 0 0-64 88 0z"],
   "temperature-arrow-down": [576, "M128 112c0-26.5 21.5-48 48-48s48 21.5 48 48l0 164.5c0 17.3 7.1 31.9 15.3 42.5C249.8 332.6 256 349.5 256 368c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-18.5 6.2-35.4 16.7-48.9c8.2-10.6 15.3-25.2 15.3-42.5L128 112zM176 0C114.1 0 64 50.1 64 112l0 164.4c0 .1-.1 .3-.2 .6c-.2 .6-.8 1.6-1.7 2.8C43.2 304.2 32 334.8 32 368c0 79.5 64.5 144 144 144s144-64.5 144-144c0-33.2-11.2-63.8-30.1-88.1c-.9-1.2-1.5-2.2-1.7-2.8c-.1-.3-.2-.5-.2-.6L288 112C288 50.1 237.9 0 176 0zm0 416c26.5 0 48-21.5 48-48c0-20.9-13.4-38.7-32-45.3l0-50.7c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 50.7c-18.6 6.6-32 24.4-32 45.3c0 26.5 21.5 48 48 48zm336-64l-32 0 0-288c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 288-32 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l64 64c6 6 14.1 9.4 22.6 9.4s16.6-3.4 22.6-9.4l64-64c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8z"],
@@ -156,14 +162,9 @@ const FA = {
   "temperature-low": [512, "M448 96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM320 96a96 96 0 1 1 192 0A96 96 0 1 1 320 96zM144 64c-26.5 0-48 21.5-48 48l0 164.5c0 17.3-7.1 31.9-15.3 42.5C70.2 332.6 64 349.5 64 368c0 44.2 35.8 80 80 80s80-35.8 80-80c0-18.5-6.2-35.4-16.7-48.9c-8.2-10.6-15.3-25.2-15.3-42.5L192 112c0-26.5-21.5-48-48-48zM32 112C32 50.2 82.1 0 144 0s112 50.1 112 112l0 164.4c0 .1 .1 .3 .2 .6c.2 .6 .8 1.6 1.7 2.8c18.9 24.4 30.1 55 30.1 88.1c0 79.5-64.5 144-144 144S0 447.5 0 368c0-33.2 11.2-63.8 30.1-88.1c.9-1.2 1.5-2.2 1.7-2.8c.1-.3 .2-.5 .2-.6L32 112zM192 368c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-20.9 13.4-38.7 32-45.3l0-50.7c0-8.8 7.2-16 16-16s16 7.2 16 16l0 50.7c18.6 6.6 32 24.4 32 45.3z"],
   "water": [576, "M269.5 69.9c11.1-7.9 25.9-7.9 37 0C329 85.4 356.5 96 384 96c26.9 0 55.4-10.8 77.4-26.1c0 0 0 0 0 0c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 149.7 417 160 384 160c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4C42.8 92.6 61 83.5 75.3 71.6c11.1-9.5 27.3-10.1 39.2-1.7c0 0 0 0 0 0C136.7 85.2 165.1 96 192 96c27.5 0 55-10.6 77.5-26.1zm37 288C329 373.4 356.5 384 384 384c26.9 0 55.4-10.8 77.4-26.1c0 0 0 0 0 0c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 437.7 417 448 384 448c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.4 27.3-10.1 39.2-1.7c0 0 0 0 0 0C136.7 373.2 165.1 384 192 384c27.5 0 55-10.6 77.5-26.1c11.1-7.9 25.9-7.9 37 0zm0-144C329 229.4 356.5 240 384 240c26.9 0 55.4-10.8 77.4-26.1c0 0 0 0 0 0c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 293.7 417 304 384 304c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.5 27.3-10.1 39.2-1.7c0 0 0 0 0 0C136.7 229.2 165.1 240 192 240c27.5 0 55-10.6 77.5-26.1c11.1-7.9 25.9-7.9 37 0z"],
   "wifi": [640, "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"],
+  "xmark": [384, "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"],
 };
 /* FA-ICONS-END */
-// Brand mark: a ring stacked on a square, like a Font Awesome stacked icon.
-const logo = () => {
-  const sq = FA.square, ring = FA["regular-circle"];
-  return `<span class="logo" aria-hidden="true"><svg viewBox="0 0 ${sq[0]} 512"><path fill="${HEAT}" d="${sq[1]}"/></svg>`
-    + `<svg class="ring2" viewBox="0 0 ${ring[0]} 512"><path fill="#fff" d="${ring[1]}"/></svg></span>`;
-};
 const icon = (n) => {
   const i = FA[FA_ALIAS[n] || n] || FA["circle-question"];
   return `<svg class="i" viewBox="0 0 ${i[0]} 512" aria-hidden="true"><path fill="currentColor" d="${i[1]}"/></svg>`;
@@ -283,6 +284,18 @@ function trendPerHour(pts, nowVal) {
   return d ? (n * sxy - sx * sy) / d : null;
 }
 
+// A wall boiler: a display showing the output temperature, and a flame that lights when it is being
+// asked for heat. The pipes in the boiler card leave the body directly (it spans y 14 to 124).
+function boilerSVG(calling, temp) {
+  const fire = FA.fire;
+  return `<svg class="boiler" viewBox="0 10 120 120" role="img" aria-label="Boiler${calling ? ", calling for heat" : ""}">
+    <rect x="10" y="14" width="100" height="110" rx="14" style="fill:color-mix(in srgb, var(--mut) 16%, var(--card))" stroke="var(--mut)" stroke-width="3"/>
+    <rect x="26" y="30" width="68" height="30" rx="7" style="fill:color-mix(in srgb, var(--mut) 24%, var(--card))"/>
+    <text x="60" y="51" text-anchor="middle" class="bdisp">${temp != null ? `${f1(temp)}°` : "–"}</text>
+    <svg x="46" y="74" width="28" height="34" viewBox="0 0 ${fire[0]} 512"><path d="${fire[1]}" fill="${calling ? HEAT : "var(--mut)"}" opacity="${calling ? 1 : 0.35}"/></svg>
+  </svg>`;
+}
+
 // A radiator valve head that fills from the bottom with how far the valve is open.
 let trvN = 0;
 function trvSVG(pct) {
@@ -323,7 +336,9 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
-    this._layout = { floors: [], rooms: {}, compact: false }; // user's floor order, room order within each floor, and card size
+    this._layout = { floors: [], rooms: {}, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
+    this._settingsOpen = false;
+    this._onKey = (e) => { if (e.key === "Escape" && this._settingsOpen) { this._settingsOpen = false; this._render(); } };
     this._drag = null;
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
@@ -345,7 +360,9 @@ class TadoDashPanel extends HTMLElement {
     const ids = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === "string") : []);
     const rooms = {};
     for (const [k, a] of Object.entries(v.rooms && typeof v.rooms === "object" ? v.rooms : {})) rooms[k] = ids(a);
-    this._layout = { floors: ids(v.floors), rooms, compact: v.compact === true };
+    const show = { ...SHOW_DEFAULTS };
+    for (const k of Object.keys(show)) if (typeof v.show?.[k] === "boolean") show[k] = v.show[k];
+    this._layout = { floors: ids(v.floors), rooms, compact: v.compact === true, show };
   }
 
   _saveLayout() {
@@ -397,8 +414,14 @@ class TadoDashPanel extends HTMLElement {
     this._saveLayout();
   }
 
+  // Rooms the Rooms tab is allowed to show (the hot water card can be switched off in Settings).
+  _roomZones() {
+    return this._zones.filter((z) => this._layout.show.hotWater || z.type !== "hot_water");
+  }
+
   _visibleZones() {
-    return this._filter === "heating" ? this._zones.filter((z) => z.heating) : this._zones;
+    const zones = this._roomZones();
+    return this._filter === "heating" ? zones.filter((z) => z.heating) : zones;
   }
 
   /* ----- drag a card to reorder it within its own floor ----- */
@@ -463,8 +486,13 @@ class TadoDashPanel extends HTMLElement {
 
   connectedCallback() {
     this._timer = setInterval(() => this._refreshHistory(), 5 * MIN);
+    window.addEventListener("keydown", this._onKey);
   }
-  disconnectedCallback() { clearInterval(this._timer); }
+  disconnectedCallback() {
+    clearInterval(this._timer);
+    window.removeEventListener("keydown", this._onKey);
+    this._ro?.disconnect();
+  }
 
   async _init() {
     this._render();
@@ -673,6 +701,8 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _onClick(e) {
+    // A click on the dimmed area behind the settings window closes it.
+    if (e.target.classList?.contains("modal-back")) { this._settingsOpen = false; this._render(); return; }
     const el = e.target.closest("[data-a]");
     if (!el) return;
     const { a, z, v } = el.dataset;
@@ -680,13 +710,15 @@ class TadoDashPanel extends HTMLElement {
     switch (a) {
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
       case "compact": this._layout.compact = !this._layout.compact; this._saveLayout(); break;
+      case "settings": this._settingsOpen = !this._settingsOpen; break;
+      case "settings-close": this._settingsOpen = false; break;
       case "opt": {
         const id = el.dataset.id;
         this._selOpt[id] = v;
         this._call("select", "select_option", { entity_id: id, option: v }).then((ok) => { if (!ok) { delete this._selOpt[id]; this._render(); } });
         break;
       }
-      case "tab": this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
+      case "tab": this._settingsOpen = false; this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
       case "open": this._zone = z; this._sel = z; break;
       case "back": this._zone = null; break;
       case "menu": this.dispatchEvent(new CustomEvent("hass-toggle-menu", { bubbles: true, composed: true })); return;
@@ -709,6 +741,11 @@ class TadoDashPanel extends HTMLElement {
     if (!el) return;
     if (el.dataset.c === "select") this._call("select", "select_option", { entity_id: el.dataset.id, option: el.value });
     if (el.dataset.c === "sel") { this._sel = el.value; this._render(); }
+    if (el.dataset.c === "setting" && el.dataset.key in SHOW_DEFAULTS) {
+      this._layout.show[el.dataset.key] = el.checked;
+      this._saveLayout();
+      this._render();
+    }
   }
 
   _ensureSel() { if (!this._sel) this._sel = this._zones[0]?.id || null; }
@@ -740,10 +777,12 @@ class TadoDashPanel extends HTMLElement {
         <header>
           ${inRoom ? `<button class="icon-btn" data-a="back" title="Back">${icon("arrow-left")}</button>`
             : this._narrow ? `<button class="icon-btn" data-a="menu" title="Menu">${icon("menu")}</button>` : ""}
-          ${inRoom ? "" : logo()}<h1>${esc(title)}</h1>
+          ${inRoom ? `<h1>${esc(title)}</h1>` : `<img class="brand" alt="Tado Dash" src="${BASE}brand/${this.getAttribute("data-theme") === "dark" ? "dark_logo" : "logo"}.png${VERSION_Q}"
+            onerror="this.outerHTML='<h1>Tado Dash</h1>'">`}
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
         <div class="content"><div class="wrap">${body}</div></div>
+        ${this._settingsOpen && !inRoom ? this._settingsModal() : ""}
       </div>`;
     const sc = this.shadowRoot.querySelector(".content");
     const key = `${this._tab}:${this._zone}`;
@@ -751,6 +790,7 @@ class TadoDashPanel extends HTMLElement {
     this._renderedKey = key;
     this._bindCharts();
     this._bindSparks();
+    this._bindBoiler();
     this._afterRender();
   }
 
@@ -796,7 +836,7 @@ class TadoDashPanel extends HTMLElement {
   /* ----- rooms ----- */
 
   _viewRooms() {
-    const zones = this._zones, hub = this._hub;
+    const zones = this._roomZones(), hub = this._hub;
     const heating = zones.filter((z) => z.heating).length;
     const outside = hub.n("outside_temp");
     const away = hub.get("home")?.state === "off";
@@ -811,7 +851,10 @@ class TadoDashPanel extends HTMLElement {
       showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
       alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : "",
       this._compactChip(),
+      this._settingsChip(),
     ].join("");
+    // In a grid of its own with the same columns as the room cards, spanning two of them.
+    const boiler = this._layout.show.boilerRooms ? `<div class="grid boilerrow ${this._layout.compact ? "compact" : ""}">${this._boilerCard(zones.filter((z) => z.type === "heating"))}</div>` : "";
     const shown = this._visibleZones();
     const groups = this._groups(shown);
     const body = !shown.length
@@ -822,7 +865,7 @@ class TadoDashPanel extends HTMLElement {
           <button class="mv" title="Move this floor down" data-a="floor-mv" data-f="${g.id}" data-v="1" ${i === groups.length - 1 ? "disabled" : ""}>${icon("chevron-down")}</button>` : ""}</div>` : "";
         return `<section class="floor">${head}<div class="grid ${this._layout.compact ? "compact" : ""}" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
       }).join("");
-    return `<div class="chips">${chips}</div>${body}`;
+    return `<div class="chips">${chips}</div>${boiler}${body}`;
   }
 
   // The boiler's output temperature from the Internet Bridge (flow temperature on eBUS boilers),
@@ -832,13 +875,142 @@ class TadoDashPanel extends HTMLElement {
     return chip("compact", "Compact", "", `push ${this._layout.compact ? "on" : ""}`, `data-a="compact" title="Smaller cards, so more fit on the screen"`);
   }
 
-  // It turns orange while any room (or hot water) is calling for heat. That is inferred from the rooms:
-  // Tado CE has no burner or flame signal, so it says the boiler is being asked to run, not that it is.
+  // Is any room (or hot water) calling for heat? Inferred from the rooms: Tado CE has no burner or flame
+  // signal, so this says the boiler is being asked to run, not that it is.
+  _callingForHeat() {
+    return this._zones.some((z) => z.type !== "ac" && z.heating);
+  }
+
+  // The settings pill: opens a small modal with what the current tab can show.
+  _settingsChip() {
+    return chip("settings", "Settings", "", this._settingsOpen ? "on" : "", `data-a="settings" title="Choose what this page shows"`);
+  }
+
+  _settingsModal() {
+    const s = this._layout.show, onTrvs = this._tab === "trvs";
+    const row = (key, label, note) => `<label class="srow"><input type="checkbox" data-c="setting" data-key="${key}" ${s[key] ? "checked" : ""}>
+      <span><b>${label}</b><small>${note}</small></span></label>`;
+    const rows = onTrvs
+      ? row("boilerTrvs", "Show the boiler card", "The boiler with a line to each room that has a valve.")
+      : row("hotWater", "Show the hot water card", "The hot water cylinder, if Tado CE has one.") +
+        row("boilerRooms", "Show the boiler card", "The boiler with a line to each heating room.");
+    return `<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="mhead"><h3>Settings</h3><small>${onTrvs ? "TRV's tab" : "Rooms tab"}</small><span class="sp"></span>
+        <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
+      ${rows}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+  }
+
+  // The boiler in the middle with the rooms of the upper floors above it and the rest below, in the
+  // user's floor and room order. Pipework joins them (see _drawWires): copper while a room is calling
+  // for heat, thicker the more open its valve is; thin and dashed when it isn't.
+  _boilerCard(rooms) {
+    const h = this._hub, temp = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
+    const calling = this._callingForHeat();
+    const groups = this._groups(rooms), n = groups.length, split = n >= 2 ? Math.ceil(n / 2) : 0;
+    const node = (z, side) => {
+      const on = z.heating && !z.off, pct = on ? Math.round(z.power ?? 40) : 0;
+      return `<span class="bnode ${on ? "on" : ""}" data-a="open" data-z="${z.id}" data-side="${side}" data-pct="${pct}"
+        title="${esc(z.name)}: ${on ? `calling for heat, valve ${pct}% open` : "not calling for heat"}">${esc(z.name)}${on ? `<small>${pct}%</small>` : ""}</span>`;
+    };
+    // The floor name goes on the far side of its rooms from the boiler, so no wire runs through it.
+    const side = (gs, name) => `<div class="bside" data-side="${name}">${gs.map((g) => {
+      const label = g.titled ? `<div class="bfloor">${esc(g.name)}</div>` : "";
+      const nodes = `<div class="bnodes">${g.zones.map((z) => node(z, name)).join("")}</div>`;
+      return `<div class="bgroup">${name === "top" ? label + nodes : nodes + label}</div>`;
+    }).join("")}</div>`;
+    return `<div class="card boilercard ${this._layout.compact ? "compact" : ""}">
+      <div class="row top"><span class="name">${icon("fire-burner")}Boiler</span>
+        <span class="pill ${calling ? "heating" : ""}" title="Inferred from the rooms; Tado CE has no flame signal">${calling ? icon("fire") + "Calling for heat" : "Idle"}</span></div>
+      <div class="bflow"><svg class="bwires" aria-hidden="true"></svg>
+        ${side(groups.slice(0, split), "top")}<div class="bimg">${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
+  }
+
+  // Pipework: one main pipe from the boiler for each floor runs to a horizontal pipe along that
+  // floor's rooms, and every room tees off it. Where the horizontal pipe turns into the outer rooms
+  // it makes a 90 degree elbow. Pipes that aren't carrying heat are drawn empty (an outline with a hollow
+  // inside); hot ones are copper with glints flowing from the boiler to the rooms, faster the more open
+  // the valve. Measured from the laid-out card, so it follows the card's width.
+  _drawWires(flow) {
+    const svg = flow.querySelector(".bwires"), img = flow.querySelector(".boiler");
+    if (!svg || !img) return;
+    const fr = flow.getBoundingClientRect(), ir = img.getBoundingClientRect();
+    if (!fr.width || !ir.height) return;
+    const k = ir.height / 120, ox = ir.left - fr.left, oy = ir.top - fr.top; // the drawing is 120 units tall, from y 10
+    svg.setAttribute("viewBox", `0 0 ${fr.width} ${fr.height}`);
+    svg.setAttribute("width", fr.width);
+    svg.setAttribute("height", fr.height);
+    const f = (v) => v.toFixed(1);
+    const BEND = 12; // radius of the elbows
+    const PIPE = flow.closest(".compact") ? 4 : 5.5; // every pipe is the same size, like real plumbing
+    const pieces = []; // { d, hot, pct (how open: sets speed, density and depth of colour), rev (flows against the way the path is drawn) }
+    for (const side of ["top", "bottom"]) {
+      const up = side === "top";
+      const stubY = up ? oy + (14 - 10) * k : oy + (124 - 10) * k; // the pipes leave the boiler's top or bottom edge
+      const groups = [...flow.querySelectorAll(`.bside[data-side="${side}"] .bgroup`)];
+      const slots = groups.length === 1 ? [60] : groups.length === 2 ? [34, 86] : [34, 60, 86]; // where along the edge, in the boiler drawing
+      groups.forEach((grp, gi) => {
+        const rooms = [...grp.querySelectorAll(".bnode")].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.left - fr.left + r.width / 2, end: up ? r.bottom - fr.top : r.top - fr.top, hot: el.classList.contains("on"), pct: +el.dataset.pct };
+        });
+        if (!rooms.length) return;
+        const nearest = up ? Math.max(...rooms.map((r) => r.end)) : Math.min(...rooms.map((r) => r.end));
+        const yh = stubY + (nearest - stubY) * 0.4; // the horizontal pipe, nearer the boiler so each room's branch is the longer run
+        const hotRooms = rooms.filter((r) => r.hot), hot = hotRooms.length > 0;
+        const busiest = hot ? Math.max(...hotRooms.map((r) => r.pct)) : 0;
+        // Everything hangs off the horizontal pipe: the main pipe to the boiler, and one branch per room.
+        const riser = { x: ox + slots[Math.min(gi, slots.length - 1)] * k, end: stubY, hot, riser: true, pct: busiest };
+        const branches = [riser];
+        rooms.forEach((r) => branches.push({ x: r.x, end: r.end, hot: r.hot, pct: r.pct }));
+        branches.sort((a, b) => a.x - b.x);
+        const first = branches[0], last = branches[branches.length - 1], span = last.x - first.x;
+        const rad = (b) => Math.max(0, Math.min(BEND, span / 2, Math.abs(b.end - yh)));
+        // Drawn from the room (or the boiler stub) in towards the horizontal pipe; the rooms are fed the
+        // other way, so their flow runs against the path.
+        branches.forEach((b, i) => {
+          const base = { hot: b.hot, rev: !b.riser, pct: b.pct };
+          if (span < 1 || (i > 0 && i < branches.length - 1)) { pieces.push({ ...base, d: `M${f(b.x)},${f(b.end)}V${f(yh)}` }); return; } // a tee
+          const r = rad(b), sgn = b.end > yh ? 1 : -1, dir = i === 0 ? 1 : -1; // an outer branch: an elbow into the horizontal pipe
+          pieces.push({ ...base, d: `M${f(b.x)},${f(b.end)}V${f(yh + sgn * r)}Q${f(b.x)},${f(yh)} ${f(b.x + dir * r)},${f(yh)}` });
+        });
+        // The horizontal pipe, in two halves that run out from the main pipe (the way the water goes).
+        const hdr = { hot, rev: false, pct: busiest };
+        const rx = riser.x, leftEnd = first.x + rad(first), rightEnd = last.x - rad(last);
+        if (first !== riser && rx - leftEnd > 1) pieces.push({ ...hdr, d: `M${f(riser === last ? rx - rad(riser) : rx)},${f(yh)}H${f(leftEnd)}` });
+        if (last !== riser && rightEnd - rx > 1) pieces.push({ ...hdr, d: `M${f(riser === first ? rx + rad(riser) : rx)},${f(yh)}H${f(rightEnd)}` });
+      });
+    }
+    // All the outlines first, then all the insides, so where pipes meet they join into one open tube.
+    const path = (p, cls, w, extra = "") => `<path d="${p.d}" class="wire ${cls}" stroke-width="${w.toFixed(1)}"${extra}/>`;
+    const idle = pieces.filter((p) => !p.hot), hotP = pieces.filter((p) => p.hot);
+    let out = idle.map((p) => path(p, "edge off", PIPE + 2)).join("") + idle.map((p) => path(p, "core off", PIPE)).join("");
+    out += hotP.map((p) => path(p, "edge on", PIPE + 2)).join("");
+    // How much flows is shown three ways, all driven by how far the valve is open: how bright the copper
+    // is, how many glints there are along the pipe, and how fast they travel.
+    const open = (p) => Math.min(100, Math.max(5, p.pct)) / 100;
+    out += hotP.map((p) => path(p, "core on", PIPE, ` style="stroke:color-mix(in srgb, var(--pipe) ${Math.round(50 + 50 * open(p))}%, var(--card))"`)).join("");
+    out += hotP.map((p) => path(p, "hi", PIPE * 0.3)).join("");
+    out += hotP.map((p) => {
+      const gap = 30 - 22 * open(p), period = gap + 1, speed = 8 + 22 * open(p); // px between glints; px per second
+      return path(p, `flow${p.rev ? " rev" : ""}`, PIPE * 0.5, ` style="stroke-dasharray:1 ${gap.toFixed(1)};--period:-${period.toFixed(1)};animation-duration:${(period / speed).toFixed(2)}s"`);
+    }).join("");
+    svg.innerHTML = out;
+  }
+
+  _bindBoiler() {
+    this._ro?.disconnect();
+    const flows = [...this.shadowRoot.querySelectorAll(".bflow")];
+    if (!flows.length) return;
+    this._ro = new ResizeObserver(() => flows.forEach((f) => this._drawWires(f)));
+    flows.forEach((f) => { this._ro.observe(f); this._drawWires(f); });
+  }
+
+  // It turns orange while any room (or hot water) is calling for heat (see _callingForHeat).
   _boilerChip() {
     const h = this._hub;
     const v = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
     if (v == null) return "";
-    const calling = this._zones.some((z) => z.type !== "ac" && z.heating);
+    const calling = this._callingForHeat();
     const tip = calling
       ? "Boiler output temperature. Orange: at least one room is calling for heat (inferred from the rooms, not a flame sensor)."
       : "Boiler output temperature. Grey: no room is calling for heat right now.";
@@ -861,12 +1033,14 @@ class TadoDashPanel extends HTMLElement {
       chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
       this._boilerChip(),
       this._compactChip(),
+      this._settingsChip(),
     ].join("")}</div>`;
+    const boiler = this._layout.show.boilerTrvs ? `<div class="grid trvs boilerrow ${this._layout.compact ? "compact" : ""}">${this._boilerCard(all)}</div>` : "";
     const zones = f === "heating" ? all.filter((z) => z.heating) : all;
     if (!zones.length) {
-      return `${chips}<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
+      return `${chips}${boiler}<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
     }
-    const body = chips + this._groups(zones).map((g) => `<section class="floor">
+    const body = chips + boiler + this._groups(zones).map((g) => `<section class="floor">
       ${g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} room${g.zones.length === 1 ? "" : "s"}</small></div>` : ""}
       <div class="grid trvs ${this._layout.compact ? "compact" : ""}">${g.zones.map((z) => this._trvCard(z)).join("")}</div></section>`).join("");
     return `${body}<p class="hint center">The TRV figure is the valve's own reading before any offset: the temperature Tado reports, minus the offset applied to it.</p>`;
@@ -1436,7 +1610,7 @@ function ringSVG(pct, color, size = 72) {
 const STYLE = `
 :host{display:block;height:100%;background:var(--bg);color:var(--fg);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);
   --heat:${HEAT};--cold:${C.peter};--ok:${C.emerald};--go:${C.nephritis};--warn:${C.orange};--bad:${C.alizarin};--accent:${C.turquoise};
-  --hum:${C.turquoise};--out:${C.concrete};--wis:${C.amethyst};--humhi:color-mix(in srgb,${C.peter} 55%,#fff);
+  --hum:${C.turquoise};--out:${C.concrete};--wis:${C.amethyst};--humhi:color-mix(in srgb,${C.peter} 55%,#fff);--pipe:#c8793c;--pipehi:#eab07a;--pipeedge:#8f5424;
   /* Surfaces, text and borders come from the user's Home Assistant theme, so light/dark just works. */
   --bg:var(--primary-background-color,#111);--card:var(--card-background-color,#1c1c1c);--line:var(--divider-color,rgba(127,127,127,.28));
   --mut:var(--secondary-text-color,#9b9b9b);--fg:var(--primary-text-color,#e1e1e1)}
@@ -1444,8 +1618,7 @@ const STYLE = `
 .page{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
 h1{font-size:20px;font-weight:400;margin:0}
-.logo{position:relative;width:28px;height:28px;flex:none;margin-right:2px}
-.logo svg{position:absolute;left:0;top:0;width:100%;height:100%}.logo .ring2{left:25%;top:25%;width:50%;height:50%}
+.brand{height:40px;width:auto;display:block}
 nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font:inherit;font-size:14px;font-weight:500;padding:14px 14px 12px;cursor:pointer;white-space:nowrap}
 nav button.on{color:var(--heat);border-bottom-color:var(--heat)}
@@ -1527,6 +1700,45 @@ button{font:inherit;color:inherit}
 .compact .seg.icons button,.compact .seg.stepbar button{min-height:30px;padding:4px 2px}
 .compact .seg.icons .lb{display:none}
 .compact .seg.icons button.on,.compact .seg.icons button:hover{flex-grow:1}
+/* ----- boiler card ----- */
+.boilerrow{margin-bottom:22px}
+.boilercard{grid-column:span 2;display:flex;flex-direction:column;gap:8px}
+/* Where only one column fits, the boiler card takes the whole width instead of spilling into a second. */
+.wrap{container-type:inline-size}
+@container (max-width:613px){.grid:not(.trvs):not(.compact)>.boilercard{grid-column:1/-1}}
+@container (max-width:513px){.grid.trvs:not(.compact)>.boilercard{grid-column:1/-1}}
+@container (max-width:469px){.grid.compact>.boilercard{grid-column:1/-1}}
+.bflow{position:relative;display:flex;flex-direction:column;gap:40px;padding:2px 0}
+.bwires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:0}
+.bside{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.bgroup{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bfloor{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.bnodes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.bnode{display:inline-flex;align-items:baseline;gap:5px;padding:5px 11px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--fg);
+  background:color-mix(in srgb,var(--mut) 16%,var(--card))}
+.bnode small{font-size:11px;color:var(--mut)}
+.bnode.on{background:color-mix(in srgb,var(--heat) 32%,var(--card))}.bnode.on small{color:var(--fg)}
+.bimg{display:flex;justify-content:center;position:relative;z-index:1}
+.boiler{width:104px;height:104px;display:block}.bdisp{font-size:17px;font-weight:500;fill:var(--fg)}
+.wire{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.wire.edge.off{stroke:var(--mut);opacity:.55}.wire.core.off{stroke:var(--card)}   /* an empty pipe: outline, hollow inside */
+.wire.edge.on{stroke:var(--pipeedge)}.wire.core.on{stroke:var(--pipe)}.wire.hi{stroke:var(--pipehi);opacity:.4}
+.wire.flow{stroke:#fff3e0;opacity:.9;animation:pipeflow 1.2s linear infinite}
+.wire.flow.rev{animation-direction:reverse}
+@keyframes pipeflow{to{stroke-dashoffset:var(--period,-14)}}
+@media (prefers-reduced-motion:reduce){.wire.flow{animation:none;opacity:.3}}
+.boilercard.compact{padding:12px;gap:4px}.boilercard.compact .bflow{gap:28px}.boilercard.compact .boiler{width:78px;height:78px}
+.boilercard.compact .bnode{padding:3px 9px;font-size:12px}
+/* ----- settings window ----- */
+.page{position:relative}
+.modal-back{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal{width:min(380px,100%);background:var(--card);border-radius:14px;padding:16px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.mhead{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
+.mhead .sp{flex:1}.mhead .icon-btn{align-self:center;padding:6px}
+.srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
+.srow input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--go);flex:none;cursor:pointer}
+.srow b{display:block;font-weight:500;font-size:14px}.srow small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.mfoot{display:flex;justify-content:flex-end;margin-top:8px}
 .trvbody{display:flex;align-items:center;gap:12px}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
 .trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}

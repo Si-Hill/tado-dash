@@ -20,6 +20,7 @@ from homeassistant.core import HomeAssistant
 
 from . import websocket_api
 from .const import (
+    BRAND_STATIC_URL,
     CONF_REQUIRE_ADMIN,
     CONF_SIDEBAR_ICON,
     CONF_SIDEBAR_TITLE,
@@ -35,6 +36,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 _PANEL_JS = Path(__file__).parent / "frontend" / f"{PANEL_ELEMENT}.js"
+_BRAND_DIR = Path(__file__).parent / "brand"
 _MANIFEST = Path(__file__).parent / "manifest.json"
 
 
@@ -47,7 +49,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     domain_data = hass.data.setdefault(DOMAIN, {})
     if not domain_data.get("static_registered"):
         await hass.http.async_register_static_paths(
-            [StaticPathConfig(PANEL_STATIC_URL, str(_PANEL_JS), False)]
+            [
+                StaticPathConfig(PANEL_STATIC_URL, str(_PANEL_JS), False),
+                # The panel header shows the same logo as the brand images, light or dark to suit the theme.
+                StaticPathConfig(f"{BRAND_STATIC_URL}/logo.png", str(_BRAND_DIR / "logo.png"), True),
+                StaticPathConfig(f"{BRAND_STATIC_URL}/dark_logo.png", str(_BRAND_DIR / "dark_logo.png"), True),
+            ]
         )
         websocket_api.async_register(hass)
         domain_data["static_registered"] = True

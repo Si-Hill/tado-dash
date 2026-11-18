@@ -46,6 +46,14 @@
     home.devices[serial] = { serial, zone: z.id, entities: { battery: bat, connection: con } };
   });
 
+  // A hot water zone (no area, like many real installs)
+  {
+    const e = { water_heater: "water_heater.hot_water", power: "binary_sensor.hot_water_power" };
+    put(e.water_heater, "heat", { friendly_name: "Hot Water", zone_id: "1" });
+    put(e.power, "off");
+    home.zones["1"] = { id: "1", entities: e };
+  }
+
   const hub = (key, id, state, attrs = {}) => { home.hub[key] = id; put(id, state, { friendly_name: key, ...attrs }); };
   hub("outside_temp", "sensor.tado_ce_hub_outside_temp", 6.1, { unit_of_measurement: "°C" });
   hub("api_usage", "sensor.tado_ce_hub_api_usage", 124); hub("api_limit", "sensor.tado_ce_hub_api_limit", 1000);

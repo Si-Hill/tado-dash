@@ -11,8 +11,12 @@
 </style>
 </head>
 <body>
-<script src="mock.js"></script>
+<script>
+  // ?mine loads a git-ignored mock of the owner's own home; otherwise the generic one
+  document.write('<script src="' + (new URLSearchParams(location.search).has("mine") ? "mock.local.js" : "mock.js") + '"><\/script>');
+</script>
 <script type="module">
+  window.TADO_DASH_BASE = "../custom_components/tado_dash/"; // where the logos live in the repo
   await import("../custom_components/tado_dash/frontend/tado-dash-panel.js");
   if (new URLSearchParams(location.search).has("light")) {
     // Stand-in for a light Home Assistant theme

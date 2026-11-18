@@ -8,6 +8,7 @@ TADO_CE_DOMAIN = "tado_ce"
 PANEL_URL_PATH = "tado"
 PANEL_ELEMENT = "tado-dash-panel"
 PANEL_STATIC_URL = f"/{DOMAIN}/{PANEL_ELEMENT}.js"
+BRAND_STATIC_URL = f"/{DOMAIN}/brand"  # the logos shown in the panel header
 
 CONF_SIDEBAR_TITLE = "sidebar_title"
 CONF_SIDEBAR_ICON = "sidebar_icon"

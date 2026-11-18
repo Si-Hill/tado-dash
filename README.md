@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/custom_components/tado_dash/brand/icon@2x.png" alt="Tado Dash" width="120">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/custom_components/tado_dash/brand/dark_logo.png">
+    <img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/custom_components/tado_dash/brand/logo.png" alt="Tado Dash" width="380">
+  </picture>
 </p>
 
 # Tado Dash
@@ -11,9 +14,11 @@
   <img src="https://img.shields.io/github/license/Si-Hill/tado-dash?style=for-the-badge&label=LICENSE" alt="License">
 </p>
 
-A **Tado Dash** item in the Home Assistant sidebar: a room-by-room dashboard for heating that [Tado CE](https://github.com/hiall-fyi/tado_ce) already controls.
+Tado Dash is a **companion app for [Tado CE](https://github.com/hiall-fyi/tado_ce)**: a Home Assistant sidebar dashboard that displays the rooms, valves and heating data Tado CE already provides. It adds no functionality to Tado CE and does not change how Tado CE works in any way.
 
-Tado Dash has no account, no entities and no polling of its own. It reads the entities Tado CE creates and calls Tado CE's services, so if Tado CE works for you, Tado Dash works the moment you add it. Not affiliated with Tado or the Tado CE project. The layout is inspired by [RoomMind](https://github.com/snazzybean/roommind), but shares no code with it.
+Everything it shows comes from the entities Tado CE already creates. Tado Dash has no account, no entities and no polling of its own, and it never touches Tado CE's settings. The few controls on the cards (change the target, Schedule, Boost, Manual, Off) are only shortcuts that call Tado CE's existing services and Home Assistant's standard climate services, just as the Home Assistant UI or one of your own automations would, and Tado CE does the actual work. The only thing Tado Dash stores is your layout preferences (floor order, room order and card size), kept in your Home Assistant user data.
+
+If Tado CE works for you, Tado Dash works the moment you add it, and removing it leaves Tado CE exactly as it was. Not affiliated with Tado or the Tado CE project. The layout is inspired by [RoomMind](https://github.com/snazzybean/roommind), but shares no code with it.
 
 ## What you get
 
