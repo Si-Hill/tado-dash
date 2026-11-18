@@ -86,6 +86,7 @@
   };
 
   window.mockHass = {
+    themes: { darkMode: !new URLSearchParams(location.search).has("light") },
     states,
     callWS: async (msg) => {
       if (msg.type === "tado_dash/map") return registry;

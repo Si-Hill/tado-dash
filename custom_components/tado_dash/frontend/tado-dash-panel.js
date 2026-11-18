@@ -427,6 +427,7 @@ class TadoDashPanel extends HTMLElement {
 
   set hass(h) {
     const first = !this._hass;
+    this.setAttribute("data-theme", h.themes?.darkMode ? "dark" : "light");
     this._hass = h;
     if (first) this._init();
     else this._maybeRender();
@@ -1409,6 +1410,9 @@ button{font:inherit;color:inherit}
 .hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
 .hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
 .hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
+/* Dark theme: our own near-black surfaces and borderless cards. Light theme follows Home Assistant. */
+:host([data-theme=dark]){--bg:#0d0e12;--card:#121318}
+:host([data-theme=dark]) .card,:host([data-theme=dark]) .card:hover{border-color:transparent}
 .grid.trvs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .trvcard{cursor:pointer;display:flex;flex-direction:column;gap:8px}.trvcard:hover{border-color:var(--mut)}
 .trv{width:120px;height:160px;align-self:center;display:block}
