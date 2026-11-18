@@ -33,7 +33,7 @@ ALIAS = {
     "water-thermometer-outline": "temperature-arrow-down", "water-outline": "water", "clock-start": "clock",
     "radiator": "temperature-half", "thermostat": "temperature-half", "battery": "battery-full",
     "battery-alert": "battery-quarter", "battery-unknown": "battery-half", "air-conditioner": "snowflake",
-    "settings": "gear", "close": "xmark", "compact": "table-cells", "trend-up": "caret-up", "trend-down": "caret-down", "trend-flat": "minus",
+    "floor-other": "layer-group", "cloud-arrow": "cloud-arrow-down", "settings": "gear", "close": "xmark", "compact": "table-cells", "trend-up": "caret-up", "trend-down": "caret-down", "trend-flat": "minus",
     "chevron-up": "chevron-up", "chevron-down": "chevron-down", "confidence": "gauge", "home-export-outline": "house",
     "home-account": "house", "circle-question": "circle-question",
 }

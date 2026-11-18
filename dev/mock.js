@@ -36,6 +36,7 @@
     sensor("overlay", z.over === "None" ? "Schedule" : "Timer", { next_change: new Date(Date.now() + 3 * 3600e3).toISOString(), next_temperature: 20 });
     sensor("insights", 2, { recommendations: ["Room too cold — increase heating setpoint by 2°C", "Preheat takes ~173 min. Start heating 173 min before the next schedule change."] });
     e.boost = `button.${z.name.toLowerCase()}_boost`; put(e.boost, "unknown");
+    e.refresh_schedule = `button.${z.name.toLowerCase()}_refresh_schedule`; put(e.refresh_schedule, new Date(Date.now() - 3 * 86400e3).toISOString());
     e.early_start = `switch.${z.name.toLowerCase()}_early_start`; put(e.early_start, "on", { friendly_name: "Early start" });
     e.schedule = `calendar.sched_${z.id}`; put(e.schedule, "off");
     e.open_window = `binary_sensor.${z.name.toLowerCase()}_window`; put(e.open_window, i === 3 ? "on" : "off");
@@ -66,6 +67,22 @@
   hub("home", "binary_sensor.tado_ce_hub_home", "on");
   hub("boiler_flow_temp", "sensor.boiler_flow", 60.3); hub("boiler_output_temperature", "sensor.tado_ce_hub_bridge_boiler_output_temperature", 58.4); hub("zone_count", "sensor.tado_ce_hub_zone_count", 4);
   hub("resume_all", "button.tado_ce_hub_resume_all", "unknown");
+  // The rest of Tado CE's hub entities, named the way Tado CE names them
+  const hubx = (key, id, state, name, attrs = {}) => hub(key, id, state, { friendly_name: name, ...attrs });
+  hubx("api_breakdown", "sensor.tado_ce_hub_api_breakdown", "zoneStates", "Tado CE Hub API Breakdown");
+  hubx("boiler_output_temperature_time", "sensor.tado_ce_hub_bridge_boiler_output_temperature_time", new Date(Date.now() - 2 * 60e3).toISOString(), "Internet Bridge Boiler Output Temperature Time");
+  hubx("bridge_capabilities", "sensor.tado_ce_hub_bridge_capabilities", "OpenTherm", "Internet Bridge Bridge Capabilities");
+  hubx("bridge_schema_version", "sensor.tado_ce_hub_bridge_schema_version", 10, "Internet Bridge Bridge Schema Version");
+  hubx("boiler_wiring_state", "sensor.tado_ce_hub_bridge_wiring_state", "Ready", "Internet Bridge Boiler Wiring State");
+  hubx("call_history", "sensor.tado_ce_hub_call_history", 2261, "Tado CE Hub Call History");
+  hubx("home_id", "sensor.tado_ce_hub_home_id", 1234567, "Tado CE Hub Home ID");
+  hubx("homekit_reads_saved", "sensor.tado_ce_hub_homekit_reads_saved", 22, "Tado CE Hub HomeKit Reads Saved");
+  hubx("homekit_writes_saved", "sensor.tado_ce_hub_homekit_writes_saved", 0, "Tado CE Hub HomeKit Writes Saved");
+  hubx("wc_status", "sensor.tado_ce_hub_weather_compensation_status", "active", "Tado CE Hub Weather Compensation Status");
+  hubx("wc_target_flow_temp", "sensor.tado_ce_hub_weather_compensation_target", 53.0, "Tado CE Hub Weather Compensation Target", { unit_of_measurement: "°C" });
+  hubx("overlay_timer", "select.tado_ce_hub_overlay_timer", "60", "Tado CE Hub Overlay Timer", { options: ["30", "60", "90", "120"] });
+  hubx("quota_reserve_enabled", "switch.tado_ce_hub_quota_reserve", "off", "Tado CE Hub Quota Reserve");
+
   hub("presence_mode", "select.tado_ce_hub_presence_mode", "auto", { options: ["auto", "home", "away"] });
   hub("overlay_mode", "select.tado_ce_hub_overlay_mode", "tado_mode", { options: ["tado_mode", "next_time_block", "timer", "manual"] });
   hub("home_insights", "sensor.tado_ce_hub_home_insights", 4, {

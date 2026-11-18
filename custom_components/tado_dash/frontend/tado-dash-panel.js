@@ -94,6 +94,8 @@ const FA_ALIAS = {
   "battery-alert": "battery-quarter",
   "battery-unknown": "battery-half",
   "air-conditioner": "snowflake",
+  "floor-other": "layer-group",
+  "cloud-arrow": "cloud-arrow-down",
   "settings": "gear",
   "close": "xmark",
   "compact": "table-cells",
@@ -131,6 +133,7 @@ const FA = {
   "clock": [512, "M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"],
   "clock-rotate-left": [512, "M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"],
   "cloud": [640, "M0 336c0 79.5 64.5 144 144 144l368 0c70.7 0 128-57.3 128-128c0-61.9-44-113.6-102.4-125.4c4.1-10.7 6.4-22.4 6.4-34.6c0-53-43-96-96-96c-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32C167.6 32 96 103.6 96 192c0 2.7 .1 5.4 .2 8.1C40.2 219.8 0 273.2 0 336z"],
+  "cloud-arrow-down": [640, "M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39L344 184c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 134.1-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z"],
   "droplet": [384, "M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0l1.8 0c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"],
   "face-smile": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM164.1 325.5C182 346.2 212.6 368 256 368s74-21.8 91.9-42.5c5.8-6.7 15.9-7.4 22.6-1.6s7.4 15.9 1.6 22.6C349.8 372.1 311.1 400 256 400s-93.8-27.9-116.1-53.5c-5.8-6.7-5.1-16.8 1.6-22.6s16.8-5.1 22.6 1.6zM144.4 208a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm192-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"],
   "faucet-drip": [512, "M224 0c17.7 0 32 14.3 32 32l0 12 96-12c17.7 0 32 14.3 32 32s-14.3 32-32 32L256 84l-31-3.9-1-.1-1 .1L192 84 96 96C78.3 96 64 81.7 64 64s14.3-32 32-32l96 12 0-12c0-17.7 14.3-32 32-32zM0 224c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-43.8 32-4 32 4 0 43.8 18.7 0c8.5 0 16.6 3.4 22.6 9.4L320 192l32 0c88.4 0 160 71.6 160 160c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 320c-17.7 0-32-14.3-32-32l0-64zM436.8 423.4c1.9-4.5 6.3-7.4 11.2-7.4s9.2 2.9 11.2 7.4l18.2 42.4c1.8 4.1 2.7 8.6 2.7 13.1l0 1.2c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-1.2c0-4.5 .9-8.9 2.7-13.1l18.2-42.4z"],
@@ -145,6 +148,7 @@ const FA = {
   "house-signal": [576, "M357.7 8.5c-12.3-11.3-31.2-11.3-43.4 0l-208 192c-9.4 8.6-12.7 22-8.5 34c87.1 25.3 155.6 94.2 180.3 181.6L464 416c26.5 0 48-21.5 48-48l0-112 32 0c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8.1-35.2l-208-192zM288 208c0-8.8 7.2-16 16-16l64 0c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16l0-64zM24 256c-13.3 0-24 10.7-24 24s10.7 24 24 24c101.6 0 184 82.4 184 184c0 13.3 10.7 24 24 24s24-10.7 24-24c0-128.1-103.9-232-232-232zm8 256a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM0 376c0 13.3 10.7 24 24 24c48.6 0 88 39.4 88 88c0 13.3 10.7 24 24 24s24-10.7 24-24c0-75.1-60.9-136-136-136c-13.3 0-24 10.7-24 24z"],
   "infinity": [640, "M0 241.1C0 161 65 96 145.1 96c38.5 0 75.4 15.3 102.6 42.5L320 210.7l72.2-72.2C419.5 111.3 456.4 96 494.9 96C575 96 640 161 640 241.1l0 29.7C640 351 575 416 494.9 416c-38.5 0-75.4-15.3-102.6-42.5L320 301.3l-72.2 72.2C220.5 400.7 183.6 416 145.1 416C65 416 0 351 0 270.9l0-29.7zM274.7 256l-72.2-72.2c-15.2-15.2-35.9-23.8-57.4-23.8C100.3 160 64 196.3 64 241.1l0 29.7c0 44.8 36.3 81.1 81.1 81.1c21.5 0 42.2-8.5 57.4-23.8L274.7 256zm90.5 0l72.2 72.2c15.2 15.2 35.9 23.8 57.4 23.8c44.8 0 81.1-36.3 81.1-81.1l0-29.7c0-44.8-36.3-81.1-81.1-81.1c-21.5 0-42.2 8.5-57.4 23.8L365.3 256z"],
   "key": [512, "M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17l0 80c0 13.3 10.7 24 24 24l80 0c13.3 0 24-10.7 24-24l0-40 40 0c13.3 0 24-10.7 24-24l0-40 40 0c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"],
+  "layer-group": [576, "M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0l152-70.2zm-152 198.2l152-70.2 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0z"],
   "lightbulb": [384, "M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"],
   "location-dot": [384, "M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"],
   "minus": [448, "M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"],
@@ -172,6 +176,14 @@ const icon = (n) => {
 const pad = (n) => String(n).padStart(2, "0");
 const hhmm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// "outside_temp" / "Outside Temp" -> "Outside Temperature": capitalise, and spell out the usual abbreviations.
+const WORDS = { temp: "Temperature", api: "API", trv: "TRV", trvs: "TRVs", ce: "CE", pct: "%", min: "Minimum", max: "Maximum", avg: "Average",
+  hum: "Humidity", tado: "Tado", ac: "AC", id: "ID", ip: "IP", wifi: "Wi-Fi", hvac: "HVAC", dhw: "Hot Water", hw: "Hot Water", cnt: "Count", num: "Number", sec: "Seconds" };
+function niceName(raw) {
+  return String(raw).replace(/^tado ce hub /i, "").replace(/[_-]+/g, " ").trim().split(/\s+/)
+    .map((w) => WORDS[w.toLowerCase()] || w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
 
 function ago(iso) {
   const t = Date.parse(iso);
@@ -298,12 +310,25 @@ function boilerSVG(calling, temp) {
 
 // A radiator valve head that fills from the bottom with how far the valve is open.
 let trvN = 0;
-function trvSVG(pct) {
+// One side of the pipe running through a valve. Water arrives on the left at full speed; what leaves on the
+// right flows at a speed, density and colour depth set by how open the valve is, and the pipe is empty
+// when it is shut. Same look as the boiler card's pipes.
+function trvPipe(d, hot, open) {
+  if (!hot) return `<path d="${d}" class="wire edge off" stroke-width="10"/><path d="${d}" class="wire core off" stroke-width="8"/>`;
+  const gap = 30 - 22 * open, period = gap + 1, speed = 8 + 22 * open; // units between glints; units per second
+  return `<path d="${d}" class="wire edge on" stroke-width="10"/>`
+    + `<path d="${d}" class="wire core on" stroke-width="8" style="stroke:color-mix(in srgb, var(--pipe) ${Math.round(50 + 50 * open)}%, var(--card))"/>`
+    + `<path d="${d}" class="wire hi" stroke-width="2.4"/>`
+    + `<path d="${d}" class="wire flow" stroke-width="3.6" style="stroke-dasharray:1 ${gap.toFixed(1)};--period:-${period.toFixed(1)};animation-duration:${(period / speed).toFixed(2)}s"/>`;
+}
+
+// supply: is the boiler being asked for heat? If not, no water arrives, so both sides of the pipe are empty.
+function trvSVG(pct, supply = true) {
   const p = pct == null ? 0 : Math.max(0, Math.min(100, pct));
   const id = `trv${++trvN}`, top = 14, h = 84, y = top + h * (1 - p / 100);
   return `<svg class="trv" viewBox="0 0 120 160" role="img" aria-label="${pct == null ? "Valve position unknown" : `Valve ${Math.round(p)}% open`}">
     <defs><clipPath id="${id}"><rect x="28" y="${top}" width="64" height="${h}" rx="16"/></clipPath></defs>
-    <rect x="6" y="133" width="108" height="11" rx="5" fill="var(--mut)" opacity=".35"/>
+    ${trvPipe("M6,138.5H34", supply, 1)}${trvPipe("M86,138.5H114", supply && p > 0, Math.max(5, p) / 100)}
     <rect x="48" y="98" width="24" height="18" fill="var(--mut)" opacity=".55"/>
     <rect x="36" y="114" width="48" height="14" rx="4" fill="var(--mut)" opacity=".75"/>
     <rect x="32" y="126" width="56" height="26" rx="6" fill="var(--mut)" opacity=".5"/>
@@ -730,7 +755,9 @@ class TadoDashPanel extends HTMLElement {
       case "filter": this._filter = v === "heating" && this._filter === "heating" ? "all" : v; break;
       case "range": this._range = parseInt(v, 10); break;
       case "pick": this._sel = z; break;
-      case "refresh-sched": this._cal = {}; break;
+      case "ent-group": { const s = (this._entClosed ||= new Set()); s.has(v) ? s.delete(v) : s.add(v); break; }
+      case "tado-refresh-all": this._refreshFromTado(this._orderedZones().filter((x) => x.ents.schedule)); return;
+      case "tado-refresh-one": if (zone) this._refreshFromTado([zone]); return;
       default: return;
     }
     this._render();
@@ -748,7 +775,16 @@ class TadoDashPanel extends HTMLElement {
     }
   }
 
-  _ensureSel() { if (!this._sel) this._sel = this._zones[0]?.id || null; }
+  // Rooms in the order the Rooms tab shows its cards (floors, then rooms within each floor), leaving out
+  // the hot water zone when its card is switched off. Used by the room pills on Analytics and Schedules.
+  _orderedZones() {
+    return this._groups(this._roomZones()).flatMap((g) => g.zones);
+  }
+
+  _ensureSel() {
+    const list = this._orderedZones();
+    if (!list.some((z) => z.id === this._sel)) this._sel = list[0]?.id || null;
+  }
 
   /* ----- rendering ----- */
 
@@ -973,11 +1009,22 @@ class TadoDashPanel extends HTMLElement {
           const r = rad(b), sgn = b.end > yh ? 1 : -1, dir = i === 0 ? 1 : -1; // an outer branch: an elbow into the horizontal pipe
           pieces.push({ ...base, d: `M${f(b.x)},${f(b.end)}V${f(yh + sgn * r)}Q${f(b.x)},${f(yh)} ${f(b.x + dir * r)},${f(yh)}` });
         });
-        // The horizontal pipe, in two halves that run out from the main pipe (the way the water goes).
-        const hdr = { hot, rev: false, pct: busiest };
+        // The horizontal pipe, in two halves that run out from the main pipe (the way the water goes). Heat
+        // only runs as far as the furthest room on that side that is calling for it; beyond that the pipe is empty.
         const rx = riser.x, leftEnd = first.x + rad(first), rightEnd = last.x - rad(last);
-        if (first !== riser && rx - leftEnd > 1) pieces.push({ ...hdr, d: `M${f(riser === last ? rx - rad(riser) : rx)},${f(yh)}H${f(leftEnd)}` });
-        if (last !== riser && rightEnd - rx > 1) pieces.push({ ...hdr, d: `M${f(riser === first ? rx + rad(riser) : rx)},${f(yh)}H${f(rightEnd)}` });
+        const half = (toLeft) => {
+          if (toLeft ? !(first !== riser && rx - leftEnd > 1) : !(last !== riser && rightEnd - rx > 1)) return;
+          const start = toLeft ? (riser === last ? rx - rad(riser) : rx) : (riser === first ? rx + rad(riser) : rx);
+          const end = toLeft ? leftEnd : rightEnd;
+          const beyond = hotRooms.filter((r) => (toLeft ? r.x < rx - 1 : r.x > rx + 1)); // calling for heat on this side
+          if (!beyond.length) { pieces.push({ d: `M${f(start)},${f(yh)}H${f(end)}`, hot: false, rev: false, pct: 0 }); return; }
+          const far = toLeft ? Math.min(...beyond.map((r) => r.x)) : Math.max(...beyond.map((r) => r.x));
+          const edge = toLeft ? Math.max(far, end) : Math.min(far, end); // an outer room's elbow is the end of the pipe
+          pieces.push({ d: `M${f(start)},${f(yh)}H${f(edge)}`, hot: true, rev: false, pct: Math.max(...beyond.map((r) => r.pct)) });
+          if (Math.abs(end - edge) > 1) pieces.push({ d: `M${f(edge)},${f(yh)}H${f(end)}`, hot: false, rev: false, pct: 0 });
+        };
+        half(true);
+        half(false);
       });
     }
     // All the outlines first, then all the insides, so where pipes meet they join into one open tube.
@@ -1049,6 +1096,7 @@ class TadoDashPanel extends HTMLElement {
   _trvCard(z) {
     const a = z.attrs, e = z.ents;
     const trvs = z.devices.filter((d) => /^VA/i.test(d.serial));
+    const calling = this._callingForHeat(); // is any water flowing to the radiators?
     const pct = z.power == null ? null : Math.max(0, Math.min(100, z.power));
     // Tado's reported temperature has the device offset applied (Tado CE's Offset Sync works out
     // the raw reading as reported minus offset), so take the offset off to get the valve's own.
@@ -1066,7 +1114,7 @@ class TadoDashPanel extends HTMLElement {
     if (this._layout.compact) {
       // Compact: a small valve beside the three temperatures as one-line rows.
       return `<div class="card trvcard compact" data-a="open" data-z="${z.id}">${head}
-        <div class="trvbody">${trvSVG(pct)}<div class="trvlist">
+        <div class="trvbody">${trvSVG(pct, calling)}<div class="trvlist">
           <div class="trvr" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}°` : "–"}</b></div>
           <div class="trvr" title="${extId ? "External room sensor" : "No external room sensor set up"}"><span>Room</span><b>${ext != null ? `${f1(ext)}°` : "–"}</b></div>
           <div class="trvr" title="${offset != null ? "Offset applied to the TRV" : "Offset not enabled in Tado CE"}"><span>Offset</span><b>${offset != null ? `${sign(offset)}°` : "–"}</b></div>
@@ -1074,7 +1122,7 @@ class TadoDashPanel extends HTMLElement {
     }
     return `<div class="card trvcard" data-a="open" data-z="${z.id}">
       ${head}
-      ${trvSVG(pct)}
+      ${trvSVG(pct, calling)}
       <div class="trvtemps">
         <div class="trvt" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}<small>°C</small>` : "–"}</b><em>before offset</em></div>
         <div class="trvt"><span>Room sensor</span><b>${ext != null ? `${f1(ext)}<small>°C</small>` : "–"}</b><em>${extId ? "external" : "none set up"}</em></div>
@@ -1316,7 +1364,8 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _viewAnalytics() {
-    const z = this._zoneById(this._sel) || this._zones[0];
+    this._ensureSel(); // the chosen room may have been hidden in Settings
+    const z = this._zoneById(this._sel);
     if (!z) return "";
     const d = this._analytics && this._analyticsKey === `${z.id}:${this._range}` ? this._analytics : null;
     const picker = this._picker(z.id);
@@ -1328,7 +1377,7 @@ class TadoDashPanel extends HTMLElement {
     const panels = [this._tempPanel(z, d)];
     if (outId && d[outId]?.length) panels.push({ title: "Outside temperature (°C)", height: 100, unit: "°C",
       series: [{ name: "Outside", pts: d[outId], color: "var(--out)", w: 2.4 }] });
-    if (d[z.ents.humidity]?.length) panels.push({ title: "Humidity (%)", height: 110, unit: "%", fixed: [20, 80], band2: [40, 60],
+    if (d[z.ents.humidity]?.length) panels.push({ title: "Humidity (%)", height: 110, unit: "%", fixed: [20, 80], band2: [40, 60], band2Label: "Comfortable 40–60%",
       series: [{ name: "Humidity", pts: d[z.ents.humidity], color: "var(--hum)", w: 2.4 }] });
     const stats = this._stats(z, d);
     const legend = [["var(--cold)", "Temperature"], ["var(--ok)", "Target"], [HEAT, "Heating (right scale, %)"],["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
@@ -1340,33 +1389,72 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _stats(z, d) {
-    const t = d[z.ents.temp] || [], tg = d[z.ents.target] || [], pw = d[z.ents.heating] || [];
-    if (!t.length) return "";
-    const vals = t.map((p) => p[1]);
-    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const from = Date.now() - this._range * HOUR;
-    let heatMs = 0, onTarget = 0, covered = 0;
-    for (let i = 0; i < pw.length; i++) {
-      const end = i + 1 < pw.length ? pw[i + 1][0] : Date.now();
-      if (pw[i][1] > 0) heatMs += end - Math.max(pw[i][0], from);
+    const t = d[z.ents.temp] || [], tg = d[z.ents.target] || [], pw = d[z.ents.heating] || [], hum = d[z.ents.humidity] || [];
+    // tone: the colour that goes with what the figure means (cold, heat, good, warning...)
+    const s = (ic, l, v, tip = "", tone = "") => `<div class="stat${tone ? " tone" : ""}"${tone ? ` style="--tone:${tone}"` : ""}${tip ? ` title="${esc(tip)}"` : ""}>${icon(ic)}<span>${l}</span><b>${v}</b></div>`;
+    let temps = "", humidity = "", heating = "";
+    if (t.length) {
+      const vals = t.map((p) => p[1]);
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      temps = s("thermometer-low", "Lowest", `${f1(Math.min(...vals))} °C`, "", "var(--cold)") + s("thermometer-high", "Highest", `${f1(Math.max(...vals))} °C`, "", "var(--heat)") +
+        s("thermometer", "Average", `${f1(avg)} °C`, "", "var(--accent)");
+      const from = Date.now() - this._range * HOUR;
+      let heatMs = 0, onTarget = 0, covered = 0;
+      for (let i = 0; i < pw.length; i++) {
+        const end = i + 1 < pw.length ? pw[i + 1][0] : Date.now();
+        if (pw[i][1] > 0) heatMs += end - Math.max(pw[i][0], from);
+      }
+      for (let i = 0; i < t.length; i++) {
+        const end = i + 1 < t.length ? t[i + 1][0] : Date.now();
+        const target = valueAt(tg, t[i][0]);
+        if (target == null) continue;
+        const span = end - Math.max(t[i][0], from);
+        covered += span;
+        if (Math.abs(t[i][1] - target) <= 0.5) onTarget += span;
+      }
+      const within = covered ? Math.round((onTarget / covered) * 100) : null;
+      heating = s("fire", "Heating on", `${(heatMs / HOUR).toFixed(1)} h`, "", "var(--heat)") +
+        (within != null ? s("bullseye-arrow", "Within 0.5° of target", `${within}%`, "", within >= 70 ? "var(--ok)" : within >= 40 ? "var(--warn)" : "var(--bad)") : "");
     }
-    for (let i = 0; i < t.length; i++) {
-      const end = i + 1 < t.length ? t[i + 1][0] : Date.now();
-      const target = valueAt(tg, t[i][0]);
-      if (target == null) continue;
-      const span = end - Math.max(t[i][0], from);
-      covered += span;
-      if (Math.abs(t[i][1] - target) <= 0.5) onTarget += span;
+    if (hum.length) {
+      // Coloured by where it falls against the comfortable 40-60% range: dry, comfortable, damp, or very damp.
+      const tone = (v) => (v < 40 ? "var(--warn)" : v <= HUM_HIGH ? "var(--ok)" : v <= 70 ? "var(--humhi)" : "var(--bad)");
+      const hv = hum.map((p) => p[1]), havg = hv.reduce((a, b) => a + b, 0) / hv.length;
+      const range = "Comfortable range is 40–60%";
+      humidity = s("water-percent", "Lowest humidity", `${f0(Math.min(...hv))}%`, range, tone(Math.min(...hv))) + s("water-percent", "Highest humidity", `${f0(Math.max(...hv))}%`, range, tone(Math.max(...hv))) +
+        s("water-percent", "Average humidity", `${f0(havg)}%`, range, tone(havg));
     }
-    const s = (ic, l, v) => `<div class="stat">${icon(ic)}<span>${l}</span><b>${v}</b></div>`;
-    return s("thermometer", "Average", `${f1(avg)} °C`) + s("thermometer-low", "Lowest", `${f1(Math.min(...vals))} °C`) +
-      s("thermometer-high", "Highest", `${f1(Math.max(...vals))} °C`) +
-      s("fire", "Heating on", `${(heatMs / HOUR).toFixed(1)} h`) +
-      (covered ? s("bullseye-arrow", "Within 0.5° of target", `${Math.round((onTarget / covered) * 100)}%`) : "");
+    // What Tado CE has learned about this room (the same figures as the Confidence tab). These describe the
+    // room as it is now, not the period charted above, and are left out when Tado CE doesn't provide them.
+    const m = (k) => this._n(z.ents[k]);
+    const signed = (v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)} °C`;
+    const learned = [
+      ["trend-up", "Heating rate", m("heating_rate"), (v) => `${f1(v)} °C/h`, "How fast this room warms while heating", (v) => (v > 0 ? "var(--ok)" : "var(--bad)")],
+      ["timer-sand", "Thermal inertia", m("thermal_inertia"), (v) => `${f0(v)} min`, "Delay before the room responds to heat", () => "var(--wis)"],
+      ["clock-fast", "Preheat time", m("preheat_time"), (v) => `${f0(v)} min`, "Learned lead time for the next target", () => "var(--warn)"],
+      ["calendar-clock", "Schedule deviation", m("schedule_deviation"), signed, "How far the room is from its usual temperature at this time of day",
+        (v) => (v < -0.3 ? "var(--cold)" : v > 0.3 ? "var(--heat)" : "var(--mut)")],
+    ].filter(([, , v]) => v != null).map(([ic, l, v, fmt, tip, tone]) => s(ic, l, fmt(v), tip, tone(v))).join("");
+    return temps + humidity + heating + learned;
   }
 
+  // The room pills, in card order. With more than one floor they are split into groups, each led by a
+  // small house with a badge: a triangle up or down when there are two floors, or the floor number once
+  // there are more (the lowest floor is 0). Rooms with no floor get a layers icon.
   _picker(sel) {
-    return `<div class="chips pickers">${this._zones.map((z) => `<span class="chip ${z.id === sel ? "on" : ""}" role="button" data-a="pick" data-z="${z.id}">${esc(z.name)}</span>`).join("")}</div>`;
+    const pill = (z) => `<span class="chip ${z.id === sel ? "on" : ""}" role="button" data-a="pick" data-z="${z.id}">${esc(z.name)}</span>`;
+    const groups = this._groups(this._roomZones());
+    if (groups.length < 2) return `<div class="chips pickers">${groups.flatMap((g) => g.zones).map(pill).join("")}</div>`;
+    const floors = new Map((this._map?.floors || []).map((f) => [f.id, f]));
+    const levels = [...new Set(groups.map((g) => floors.get(g.id)?.level).filter((l) => l != null))].sort((a, b) => a - b);
+    const marker = (g) => {
+      const level = floors.get(g.id)?.level;
+      if (level == null) return `<span class="floorico" title="${esc(g.name || "Rooms")}">${icon("floor-other")}</span>`;
+      const rank = levels.indexOf(level); // 0 for the lowest floor
+      const badge = levels.length > 2 ? rank : rank === levels.length - 1 ? icon("trend-up") : icon("trend-down");
+      return `<span class="floorico" title="${esc(g.name)}">${icon("house")}<span class="fbadge">${badge}</span></span>`;
+    };
+    return `<div class="chips pickers grouped">${groups.map((g) => `<div class="pgroup">${marker(g)}${g.zones.map(pill).join("")}</div>`).join("")}</div>`;
   }
 
   /* chart builder: returns SVG markup, registers hover metadata */
@@ -1386,7 +1474,10 @@ class TadoDashPanel extends HTMLElement {
         const v = lo + ((hi - lo) * k) / ticks, yy = Y(v);
         out += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" class="grid"/><text x="${L - 6}" y="${yy + 3.5}" text-anchor="end" class="axis">${p.fixed ? Math.round(v) : v.toFixed(1)}</text>`;
       }
-      if (p.band2) out += `<rect x="${L}" width="${W - L - R}" y="${Y(p.band2[1])}" height="${Y(p.band2[0]) - Y(p.band2[1])}" fill="var(--ok)" opacity=".12"/>`;
+      if (p.band2) {
+        out += `<rect x="${L}" width="${W - L - R}" y="${Y(p.band2[1])}" height="${Y(p.band2[0]) - Y(p.band2[1])}" fill="var(--ok)" opacity=".12"/>`;
+        if (p.band2Label) out += `<text x="${W - R - 6}" y="${Y(p.band2[1]) + 12}" text-anchor="end" class="bandlbl">${esc(p.band2Label)}</text>`;
+      }
       // Solid, muted fill under a line, as on the room cards.
       for (const s of p.series) {
         if (!s.area || !s.pts.length) continue;
@@ -1481,17 +1572,41 @@ class TadoDashPanel extends HTMLElement {
     this._render();
   }
 
+  // Press Tado CE's own Refresh Schedule buttons, then re-read the calendars. The buttons fetch the schedule
+  // from Tado again (2-8 API calls a room), and Tado CE updates the room's calendar when each lands.
+  async _refreshFromTado(zones) {
+    const ids = zones.map((z) => z.ents.refresh_schedule).filter(Boolean);
+    if (!ids.length || this._schedBusy) return;
+    if (ids.length > 1 && !window.confirm(`Fetch ${ids.length} schedules from Tado again?
+
+This uses roughly 2–8 Tado API calls for each room.`)) return;
+    this._schedBusy = true;
+    this._render();
+    let failed = 0;
+    for (const id of ids) if (!(await this._call("button", "press", { entity_id: id }))) failed++;
+    await new Promise((r) => setTimeout(r, 2000));
+    this._cal = {};
+    this._schedBusy = false;
+    this._render();
+    if (!failed) this._toast(ids.length > 1 ? "Schedules refreshed from Tado" : "Schedule refreshed from Tado");
+  }
+
   _viewSchedules() {
-    const zones = this._zones.filter((z) => z.ents.schedule);
+    const zones = this._orderedZones().filter((z) => z.ents.schedule && (this._layout.show.hotWater || z.type !== "hot_water"));
     if (!zones.length) return `<div class="card">${this._empty("calendar-remove-outline", "No schedule calendars", "Tado CE creates one calendar per heating room. None were found.")}</div>`;
     if (!this._cal.data) return `<div class="card">${this._empty("timer-sand", "Loading schedules…", "")}</div>`;
     const z = zones.find((x) => x.id === this._sel) || zones[0];
     const monday = this._cal.monday, now = new Date();
     const todayIdx = (now.getDay() + 6) % 7;
-    const temps = Object.values(this._cal.data).flat().map((b) => b.temp).filter((t) => t != null);
-    const lo = Math.min(...temps, 15), hi = Math.max(...temps, 22);
-    // Flat palette: orange at the cooler end of the range, deepening to pomegranate at the warmest.
-    const color = (t) => { const k = t == null ? 0.4 : (t - lo) / (hi - lo || 1); return `color-mix(in srgb, ${C.pomegranate} ${Math.round(k * 100)}%, ${C.orange})`; };
+    // Blue at 15 °C and below, green at 19 °C, orange at 22 °C and above, fading between. The scale is fixed
+    // so a colour always means the same temperature, whichever room or week is showing.
+    const color = (t) => {
+      if (t == null) return "var(--mut)";
+      if (t <= 15) return C.peter;
+      if (t >= 22) return C.carrot;
+      const [from, to] = t < 19 ? [[15, C.peter], [19, C.nephritis]] : [[19, C.nephritis], [22, C.carrot]];
+      return `color-mix(in srgb, ${to[1]} ${Math.round(((t - from[0]) / (to[0] - from[0])) * 100)}%, ${from[1]})`;
+    };
     const blocksFor = (zid, day) => {
       const d0 = monday + day * 86400000, d1 = d0 + 86400000;
       return (this._cal.data[zid] || []).filter((b) => b.e > d0 && b.s < d1).map((b) => {
@@ -1507,11 +1622,19 @@ class TadoDashPanel extends HTMLElement {
     const week = DAYS.map((dn, i) => `<div class="drow"><span class="dn ${i === todayIdx ? "today" : ""}">${dn}${i === todayIdx ? "<small>today</small>" : ""}</span>
       <div class="track">${blocksFor(z.id, i)}${i === todayIdx ? `<div class="nowline" style="left:${nowPct}%"></div>` : ""}</div></div>`).join("");
     const all = zones.map((zz) => `<div class="drow"><span class="dn small">${esc(zz.name)}</span><div class="track thin">${blocksFor(zz.id, todayIdx)}<div class="nowline" style="left:${nowPct}%"></div></div></div>`).join("");
-    const legend = `<div class="legend grad"><span>${f1(lo)}°</span><i style="background:linear-gradient(90deg,${color(lo)},${color(hi)})"></i><span>${f1(hi)}°</span><em>Blocks are periods Tado CE reports in the room's schedule calendar</em></div>`;
-    return `<div class="card"><h3>Today across rooms</h3>${axis}${all}</div>
-      <div class="toolbar">${this._picker(z.id)}<span class="chip" role="button" data-a="refresh-sched">${icon("refresh")}Reload</span></div>
-      <div class="card"><h3>${esc(z.name)} · week</h3>${axis}${week}${legend}
-        <p class="hint">Read-only view of the Tado schedule. Edit schedules in the Tado app; Tado CE picks changes up on its next sync.</p></div>`;
+    const legend = `<div class="legend grad"><span>15°</span><div class="gscale"><i style="background:linear-gradient(90deg,${C.peter},${C.nephritis} 57.14%,${C.carrot})"></i><b style="left:57.14%">19°</b></div><span>22°</span>
+      <em>Blocks are periods Tado CE reports in the room's schedule calendar</em></div>`;
+    const busy = this._schedBusy;
+    const canRefresh = zones.some((x) => x.ents.refresh_schedule);
+    const when = this._val(z.ents.refresh_schedule);
+    const refreshed = z.ents.refresh_schedule ? (when ? `Refreshed from Tado ${ago(when)}` : "Not refreshed from here yet") : "";
+    return `${canRefresh ? `<div class="chips"><span class="chip ${busy ? "on" : ""}" role="button" data-a="tado-refresh-all" title="Fetch every room's schedule from Tado again (uses roughly 2–8 Tado API calls per room)">${icon("cloud-arrow")}${busy ? "Refreshing…" : "Refresh schedules"}</span></div>` : ""}
+      <div class="card"><h3>Today across rooms</h3>${axis}${all}</div>
+      <div class="toolbar">${this._picker(z.id)}</div>
+      <div class="card"><div class="cardhead"><h3>${esc(z.name)} · week</h3>
+        ${z.ents.refresh_schedule ? `<span class="refreshed">${esc(refreshed)} · <button class="link" data-a="tado-refresh-one" data-z="${z.id}" ${busy ? "disabled" : ""}>Refresh this room</button></span>` : ""}</div>
+        ${axis}${week}${legend}
+        <p class="hint">Read-only view of the Tado schedule. Tado CE keeps its own copy of each schedule and does not re-read it by itself, so after you edit one in the Tado app, press Refresh schedules (or Refresh this room) here.</p></div>`;
   }
 
   /* ----- confidence ----- */
@@ -1546,16 +1669,44 @@ class TadoDashPanel extends HTMLElement {
 
   /* ----- system ----- */
 
+  // Every other Tado CE hub entity, in collapsible groups (all open until you close one).
+  _hubEntities(ids, known) {
+    const GROUPS = [
+      ["Boiler & weather compensation", ["boiler_flow_temp", "boiler_output_temperature", "boiler_output_temperature_time", "boiler_wiring_state", "bridge_capabilities", "bridge_schema_version", "wc_status", "wc_target_flow_temp"]],
+      ["API & sync", ["api_breakdown", "call_history", "homekit_reads_saved", "homekit_writes_saved"]],
+      ["Home", ["home_id", "zone_count", "home_insights", "outside_temp"]],
+    ];
+    const rest = Object.keys(ids).filter((k) => !known.has(k));
+    const row = (k) => {
+      const id = ids[k], s = this._st(id);
+      const raw = s ? s.state : "–";
+      const val = /^\d{4}-\d\d-\d\dT/.test(raw) ? ago(raw) : raw;
+      return `<div class="kv"><span>${esc(niceName(s?.attributes?.friendly_name || k))}<small>${esc(id)}</small></span><b>${esc(val)}${s?.attributes?.unit_of_measurement ? " " + esc(s.attributes.unit_of_measurement) : ""}</b></div>`;
+    };
+    const groups = GROUPS.map(([name, keys]) => [name, keys.filter((k) => rest.includes(k))]);
+    const placed = new Set(groups.flatMap(([, ks]) => ks));
+    groups.push(["Other", rest.filter((k) => !placed.has(k))]);
+    const closed = (this._entClosed ||= new Set());
+    return groups.filter(([, ks]) => ks.length).map(([name, ks]) => `<div class="card entgroup ${closed.has(name) ? "shut" : ""}">
+      <h3 role="button" data-a="ent-group" data-v="${esc(name)}">${esc(name)}<span class="count">${ks.length}</span>${icon(closed.has(name) ? "chevron-down" : "chevron-up")}</h3>
+      ${closed.has(name) ? "" : `<div class="ents">${ks.map(row).join("")}</div>`}</div>`).join("");
+  }
+
   _viewSystem() {
     const h = this._hub, ids = h.ids;
     const usage = h.n("api_usage"), limit = h.n("api_limit");
     const pctUsed = usage != null && limit ? Math.min(100, (usage / limit) * 100) : null;
     const state = (k) => h.val(k);
     const tile = (ic, l, v, cls = "") => v == null ? "" : `<div class="stat ${cls}">${icon(ic)}<span>${l}</span><b>${esc(v)}</b></div>`;
-    const okCls = (v) => (/^(ok|valid|on)$/i.test(v) ? "ok" : "bad");
-    const apiStatus = state("api_status"), token = state("token_status");
+    const okCls = (v) => (/^(ok|good|valid|on|connected|active|healthy)$/i.test(v) ? "ok" : "bad");
+    const cap = (v) => (v == null ? v : String(v).replace(/^./, (c) => c.toUpperCase()));
+    const apiStatus = cap(state("api_status")), token = cap(state("token_status"));
     const bin = (k) => { const s = h.get(k)?.state; return s == null ? null : s === "on" ? "Connected" : "Off"; };
     const when = (k) => { const v = state(k); return v ? ago(v) : null; };
+    const binCls = (k) => { const s = h.get(k)?.state; return s == null ? "" : s === "on" ? "ok" : "bad"; };
+    // A sync that is more than three polling intervals old means Tado CE has stopped reading the cloud.
+    const lastAge = state("last_sync") ? (Date.now() - Date.parse(state("last_sync"))) / 60000 : null;
+    const syncCls = lastAge == null || isNaN(lastAge) ? "" : lastAge <= 3 * (h.n("polling_interval") || 10) ? "ok" : "bad";
     const selects = ["presence_mode", "overlay_mode", "overlay_timer"].filter((k) => ids[k]).map((k) => {
       const s = h.get(k), opts = s?.attributes?.options || [];
       const label = { presence_mode: "Presence mode", overlay_mode: "Override duration", overlay_timer: "Override timer" }[k];
@@ -1572,21 +1723,22 @@ class TadoDashPanel extends HTMLElement {
     }).join("");
     const quota = ids.quota_reserve_enabled ? `<div class="line"><div class="tx"><b>Quota reserve</b><small>Keep some API calls back for manual actions</small></div>
       <button class="sw ${h.get("quota_reserve_enabled")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${ids.quota_reserve_enabled}" aria-label="Quota reserve"></button></div>` : "";
-    const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override in the house</small></div>
-      <button class="btn" data-a="press" data-v="${ids.resume_all}">Resume all</button></div>` : "";
+    const offSchedule = this._zones.some((z) => z.type !== "hot_water" ? (z.overlayType || z.off) : z.overlayType);
+    const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override, or fetch the schedules from Tado again</small></div>
+      <div class="btns"><button class="btn ghost" data-a="tado-refresh-all" ${this._schedBusy ? "disabled" : ""}>${icon("cloud-arrow")}${this._schedBusy ? "Refreshing…" : "Refresh schedules"}</button>
+        <button class="btn ${offSchedule ? "" : "idle"}" data-a="press" data-v="${ids.resume_all}" ${offSchedule ? "" : "disabled"} title="${offSchedule ? "" : "Every room is already following its schedule"}">Resume all</button></div></div>` : "";
     const bridge = [["boiler_output_temperature", "Boiler output"], ["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
       .map(([k, l]) => { const v = h.n(k); return v == null ? "" : tile("fire-burner", l, `${f1(v)} °C`); }).join("");
-    const known = new Set(["api_usage", "api_limit", "api_reset", "api_status", "token_status", "last_sync", "next_sync", "polling_interval", "bridge_connected", "homekit_connected", "home"]);
+    const known = new Set(["api_usage", "api_limit", "api_reset", "api_status", "token_status", "last_sync", "next_sync", "polling_interval", "bridge_connected", "homekit_connected", "home",
+      "resume_all", "presence_mode", "overlay_mode", "overlay_timer", "quota_reserve_enabled"]); // shown in the cards above
     return `<div class="card"><h3>Tado cloud</h3>
         ${pctUsed != null ? `<div class="meter"><div class="mhead"><span>API calls today</span><b>${f0(usage)} / ${f0(limit)}</b></div><div class="bar"><i style="width:${pctUsed}%" class="${pctUsed > 85 ? "bad" : pctUsed > 60 ? "warn" : ""}"></i></div>
           ${state("api_reset") ? `<small>Resets ${ago(state("api_reset"))}</small>` : ""}</div>` : ""}
         <div class="stats">${tile("cloud-check-outline", "API status", apiStatus, apiStatus ? okCls(apiStatus) : "")}${tile("key-outline", "Token", token, token ? okCls(token) : "")}
-          ${tile("sync", "Last sync", when("last_sync"))}${tile("sync-circle", "Next sync", when("next_sync"))}${tile("timer-cog-outline", "Polling", state("polling_interval") ? `${state("polling_interval")} min` : null)}
-          ${tile("router-wireless", "Internet bridge", bin("bridge_connected"))}${tile("apple", "HomeKit", bin("homekit_connected"))}${tile("home-map-marker", "Geofencing", bin("home"))}${bridge}</div></div>
+          ${tile("sync", "Last sync", when("last_sync"), syncCls)}${tile("sync-circle", "Next sync", when("next_sync"))}${tile("timer-cog-outline", "Polling", state("polling_interval") ? `${state("polling_interval")} min` : null)}
+          ${tile("router-wireless", "Internet bridge", bin("bridge_connected"), binCls("bridge_connected"))}${tile("apple", "HomeKit", bin("homekit_connected"), binCls("homekit_connected"))}${tile("home-map-marker", "Geofencing", bin("home"), binCls("home"))}${bridge}</div></div>
       <div class="card"><h3>Controls</h3>${resume}${selects}${quota}</div>
-      <div class="card"><h3>All Tado CE hub entities</h3><div class="ents">${Object.entries(ids).filter(([k]) => !known.has(k)).map(([k, id]) => {
-        const s = this._st(id); return `<div class="kv"><span>${esc(s?.attributes?.friendly_name || k)}<small>${esc(id)}</small></span><b>${esc(s ? s.state : "–")}${s?.attributes?.unit_of_measurement ? " " + esc(s.attributes.unit_of_measurement) : ""}</b></div>`;
-      }).join("")}</div></div>
+      ${this._hubEntities(ids, known)}
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
   }
 }
@@ -1756,7 +1908,11 @@ button{font:inherit;color:inherit}
 .seg.hold button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
 .optrow{padding:10px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px;margin-bottom:2px}
 .optrow .seg button{min-height:36px}.optrow .seg button:hover:not(.on){background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
-.chips.pickers{margin-bottom:0}.toolbar .chips{flex:1}
+.chips.pickers{margin-bottom:0}.chips.pickers.grouped{gap:10px 22px}.pgroup{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.floorico{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;flex:none;color:var(--mut);background:color-mix(in srgb,var(--mut) 15%,transparent)}
+.floorico .i{font-size:15px}
+.fbadge{position:absolute;right:-3px;bottom:-3px;min-width:14px;height:14px;padding:0 2px;border-radius:7px;background:var(--go);color:#fff;font-size:9px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--bg)}
+.fbadge .i{font-size:8px;color:#fff}.toolbar .chips{flex:1}
 .hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
 .hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
 .hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
@@ -1793,12 +1949,16 @@ button{font:inherit;color:inherit}
 .lbl{font-size:12px;color:var(--mut);display:block;margin-top:4px}
 .learn{display:flex;align-items:center;gap:14px;margin:6px 0 10px}.lt b{display:block;font-size:17px;font-weight:500}.lt small{color:var(--mut);font-size:12px}
 .ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
+.entgroup h3{display:flex;align-items:center;gap:8px;cursor:pointer;margin:0}.entgroup h3 .i{margin-left:auto;color:var(--mut);font-size:12px}
+.entgroup .count{font-size:11px;font-weight:500;color:var(--mut);background:var(--chip,rgba(128,128,128,.18));border-radius:9px;padding:1px 7px}.entgroup.shut h3{margin-bottom:0}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
 .kv span small{display:block;color:var(--mut);font-size:12px;word-break:break-all}.kv b{font-weight:500;white-space:nowrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--mut) 12%,transparent);font-size:12px;color:var(--mut)}
-.stat .i{color:var(--mut)}.stat b{font-size:15px;color:var(--fg);font-weight:500}
-.stat.ok .i{color:var(--ok)}.stat.warn .i,.stat.warn b{color:var(--warn)}.stat.bad .i,.stat.bad b{color:var(--bad)}
+.stat{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:7px;row-gap:3px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--mut) 12%,transparent);font-size:12px;color:var(--mut)}
+.stat .i{color:var(--mut)}.stat span{min-width:0}.stat b{grid-column:1/-1;font-size:15px;color:var(--fg);font-weight:500}
+.stat.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}.stat.ok .i,.stat.ok b{color:var(--ok)}
+.stat.bad{background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.stat.tone{background:color-mix(in srgb,var(--tone) 15%,transparent)}.stat.tone .i{color:var(--tone)}.stat.warn .i,.stat.warn b{color:var(--warn)}.stat.bad .i,.stat.bad b{color:var(--bad)}
 .stats.big{margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 .line{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .line:first-of-type{border-top:0}.line .ic{width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--mut) 14%,transparent);display:flex;align-items:center;justify-content:center;color:var(--mut)}
@@ -1808,12 +1968,15 @@ button{font:inherit;color:inherit}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
 .sw.on{background:var(--go);opacity:1}.sw.on::after{left:21px}
 .btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{background:var(--go);color:#fff;border-radius:10px;padding:9px 16px}.btn:hover{filter:brightness(1.1)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn.ghost{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.btn.idle,.btn:disabled{background:var(--chip,rgba(128,128,128,.18));color:var(--mut);cursor:default;filter:none}
+.btn .i{margin-right:7px}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
 .pick{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .chart{position:relative}.chartsvg{width:100%;height:auto;display:block;touch-action:pan-y}
 .grid{}.chartsvg .grid{stroke:var(--line);stroke-width:1}.chartsvg .vgrid{stroke:var(--line);stroke-width:1;opacity:.45}
-.axis{fill:var(--mut);font-size:11px}.axis.heat{fill:var(--heat)}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--fg);stroke-width:1;opacity:.5}
+.axis{fill:var(--mut);font-size:11px}.bandlbl{fill:var(--ok);font-size:10px;opacity:.9}.axis.heat{fill:var(--heat)}.ptitle{fill:var(--mut);font-size:11px}.cross{stroke:var(--fg);stroke-width:1;opacity:.5}
 .tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:2;white-space:nowrap}
 .tip i,.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mut);margin-top:6px}
@@ -1827,7 +1990,10 @@ button{font:inherit;color:inherit}
 .blk{position:absolute;top:2px;bottom:2px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;overflow:hidden}
 .nowline{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.85}
 .dn{font-size:13px;font-weight:500}.dn.today{color:var(--go)}.dn small{display:block;font-size:10px;font-weight:400}.dn.small{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.legend.grad{align-items:center;margin-top:14px}.legend.grad i{width:120px;height:10px;border-radius:5px;margin:0}.legend.grad em{flex-basis:100%;font-style:normal}
+.legend.grad{align-items:center;margin:14px 0 18px}.legend.grad em{flex-basis:100%;font-style:normal;margin-top:10px}
+.gscale{position:relative;width:170px;height:10px}.gscale i{display:block;width:100%;height:100%;border-radius:5px;margin:0}
+.gscale b{position:absolute;top:14px;transform:translateX(-50%);font-size:10px;color:var(--mut);font-weight:400}
+.refreshed{font-size:12px;color:var(--mut)}.link:disabled{opacity:.4;cursor:default}
 .explain p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--fg)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.two div{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:10px 12px}.two b{display:block;font-weight:500}.two small{color:var(--mut)}
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:6px}
