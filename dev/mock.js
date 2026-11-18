@@ -56,7 +56,7 @@
   hub("polling_interval", "sensor.tado_ce_hub_polling_interval", 5);
   hub("bridge_connected", "binary_sensor.tado_ce_hub_bridge_connected", "on"); hub("homekit_connected", "binary_sensor.tado_ce_hub_homekit", "on");
   hub("home", "binary_sensor.tado_ce_hub_home", "on");
-  hub("boiler_flow_temp", "sensor.boiler_flow", 60.3); hub("zone_count", "sensor.tado_ce_hub_zone_count", 4);
+  hub("boiler_flow_temp", "sensor.boiler_flow", 60.3); hub("boiler_output_temperature", "sensor.tado_ce_hub_bridge_boiler_output_temperature", 58.4); hub("zone_count", "sensor.tado_ce_hub_zone_count", 4);
   hub("resume_all", "button.tado_ce_hub_resume_all", "unknown");
   hub("presence_mode", "select.tado_ce_hub_presence_mode", "auto", { options: ["auto", "home", "away"] });
   hub("overlay_mode", "select.tado_ce_hub_overlay_mode", "tado_mode", { options: ["tado_mode", "next_time_block", "timer", "manual"] });

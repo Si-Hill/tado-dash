@@ -14,6 +14,7 @@ const C = {
   orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b", silver: "#bdc3c7", asbestos: "#7f8c8d",
 };
 const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
+const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
 const MIN = 60000;
@@ -86,6 +87,10 @@ const FA_ALIAS = {
   "battery-alert": "battery-quarter",
   "battery-unknown": "battery-half",
   "air-conditioner": "snowflake",
+  "compact": "table-cells",
+  "trend-up": "caret-up",
+  "trend-down": "caret-down",
+  "trend-flat": "minus",
   "chevron-up": "chevron-up",
   "chevron-down": "chevron-down",
   "confidence": "gauge",
@@ -109,6 +114,8 @@ const FA = {
   "calendar-check": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zM329 305c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-95 95-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L329 305z"],
   "calendar-days": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"],
   "calendar-xmark": [448, "M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zM305 305c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47z"],
+  "caret-down": [320, "M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"],
+  "caret-up": [320, "M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8l256 0c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"],
   "chevron-down": [512, "M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"],
   "chevron-up": [512, "M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"],
   "circle-exclamation": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"],
@@ -141,6 +148,7 @@ const FA = {
   "snowflake": [448, "M224 0c17.7 0 32 14.3 32 32l0 30.1 15-15c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-49 49 0 70.3 61.4-35.8 17.7-66.1c3.4-12.8 16.6-20.4 29.4-17s20.4 16.6 17 29.4l-5.2 19.3 23.6-13.8c15.3-8.9 34.9-3.7 43.8 11.5s3.8 34.9-11.5 43.8l-25.3 14.8 21.7 5.8c12.8 3.4 20.4 16.6 17 29.4s-16.6 20.4-29.4 17l-67.7-18.1L287.5 256l60.9 35.5 67.7-18.1c12.8-3.4 26 4.2 29.4 17s-4.2 26-17 29.4l-21.7 5.8 25.3 14.8c15.3 8.9 20.4 28.5 11.5 43.8s-28.5 20.4-43.8 11.5l-23.6-13.8 5.2 19.3c3.4 12.8-4.2 26-17 29.4s-26-4.2-29.4-17l-17.7-66.1L256 311.7l0 70.3 49 49c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15 0 30.1c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-30.1-15 15c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l49-49 0-70.3-61.4 35.8-17.7 66.1c-3.4 12.8-16.6 20.4-29.4 17s-20.4-16.6-17-29.4l5.2-19.3L48.1 395.6c-15.3 8.9-34.9 3.7-43.8-11.5s-3.7-34.9 11.5-43.8l25.3-14.8-21.7-5.8c-12.8-3.4-20.4-16.6-17-29.4s16.6-20.4 29.4-17l67.7 18.1L160.5 256 99.6 220.5 31.9 238.6c-12.8 3.4-26-4.2-29.4-17s4.2-26 17-29.4l21.7-5.8L15.9 171.6C.6 162.7-4.5 143.1 4.4 127.9s28.5-20.4 43.8-11.5l23.6 13.8-5.2-19.3c-3.4-12.8 4.2-26 17-29.4s26 4.2 29.4 17l17.7 66.1L192 200.3l0-70.3L143 81c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l15 15L192 32c0-17.7 14.3-32 32-32z"],
   "square": [448, "M0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z"],
   "stopwatch": [448, "M176 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l16 0 0 34.4C92.3 113.8 16 200 16 304c0 114.9 93.1 208 208 208s208-93.1 208-208c0-41.8-12.3-80.7-33.5-113.2l24.1-24.1c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L355.7 143c-28.1-23-62.2-38.8-99.7-44.6L256 64l16 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L224 0 176 0zm72 192l0 128c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-128c0-13.3 10.7-24 24-24s24 10.7 24 24z"],
+  "table-cells": [512, "M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm88 64l0 64-88 0 0-64 88 0zm56 0l88 0 0 64-88 0 0-64zm240 0l0 64-88 0 0-64 88 0zM64 224l88 0 0 64-88 0 0-64zm232 0l0 64-88 0 0-64 88 0zm64 0l88 0 0 64-88 0 0-64zM152 352l0 64-88 0 0-64 88 0zm56 0l88 0 0 64-88 0 0-64zm240 0l0 64-88 0 0-64 88 0z"],
   "temperature-arrow-down": [576, "M128 112c0-26.5 21.5-48 48-48s48 21.5 48 48l0 164.5c0 17.3 7.1 31.9 15.3 42.5C249.8 332.6 256 349.5 256 368c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-18.5 6.2-35.4 16.7-48.9c8.2-10.6 15.3-25.2 15.3-42.5L128 112zM176 0C114.1 0 64 50.1 64 112l0 164.4c0 .1-.1 .3-.2 .6c-.2 .6-.8 1.6-1.7 2.8C43.2 304.2 32 334.8 32 368c0 79.5 64.5 144 144 144s144-64.5 144-144c0-33.2-11.2-63.8-30.1-88.1c-.9-1.2-1.5-2.2-1.7-2.8c-.1-.3-.2-.5-.2-.6L288 112C288 50.1 237.9 0 176 0zm0 416c26.5 0 48-21.5 48-48c0-20.9-13.4-38.7-32-45.3l0-50.7c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 50.7c-18.6 6.6-32 24.4-32 45.3c0 26.5 21.5 48 48 48zm336-64l-32 0 0-288c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 288-32 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l64 64c6 6 14.1 9.4 22.6 9.4s16.6-3.4 22.6-9.4l64-64c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8z"],
   "temperature-empty": [320, "M112 112c0-26.5 21.5-48 48-48s48 21.5 48 48l0 164.5c0 17.3 7.1 31.9 15.3 42.5C233.8 332.6 240 349.5 240 368c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-18.5 6.2-35.4 16.7-48.9c8.2-10.6 15.3-25.2 15.3-42.5L112 112zM160 0C98.1 0 48 50.2 48 112l0 164.4c0 .1-.1 .3-.2 .6c-.2 .6-.8 1.6-1.7 2.8C27.2 304.2 16 334.8 16 368c0 79.5 64.5 144 144 144s144-64.5 144-144c0-33.2-11.2-63.8-30.1-88.1c-.9-1.2-1.5-2.2-1.7-2.8c-.1-.3-.2-.5-.2-.6L272 112C272 50.2 221.9 0 160 0zm0 416a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"],
   "temperature-half": [320, "M160 64c-26.5 0-48 21.5-48 48l0 164.5c0 17.3-7.1 31.9-15.3 42.5C86.2 332.6 80 349.5 80 368c0 44.2 35.8 80 80 80s80-35.8 80-80c0-18.5-6.2-35.4-16.7-48.9c-8.2-10.6-15.3-25.2-15.3-42.5L208 112c0-26.5-21.5-48-48-48zM48 112C48 50.2 98.1 0 160 0s112 50.1 112 112l0 164.4c0 .1 .1 .3 .2 .6c.2 .6 .8 1.6 1.7 2.8c18.9 24.4 30.1 55 30.1 88.1c0 79.5-64.5 144-144 144S16 447.5 16 368c0-33.2 11.2-63.8 30.1-88.1c.9-1.2 1.5-2.2 1.7-2.8c.1-.3 .2-.5 .2-.6L48 112zM208 368c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-20.9 13.4-38.7 32-45.3L144 208c0-8.8 7.2-16 16-16s16 7.2 16 16l0 114.7c18.6 6.6 32 24.4 32 45.3z"],
@@ -259,6 +267,22 @@ function sparkline(temp, target, heating) {
     <div class="sline"></div><div class="sdot"></div><div class="stip"></div></div>`;
 }
 
+// How fast the room is warming (+) or cooling (-), in °C per hour: a straight line fitted to the
+// last hour of readings plus the current one. null when there isn't enough to say.
+function trendPerHour(pts, nowVal) {
+  const now = Date.now(), from = now - HOUR;
+  const p = pts.filter((q) => q[0] >= from);
+  const base = valueAt(pts, from); // the reading in force when the hour began, so a steady room counts too
+  if (base != null) p.unshift([from, base]);
+  if (nowVal != null) p.push([now, nowVal]);
+  if (p.length < 3 || p[p.length - 1][0] - p[0][0] < 20 * MIN) return null;
+  const t0 = p[0][0];
+  let sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (const [t, v] of p) { const x = (t - t0) / HOUR; sx += x; sy += v; sxx += x * x; sxy += x * v; }
+  const n = p.length, d = n * sxx - sx * sx;
+  return d ? (n * sxy - sx * sy) / d : null;
+}
+
 // A radiator valve head that fills from the bottom with how far the valve is open.
 let trvN = 0;
 function trvSVG(pct) {
@@ -299,7 +323,7 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
-    this._layout = { floors: [], rooms: {} }; // user's floor order and room order within each floor
+    this._layout = { floors: [], rooms: {}, compact: false }; // user's floor order, room order within each floor, and card size
     this._drag = null;
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
@@ -321,7 +345,7 @@ class TadoDashPanel extends HTMLElement {
     const ids = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === "string") : []);
     const rooms = {};
     for (const [k, a] of Object.entries(v.rooms && typeof v.rooms === "object" ? v.rooms : {})) rooms[k] = ids(a);
-    this._layout = { floors: ids(v.floors), rooms };
+    this._layout = { floors: ids(v.floors), rooms, compact: v.compact === true };
   }
 
   _saveLayout() {
@@ -655,6 +679,7 @@ class TadoDashPanel extends HTMLElement {
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
+      case "compact": this._layout.compact = !this._layout.compact; this._saveLayout(); break;
       case "opt": {
         const id = el.dataset.id;
         this._selOpt[id] = v;
@@ -782,8 +807,10 @@ class TadoDashPanel extends HTMLElement {
       chip("home-outline", "Rooms", zones.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`),
       chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
       outside != null ? chip("thermometer", "Outside", `${f1(outside)} °C`) : "",
+      this._boilerChip(),
       showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
       alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : "",
+      this._compactChip(),
     ].join("");
     const shown = this._visibleZones();
     const groups = this._groups(shown);
@@ -793,22 +820,55 @@ class TadoDashPanel extends HTMLElement {
         const head = g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} room${g.zones.length === 1 ? "" : "s"}</small><span class="sp"></span>
           ${groups.length > 1 ? `<button class="mv" title="Move this floor up" data-a="floor-mv" data-f="${g.id}" data-v="-1" ${i === 0 ? "disabled" : ""}>${icon("chevron-up")}</button>
           <button class="mv" title="Move this floor down" data-a="floor-mv" data-f="${g.id}" data-v="1" ${i === groups.length - 1 ? "disabled" : ""}>${icon("chevron-down")}</button>` : ""}</div>` : "";
-        return `<section class="floor">${head}<div class="grid" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
+        return `<section class="floor">${head}<div class="grid ${this._layout.compact ? "compact" : ""}" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
       }).join("");
     return `<div class="chips">${chips}</div>${body}`;
+  }
+
+  // The boiler's output temperature from the Internet Bridge (flow temperature on eBUS boilers),
+  // as a chip for the Rooms and TRV tabs. Nothing if Tado CE doesn't report one.
+  // Toggles between full and compact cards on the Rooms and TRV tabs (kept with the user's layout).
+  _compactChip() {
+    return chip("compact", "Compact", "", `push ${this._layout.compact ? "on" : ""}`, `data-a="compact" title="Smaller cards, so more fit on the screen"`);
+  }
+
+  // It turns orange while any room (or hot water) is calling for heat. That is inferred from the rooms:
+  // Tado CE has no burner or flame signal, so it says the boiler is being asked to run, not that it is.
+  _boilerChip() {
+    const h = this._hub;
+    const v = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
+    if (v == null) return "";
+    const calling = this._zones.some((z) => z.type !== "ac" && z.heating);
+    const tip = calling
+      ? "Boiler output temperature. Orange: at least one room is calling for heat (inferred from the rooms, not a flame sensor)."
+      : "Boiler output temperature. Grey: no room is calling for heat right now.";
+    return chip("fire-burner", "Boiler", `${f1(v)} °C`, calling ? "fire" : "", `title="${tip}"`);
   }
 
   /* ----- TRVs ----- */
 
   _viewTrvs() {
     // Heating rooms with at least one radiator valve (Tado serials starting VA).
-    const zones = this._zones.filter((z) => z.type === "heating" && z.devices.some((d) => /^VA/i.test(d.serial)));
-    if (!zones.length) {
+    const all = this._zones.filter((z) => z.type === "heating" && z.devices.some((d) => /^VA/i.test(d.serial)));
+    if (!all.length) {
       return `<div class="card">${this._empty("temperature-empty", "No radiator valves found", "Tado Dash shows rooms that have a Tado radiator valve (TRV). None were found in Tado CE.")}</div>`;
     }
-    const body = this._groups(zones).map((g) => `<section class="floor">
+    // The same Rooms / Heating chips (and the same filter) as the Rooms tab, counting rooms with a valve.
+    const heating = all.filter((z) => z.heating).length;
+    const f = this._filter;
+    const chips = `<div class="chips">${[
+      chip("home-outline", "Rooms", all.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`),
+      chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
+      this._boilerChip(),
+      this._compactChip(),
+    ].join("")}</div>`;
+    const zones = f === "heating" ? all.filter((z) => z.heating) : all;
+    if (!zones.length) {
+      return `${chips}<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
+    }
+    const body = chips + this._groups(zones).map((g) => `<section class="floor">
       ${g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} room${g.zones.length === 1 ? "" : "s"}</small></div>` : ""}
-      <div class="grid trvs">${g.zones.map((z) => this._trvCard(z)).join("")}</div></section>`).join("");
+      <div class="grid trvs ${this._layout.compact ? "compact" : ""}">${g.zones.map((z) => this._trvCard(z)).join("")}</div></section>`).join("");
     return `${body}<p class="hint center">The TRV figure is the valve's own reading before any offset: the temperature Tado reports, minus the offset applied to it.</p>`;
   }
 
@@ -828,8 +888,18 @@ class TadoDashPanel extends HTMLElement {
     const lowBat = trvs.some((d) => /low|crit/i.test(this._val(d.entities.battery) || ""));
     const flag = offline ? `<span class="pill bad">Offline</span>` : lowBat ? `<span class="pill preheat">${icon("battery-alert")}Battery low</span>` : "";
     const rawTip = reported != null ? `Reported ${f1(reported)} °C − offset ${f1(offset ?? 0)} °C` : "No reading from Tado";
+    const head = `<div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? "Valve open" : "Valve closed"}</span>`}</div>`;
+    if (this._layout.compact) {
+      // Compact: a small valve beside the three temperatures as one-line rows.
+      return `<div class="card trvcard compact" data-a="open" data-z="${z.id}">${head}
+        <div class="trvbody">${trvSVG(pct)}<div class="trvlist">
+          <div class="trvr" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}°` : "–"}</b></div>
+          <div class="trvr" title="${extId ? "External room sensor" : "No external room sensor set up"}"><span>Room</span><b>${ext != null ? `${f1(ext)}°` : "–"}</b></div>
+          <div class="trvr" title="${offset != null ? "Offset applied to the TRV" : "Offset not enabled in Tado CE"}"><span>Offset</span><b>${offset != null ? `${sign(offset)}°` : "–"}</b></div>
+        </div></div></div>`;
+    }
     return `<div class="card trvcard" data-a="open" data-z="${z.id}">
-      <div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? "Valve open" : "Valve closed"}</span>`}</div>
+      ${head}
       ${trvSVG(pct)}
       <div class="trvtemps">
         <div class="trvt" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}<small>°C</small>` : "–"}</b><em>before offset</em></div>
@@ -838,15 +908,36 @@ class TadoDashPanel extends HTMLElement {
       </div></div>`;
   }
 
+  // Compact version of the room card: tighter, a slim chart, and one row of controls.
+  _roomCardCompact(z, floor) {
+    const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
+    const hasTemp = z.type !== "hot_water";
+    const hum = z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}%</span>` : "";
+    const pillText = this._infoPill(z).replace(/<[^>]+>/g, "");
+    return `<div class="card room compact ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}" title="${pillText}">
+      <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
+        <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
+      <div class="cmid">
+        <div class="ctemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
+        <div class="cside">
+          ${hasTemp ? `<span class="ctgt" title="Target">${icon("bullseye-arrow")}${z.shownTarget != null ? f1(z.shownTarget) : "–"}°</span>` : ""}
+          <span class="cmeta">${hum}${this._rateChip(z)}</span>
+        </div>
+      </div>
+      ${hasTemp ? sparkline(t, g, z.heating) : ""}
+      ${this._controls(z, true)}</div>`;
+  }
+
   _roomCard(z, floor) {
+    if (this._layout.compact) return this._roomCardCompact(z, floor);
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
     return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}">
       <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
         <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
-      <div class="row mid">
-        <div class="temp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}
-          ${z.humidity != null ? `<span class="hum">${icon("water-percent")}${f0(z.humidity)}%</span>` : ""}</div>
+      <div class="row mid cardmid">
+        <div class="temp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
+        <span class="meta">${z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}%</span>` : ""}${this._rateChip(z)}</span>
         ${hasTemp ? `<div class="tgt"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
@@ -854,14 +945,24 @@ class TadoDashPanel extends HTMLElement {
       ${this._controls(z)}</div>`;
   }
 
+  // Warming / cooling rate beside the humidity: ▲ orange, ▼ blue, a dash when steady.
+  _rateChip(z) {
+    if (z.type === "hot_water") return "";
+    const r = trendPerHour(this._spark?.[z.ents.temp] || [], z.temp);
+    if (r == null) return "";
+    const dir = r >= 0.05 ? "up" : r <= -0.05 ? "down" : "flat";
+    const tip = dir === "flat" ? "Steady over the last hour" : `${dir === "up" ? "Warming" : "Cooling"} at ${Math.abs(r).toFixed(1)} °C an hour (last hour)`;
+    return `<span class="rate ${dir}" title="${tip}">${icon(`trend-${dir}`)}${dir === "flat" ? "0.0" : Math.abs(r).toFixed(1)}°/h</span>`;
+  }
+
   // Schedule / Boost / Manual / Off, and the target - / + bar. Shared by the room card and room page.
-  _controls(z) {
+  _controls(z, compact = false) {
     const hasTemp = z.type !== "hot_water";
     const pending = !!this._pending[z.id];
     const sched = !z.overlayType && !z.off && !pending;
     // Manual = a hand-set temperature: any override that isn't a boost, or one still being adjusted here.
     const manual = hasTemp && !z.off && !z.boosting && (!!z.overlayType || pending);
-    return `<div class="seg icons ${z.busy ? "busy" : ""}" role="group">
+    const html = `<div class="seg icons ${z.busy ? "busy" : ""}" role="group">
         <button class="${sched ? "on" : ""}" title="Schedule" data-a="hold" data-z="${z.id}" data-v="schedule">${icon("calendar-clock")}<span class="lb">Schedule</span></button>
         ${z.ents.boost ? `<button class="boost ${z.boosting ? "on" : ""}" title="Boost" data-a="boost" data-z="${z.id}">${icon("rocket-launch-outline")}<span class="lb">Boost</span></button>` : ""}
         ${hasTemp ? `<button class="manual ${manual ? "on" : ""}" title="Manual" data-a="hold" data-z="${z.id}" data-v="manual">${icon("hand-back-right-outline")}<span class="lb">Manual</span></button>` : ""}
@@ -870,6 +971,8 @@ class TadoDashPanel extends HTMLElement {
       ${hasTemp ? `<div class="seg stepbar" role="group">
         <button title="Lower target" data-a="step" data-z="${z.id}" data-v="-1">${icon("minus")}</button>
         <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}`;
+    // Compact: the mode buttons and the - / + buttons share one row.
+    return compact ? `<div class="crow">${html}</div>` : html;
   }
 
   // One line of status under the chart, always present: the override if there is one,
@@ -918,7 +1021,8 @@ class TadoDashPanel extends HTMLElement {
       </div>
       ${hasTemp ? sparkline(sp[e.temp] || [], sp[e.target] || [], z.heating) : ""}
       <div class="facts">
-        ${z.humidity != null ? `<span>${icon("water-percent")}${f0(z.humidity)}% humidity</span>` : ""}
+        ${z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}% humidity</span>` : ""}
+        ${this._rateChip(z) ? `<span>${this._rateChip(z)}</span>` : ""}
         ${outside != null ? `<span>${icon("thermometer")}${f1(outside)} °C outside</span>` : ""}
         ${surface != null ? `<span>${icon("wall")}wall ${f1(surface)} °C</span>` : ""}
         ${z.power != null ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
@@ -1296,7 +1400,7 @@ class TadoDashPanel extends HTMLElement {
       <button class="sw ${h.get("quota_reserve_enabled")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${ids.quota_reserve_enabled}" aria-label="Quota reserve"></button></div>` : "";
     const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override in the house</small></div>
       <button class="btn" data-a="press" data-v="${ids.resume_all}">Resume all</button></div>` : "";
-    const bridge = [["bridge_boiler_output_temperature", "Boiler output"], ["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
+    const bridge = [["boiler_output_temperature", "Boiler output"], ["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
       .map(([k, l]) => { const v = h.n(k); return v == null ? "" : tile("fire-burner", l, `${f1(v)} °C`); }).join("");
     const known = new Set(["api_usage", "api_limit", "api_reset", "api_status", "token_status", "last_sync", "next_sync", "polling_interval", "bridge_connected", "homekit_connected", "home"]);
     return `<div class="card"><h3>Tado cloud</h3>
@@ -1319,7 +1423,7 @@ function insRows(list, ic, tone = "") {
 }
 
 function chip(ic, label, value, cls = "", attrs = "") {
-  return `<span class="chip ${cls}" ${attrs}${attrs ? ' role="button"' : ""}>${icon(ic)}${label} <b>${esc(value)}</b></span>`;
+  return `<span class="chip ${cls}" ${attrs}${attrs.includes("data-a") ? ' role="button"' : ""}>${icon(ic)}${label} <b>${esc(value)}</b></span>`;
 }
 
 function ringSVG(pct, color, size = 72) {
@@ -1332,7 +1436,7 @@ function ringSVG(pct, color, size = 72) {
 const STYLE = `
 :host{display:block;height:100%;background:var(--bg);color:var(--fg);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);
   --heat:${HEAT};--cold:${C.peter};--ok:${C.emerald};--go:${C.nephritis};--warn:${C.orange};--bad:${C.alizarin};--accent:${C.turquoise};
-  --hum:${C.turquoise};--out:${C.concrete};--wis:${C.amethyst};
+  --hum:${C.turquoise};--out:${C.concrete};--wis:${C.amethyst};--humhi:color-mix(in srgb,${C.peter} 55%,#fff);
   /* Surfaces, text and borders come from the user's Home Assistant theme, so light/dark just works. */
   --bg:var(--primary-background-color,#111);--card:var(--card-background-color,#1c1c1c);--line:var(--divider-color,rgba(127,127,127,.28));
   --mut:var(--secondary-text-color,#9b9b9b);--fg:var(--primary-text-color,#e1e1e1)}
@@ -1355,6 +1459,8 @@ button{font:inherit;color:inherit}
 .chip b{color:var(--fg)} .chip.heat .i{color:var(--heat)} .chip.warn .i{color:var(--warn)} .chip[data-a]{cursor:pointer;font:inherit;font-size:13px}
 .chip[data-a]:hover{border-color:var(--mut)}
 .chip.on,.chip.on:hover{background:var(--go);border-color:var(--go);color:#fff}.chip.on b,.chip.on .i{color:#fff}
+.chip.fire{background:var(--heat);border-color:var(--heat);color:#fff}.chip.fire b,.chip.fire .i{color:#fff}
+.chip.push{margin-left:auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--ha-card-border-radius,12px);padding:16px;margin-bottom:14px}
 .grid .card{margin:0}
@@ -1373,6 +1479,16 @@ button{font:inherit;color:inherit}
 .hum{font-size:13px;color:var(--mut);margin-left:10px;vertical-align:middle}
 .tgt{text-align:right;display:flex;flex-direction:column;font-size:12px;color:var(--mut)}.tgt b{font-size:17px;color:var(--fg);font-weight:500}
 .sparkwrap{position:relative;margin:0 -16px}.spark{width:100%;height:64px;display:block}.spark.empty{height:24px}
+.rate{display:inline-flex;align-items:center;gap:2px;margin-left:8px;font-size:13px;font-weight:500;vertical-align:middle;white-space:nowrap}
+.rate .i{font-size:13px}.rate.up{color:var(--ok)}.rate.down{color:var(--bad)}.rate.flat{color:var(--mut)}
+.hum.hi{color:var(--humhi)}
+.facts .rate{margin-left:0}
+/* temperature left, humidity + rate in the middle of the card, target right */
+.cardmid{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:6px}
+.cardmid .tgt{justify-self:end}
+.meta{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 0 7px;text-align:center}
+.meta .hum,.meta .rate{margin-left:0}
+.hum{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.tgt{white-space:nowrap}
 .sparkwrap{cursor:crosshair}
 .sline{position:absolute;top:0;bottom:0;width:1px;background:var(--fg);opacity:.45;display:none;pointer-events:none}
 .sdot{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid var(--card);transform:translate(-50%,-50%);display:none;pointer-events:none}
@@ -1396,6 +1512,27 @@ button{font:inherit;color:inherit}
 .seg.icons button.on,.seg.icons button:hover{flex-grow:2.4}
 .seg button.manual.on{background:var(--cold)}
 .card.room .seg{margin-top:0}
+/* ----- compact cards (Rooms and TRV's) ----- */
+.grid.compact,.grid.trvs.compact{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.card.compact{padding:12px;gap:6px}
+.compact .name{font-size:14px}.compact .pill{font-size:11px;padding:1px 7px}
+.cmid{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.ctemp{font-size:34px;font-weight:300;line-height:1;white-space:nowrap}.ctemp small{font-size:13px;color:var(--mut);margin-left:2px}
+.cside{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
+.ctgt{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;white-space:nowrap}.ctgt .i{color:var(--mut);font-size:12px}
+.cmeta{display:inline-flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}.cmeta .rate{margin-left:0;font-size:12px}.cmeta .hum{margin-left:0;font-size:12px}
+.compact .sparkwrap{margin:0 -12px}.compact .spark{height:34px}.compact .sc{display:none}
+.crow{display:flex;gap:6px}.crow .seg.icons{flex:2.2}.crow .seg.stepbar{flex:1}
+.compact .seg{padding:3px;border-radius:10px}
+.compact .seg.icons button,.compact .seg.stepbar button{min-height:30px;padding:4px 2px}
+.compact .seg.icons .lb{display:none}
+.compact .seg.icons button.on,.compact .seg.icons button:hover{flex-grow:1}
+.trvbody{display:flex;align-items:center;gap:12px}
+.compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
+.trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.trvr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+.trvr span{font-size:11px;color:var(--mut)}.trvr b{font-size:15px;font-weight:500}
+.card.room .infopill{margin-top:10px} /* with the 6px gap: the same 16px as the card's padding below the - / + bar */
 @keyframes applying{50%{opacity:.55}}
 .seg.busy button.on{animation:applying 1s ease-in-out infinite}
 /* shared pieces used outside the room cards */
@@ -1410,9 +1547,11 @@ button{font:inherit;color:inherit}
 .hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
 .hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
 .hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
-/* Dark theme: our own near-black surfaces and borderless cards. Light theme follows Home Assistant. */
-:host([data-theme=dark]){--bg:#0d0e12;--card:#121318}
-:host([data-theme=dark]) .card,:host([data-theme=dark]) .card:hover{border-color:transparent}
+/* Dark theme: our own near-black surfaces. Light theme follows Home Assistant. Cards have no border in either. */
+:host([data-theme=light]){--humhi:${C.belize}; /* a pale blue would vanish on a light card */
+  --bg:color-mix(in srgb,var(--primary-background-color,#fafafa) 95%,#000)} /* a touch darker so the borderless white cards stand out */
+:host([data-theme=dark]){--bg:#0d0e12;--card:#16181e}
+.card,.card:hover{border-color:transparent}
 .grid.trvs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .trvcard{cursor:pointer;display:flex;flex-direction:column;gap:8px}.trvcard:hover{border-color:var(--mut)}
 .trv{width:120px;height:160px;align-self:center;display:block}
