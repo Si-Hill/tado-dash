@@ -1009,6 +1009,12 @@ class TadoDashPanel extends HTMLElement {
   _drawWires(flow) {
     const svg = flow.querySelector(".bwires"), img = flow.querySelector(".boiler");
     if (!svg || !img) return;
+    // Room pills share one width, so the middle room of a row sits exactly under the boiler's centre and the
+    // main pipe can run straight into it.
+    flow.style.removeProperty("--bw");
+    const nodes = [...flow.querySelectorAll(".bnode")];
+    const widest = Math.max(0, ...nodes.map((n) => n.getBoundingClientRect().width));
+    if (widest) flow.style.setProperty("--bw", `${Math.ceil(widest)}px`);
     const fr = flow.getBoundingClientRect(), ir = img.getBoundingClientRect();
     if (!fr.width || !ir.height) return;
     const k = ir.height / 120, ox = ir.left - fr.left, oy = ir.top - fr.top; // the drawing is 120 units tall, from y 10
@@ -1035,7 +1041,12 @@ class TadoDashPanel extends HTMLElement {
         const hotRooms = rooms.filter((r) => r.hot), hot = hotRooms.length > 0;
         const busiest = hot ? Math.max(...hotRooms.map((r) => r.pct)) : 0;
         // Everything hangs off the horizontal pipe: the main pipe to the boiler, and one branch per room.
-        const riser = { x: ox + slots[Math.min(gi, slots.length - 1)] * k, end: stubY, hot, riser: true, pct: busiest };
+        // Where the main pipe meets the boiler. If a room sits (nearly) in line with it, run the main pipe
+        // straight into that room's branch so they are one pipe, not two parallel lines a few pixels apart.
+        const slotX = ox + slots[Math.min(gi, slots.length - 1)] * k;
+        const lo = ox + 30 * k, hi = ox + 90 * k; // the boiler's top and bottom edge
+        const inLine = rooms.map((r) => r.x).filter((x) => Math.abs(x - slotX) <= 3 && x >= lo && x <= hi).sort((p, q) => Math.abs(p - slotX) - Math.abs(q - slotX))[0];
+        const riser = { x: inLine ?? slotX, end: stubY, hot, riser: true, pct: busiest };
         const branches = [riser];
         rooms.forEach((r) => branches.push({ x: r.x, end: r.end, hot: r.hot, pct: r.pct }));
         branches.sort((a, b) => a.x - b.x);
@@ -1915,7 +1926,7 @@ button{font:inherit;color:inherit}
 .bgroup{display:flex;flex-direction:column;align-items:center;gap:6px}
 .bfloor{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
 .bnodes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.bnode{display:inline-flex;align-items:baseline;gap:5px;padding:5px 11px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--fg);
+.bnode{display:inline-flex;align-items:baseline;justify-content:center;box-sizing:border-box;min-width:var(--bw,0);gap:5px;padding:5px 11px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--fg);
   background:color-mix(in srgb,var(--mut) 16%,var(--card))}
 .bnode small{font-size:11px;color:var(--mut)}
 .bnode.on{background:color-mix(in srgb,var(--heat) 32%,var(--card))}.bnode.on small{color:var(--fg)}
