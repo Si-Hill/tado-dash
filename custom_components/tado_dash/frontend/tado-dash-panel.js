@@ -1731,8 +1731,9 @@ button{font:inherit;color:inherit}
 .boilercard.compact .bnode{padding:3px 9px;font-size:12px}
 /* ----- settings window ----- */
 .page{position:relative}
-.modal-back{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
-.modal{width:min(380px,100%);background:var(--card);border-radius:14px;padding:16px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+/* Fixed to the screen, not the page: in Home Assistant the page can be much taller than the window */
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal{width:min(380px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border-radius:14px;padding:16px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
 .mhead{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
 .mhead .sp{flex:1}.mhead .icon-btn{align-self:center;padding:6px}
 .srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
