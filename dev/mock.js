@@ -62,7 +62,7 @@
   hub("api_status", "sensor.tado_ce_hub_api_status", "OK"); hub("token_status", "sensor.tado_ce_hub_token_status", "valid");
   hub("last_sync", "sensor.tado_ce_hub_last_sync", new Date(Date.now() - 4 * 60e3).toISOString());
   hub("next_sync", "sensor.tado_ce_hub_next_sync", new Date(Date.now() + 1 * 60e3).toISOString());
-  hub("polling_interval", "sensor.tado_ce_hub_polling_interval", 5);
+  hub("polling_interval", "sensor.tado_ce_hub_polling_interval", 5, { source: "Adaptive (Day)", day_interval: 30, night_interval: 120, is_night_mode: false });
   hub("bridge_connected", "binary_sensor.tado_ce_hub_bridge_connected", "on"); hub("homekit_connected", "binary_sensor.tado_ce_hub_homekit", "on");
   hub("home", "binary_sensor.tado_ce_hub_home", "on");
   hub("boiler_flow_temp", "sensor.boiler_flow", 60.3); hub("boiler_output_temperature", "sensor.tado_ce_hub_bridge_boiler_output_temperature", 58.4); hub("zone_count", "sensor.tado_ce_hub_zone_count", 4);
@@ -88,7 +88,7 @@
   hub("home_insights", "sensor.tado_ce_hub_home_insights", 4, {
     top_priority: "Critical", summary: "Address humidity problem in Master Bedroom and Dining Room.",
     actions_needed: ["Address humidity problem in Master Bedroom and Dining Room", "Adjust preheat timing in Lounge and Office"],
-    persistent_insights: ["Critical: Mold Risk in Master Bedroom (57d 19h)", "Medium: Condensation in Dining Room (1d 22h)"],
+    persistent_insights: ["🔴 Critical: Mold Risk in Master Bedroom (57d 19h)", "🟡 Medium: Condensation in Dining Room (1d 22h)"],
     cross_zone_insights: ["Whole-house condensation risk: 2 zones affected — consider a dehumidifier"],
   });
 

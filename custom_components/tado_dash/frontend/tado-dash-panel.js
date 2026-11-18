@@ -363,7 +363,8 @@ class TadoDashPanel extends HTMLElement {
     this._narrow = false;
     this._layout = { floors: [], rooms: {}, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
     this._settingsOpen = false;
-    this._onKey = (e) => { if (e.key === "Escape" && this._settingsOpen) { this._settingsOpen = false; this._render(); } };
+    this._pollOpen = false;
+    this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
     this._drag = null;
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
@@ -671,6 +672,19 @@ class TadoDashPanel extends HTMLElement {
     });
   }
 
+  // Copy text to the clipboard (falls back to a hidden textarea where the clipboard API is blocked).
+  async _copy(text) {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (_) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.style.cssText = "position:fixed;opacity:0";
+        document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+      } catch (_) { /* ignore */ }
+    }
+    this._toast(ok ? `Copied ${text} to the clipboard` : `Couldn't copy ${text}`);
+  }
+
   _toast(message) {
     this.dispatchEvent(new CustomEvent("hass-notification", { detail: { message }, bubbles: true, composed: true }));
   }
@@ -727,7 +741,7 @@ class TadoDashPanel extends HTMLElement {
 
   _onClick(e) {
     // A click on the dimmed area behind the settings window closes it.
-    if (e.target.classList?.contains("modal-back")) { this._settingsOpen = false; this._render(); return; }
+    if (e.target.classList?.contains("modal-back")) { this._settingsOpen = this._pollOpen = false; this._render(); return; }
     const el = e.target.closest("[data-a]");
     if (!el) return;
     const { a, z, v } = el.dataset;
@@ -743,7 +757,7 @@ class TadoDashPanel extends HTMLElement {
         this._call("select", "select_option", { entity_id: id, option: v }).then((ok) => { if (!ok) { delete this._selOpt[id]; this._render(); } });
         break;
       }
-      case "tab": this._settingsOpen = false; this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
+      case "tab": this._settingsOpen = this._pollOpen = false; this._tab = v; this._zone = null; if (z) this._sel = z; if (v === "analytics" || v === "schedules") this._ensureSel(); break;
       case "open": this._zone = z; this._sel = z; break;
       case "back": this._zone = null; break;
       case "menu": this.dispatchEvent(new CustomEvent("hass-toggle-menu", { bubbles: true, composed: true })); return;
@@ -755,6 +769,10 @@ class TadoDashPanel extends HTMLElement {
       case "filter": this._filter = v === "heating" && this._filter === "heating" ? "all" : v; break;
       case "range": this._range = parseInt(v, 10); break;
       case "pick": this._sel = z; break;
+      case "copy": this._copy(v); return;
+      case "polling": this._pollOpen = true; break;
+      case "polling-close": this._pollOpen = false; break;
+      case "tado-settings": this._pollOpen = false; this._openTadoSettings(); break;
       case "ent-group": { const s = (this._entClosed ||= new Set()); s.has(v) ? s.delete(v) : s.add(v); break; }
       case "tado-refresh-all": this._refreshFromTado(this._orderedZones().filter((x) => x.ents.schedule)); return;
       case "tado-refresh-one": if (zone) this._refreshFromTado([zone]); return;
@@ -818,7 +836,7 @@ class TadoDashPanel extends HTMLElement {
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
         <div class="content"><div class="wrap">${body}</div></div>
-        ${this._settingsOpen && !inRoom ? this._settingsModal() : ""}
+        ${this._settingsOpen && !inRoom ? this._settingsModal() : ""}${this._pollOpen && !inRoom ? this._pollingModal() : ""}
       </div>`;
     const sc = this.shadowRoot.querySelector(".content");
     const key = `${this._tab}:${this._zone}`;
@@ -920,6 +938,27 @@ class TadoDashPanel extends HTMLElement {
   // The settings pill: opens a small modal with what the current tab can show.
   _settingsChip() {
     return chip("settings", "Settings", "", this._settingsOpen ? "on" : "", `data-a="settings" title="Choose what this page shows"`);
+  }
+
+  // Tado CE owns the polling settings (Settings -> Devices & services -> Tado CE -> Configure -> Advanced
+  // Settings), so this only explains what it is doing and takes you there.
+  _openTadoSettings() {
+    const path = "/config/integrations/integration/tado_ce";
+    history.pushState(null, "", path);
+    window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+  }
+
+  _pollingModal() {
+    const h = this._hub, a = h.get("polling_interval")?.attributes || {}, now = h.n("polling_interval");
+    const mode = a.is_night_mode ? "night" : "day";
+    const line = (l, v) => v == null ? "" : `<div class="kv"><span>${l}</span><b>${esc(v)}</b></div>`;
+    return `<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-label="Polling">
+      <div class="mhead"><h3>Polling</h3><small>How often Tado CE reads Tado</small><span class="sp"></span>
+        <button class="icon-btn" data-a="polling-close" title="Close">${icon("close")}</button></div>
+      ${line("Right now", now != null ? `Every ${now} min (${mode})` : null)}${line("Mode", a.source)}
+      ${line("Day interval", a.day_interval != null ? `${a.day_interval} min` : null)}${line("Night interval", a.night_interval != null ? `${a.night_interval} min` : null)}
+      <p class="hint">Tado CE changes this itself to stay inside your Tado API allowance. To set your own day and night intervals, open Tado CE's Configure → Advanced Settings → Polling &amp; API.</p>
+      <div class="mfoot"><button class="btn ghost" data-a="polling-close">Close</button><button class="btn" data-a="tado-settings">Open Tado CE settings</button></div></div></div>`;
   }
 
   _settingsModal() {
@@ -1681,7 +1720,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
       const id = ids[k], s = this._st(id);
       const raw = s ? s.state : "–";
       const val = /^\d{4}-\d\d-\d\dT/.test(raw) ? ago(raw) : raw;
-      return `<div class="kv"><span>${esc(niceName(s?.attributes?.friendly_name || k))}<small>${esc(id)}</small></span><b>${esc(val)}${s?.attributes?.unit_of_measurement ? " " + esc(s.attributes.unit_of_measurement) : ""}</b></div>`;
+      return `<div class="kv copy" role="button" tabindex="0" data-a="copy" data-v="${esc(id)}" title="Click to copy the entity ID"><span>${esc(niceName(s?.attributes?.friendly_name || k))}<small>${esc(id)}</small></span><b>${esc(val)}${s?.attributes?.unit_of_measurement ? " " + esc(s.attributes.unit_of_measurement) : ""}</b></div>`;
     };
     const groups = GROUPS.map(([name, keys]) => [name, keys.filter((k) => rest.includes(k))]);
     const placed = new Set(groups.flatMap(([, ks]) => ks));
@@ -1697,7 +1736,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const usage = h.n("api_usage"), limit = h.n("api_limit");
     const pctUsed = usage != null && limit ? Math.min(100, (usage / limit) * 100) : null;
     const state = (k) => h.val(k);
-    const tile = (ic, l, v, cls = "") => v == null ? "" : `<div class="stat ${cls}">${icon(ic)}<span>${l}</span><b>${esc(v)}</b></div>`;
+    const tile = (ic, l, v, cls = "", attrs = "") => v == null ? "" : `<div class="stat ${cls}" ${attrs}>${icon(ic)}<span>${l}</span><b>${esc(v)}</b></div>`;
     const okCls = (v) => (/^(ok|good|valid|on|connected|active|healthy)$/i.test(v) ? "ok" : "bad");
     const cap = (v) => (v == null ? v : String(v).replace(/^./, (c) => c.toUpperCase()));
     const apiStatus = cap(state("api_status")), token = cap(state("token_status"));
@@ -1727,16 +1766,17 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override, or fetch the schedules from Tado again</small></div>
       <div class="btns"><button class="btn ghost" data-a="tado-refresh-all" ${this._schedBusy ? "disabled" : ""}>${icon("cloud-arrow")}${this._schedBusy ? "Refreshing…" : "Refresh schedules"}</button>
         <button class="btn ${offSchedule ? "" : "idle"}" data-a="press" data-v="${ids.resume_all}" ${offSchedule ? "" : "disabled"} title="${offSchedule ? "" : "Every room is already following its schedule"}">Resume all</button></div></div>` : "";
-    const bridge = [["boiler_output_temperature", "Boiler output"], ["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
-      .map(([k, l]) => { const v = h.n(k); return v == null ? "" : tile("fire-burner", l, `${f1(v)} °C`); }).join("");
+    const bridge = [["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
+      .map(([k, l]) => { const v = h.n(k) ?? (k === "boiler_flow_temp" ? h.n("boiler_output_temperature") : null); return v == null ? "" : tile("fire-burner", l, `${f1(v)} °C`); }).join("");
     const known = new Set(["api_usage", "api_limit", "api_reset", "api_status", "token_status", "last_sync", "next_sync", "polling_interval", "bridge_connected", "homekit_connected", "home",
       "resume_all", "presence_mode", "overlay_mode", "overlay_timer", "quota_reserve_enabled"]); // shown in the cards above
     return `<div class="card"><h3>Tado cloud</h3>
         ${pctUsed != null ? `<div class="meter"><div class="mhead"><span>API calls today</span><b>${f0(usage)} / ${f0(limit)}</b></div><div class="bar"><i style="width:${pctUsed}%" class="${pctUsed > 85 ? "bad" : pctUsed > 60 ? "warn" : ""}"></i></div>
           ${state("api_reset") ? `<small>Resets ${ago(state("api_reset"))}</small>` : ""}</div>` : ""}
-        <div class="stats">${tile("cloud-check-outline", "API status", apiStatus, apiStatus ? okCls(apiStatus) : "")}${tile("key-outline", "Token", token, token ? okCls(token) : "")}
-          ${tile("sync", "Last sync", when("last_sync"), syncCls)}${tile("sync-circle", "Next sync", when("next_sync"))}${tile("timer-cog-outline", "Polling", state("polling_interval") ? `${state("polling_interval")} min` : null)}
-          ${tile("router-wireless", "Internet bridge", bin("bridge_connected"), binCls("bridge_connected"))}${tile("apple", "HomeKit", bin("homekit_connected"), binCls("homekit_connected"))}${tile("home-map-marker", "Geofencing", bin("home"), binCls("home"))}${bridge}</div></div>
+        <div class="stats cloud">${tile("router-wireless", "Internet bridge", bin("bridge_connected"), binCls("bridge_connected"))}${tile("key-outline", "Token", token, token ? okCls(token) : "")}
+          ${tile("apple", "HomeKit", bin("homekit_connected"), binCls("homekit_connected"))}${tile("cloud-check-outline", "API status", apiStatus, apiStatus ? okCls(apiStatus) : "")}
+          ${tile("home-map-marker", "Geofencing", bin("home"), binCls("home"))}${tile("timer-cog-outline", "Polling", state("polling_interval") ? `${state("polling_interval")} min` : null, "tap", 'data-a="polling" role="button" tabindex="0" title="About polling and how to change it"')}
+          ${tile("sync", "Last sync", when("last_sync"), syncCls)}${tile("sync-circle", "Next sync", when("next_sync"))}${bridge}</div></div>
       <div class="card"><h3>Controls</h3>${resume}${selects}${quota}</div>
       ${this._hubEntities(ids, known)}
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
@@ -1744,8 +1784,16 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
 }
 
 // A list of notes as soft rows, like the info pill on the room cards.
+// Tado CE prefixes insights with a coloured-circle emoji and a priority word ("🔴 Critical: ..."). Drop the
+// glossy emoji and colour the priority word itself instead.
+const PRIORITY = { critical: C.alizarin, high: C.carrot, medium: C.sunflower, low: C.nephritis };
 function insRows(list, ic, tone = "") {
-  return `<div class="insrows">${list.map((i) => `<div class="insrow ${tone}">${icon(ic)}<span>${esc(i)}</span></div>`).join("")}</div>`;
+  return `<div class="insrows">${list.map((i) => {
+    const text = String(i).replace(/^\s*(?:🔴|🟠|🟡|🟢|🔵|🟣|⚪)\s*/u, "");
+    const m = /^(Critical|High|Medium|Low):\s*/i.exec(text);
+    const body = m ? `<b class="prio" style="color:${PRIORITY[m[1].toLowerCase()]}">${esc(m[1])}:</b> ${esc(text.slice(m[0].length))}` : esc(text);
+    return `<div class="insrow ${tone}">${icon(ic)}<span>${body}</span></div>`;
+  }).join("")}</div>`;
 }
 
 function chip(ic, label, value, cls = "", attrs = "") {
@@ -1891,7 +1939,7 @@ button{font:inherit;color:inherit}
 .srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
 .srow input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--go);flex:none;cursor:pointer}
 .srow b{display:block;font-weight:500;font-size:14px}.srow small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
-.mfoot{display:flex;justify-content:flex-end;margin-top:8px}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .trvbody{display:flex;align-items:center;gap:12px}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
 .trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -1951,14 +1999,18 @@ button{font:inherit;color:inherit}
 .ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
 .entgroup h3{display:flex;align-items:center;gap:8px;cursor:pointer;margin:0}.entgroup h3 .i{margin-left:auto;color:var(--mut);font-size:12px}
 .entgroup .count{font-size:11px;font-weight:500;color:var(--mut);background:var(--chip,rgba(128,128,128,.18));border-radius:9px;padding:1px 7px}.entgroup.shut h3{margin-bottom:0}
+.kv.copy{cursor:pointer;border-radius:6px}.kv.copy:hover{background:color-mix(in srgb,var(--mut) 10%,transparent)}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
 .kv span small{display:block;color:var(--mut);font-size:12px;word-break:break-all}.kv b{font-weight:500;white-space:nowrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .stat{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:7px;row-gap:3px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--mut) 12%,transparent);font-size:12px;color:var(--mut)}
+.stat.tap{cursor:pointer}.stat.tap:hover{filter:brightness(1.15)}
 .stat .i{color:var(--mut)}.stat span{min-width:0}.stat b{grid-column:1/-1;font-size:15px;color:var(--fg);font-weight:500}
 .stat.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}.stat.ok .i,.stat.ok b{color:var(--ok)}
 .stat.bad{background:color-mix(in srgb,var(--bad) 15%,transparent)}
 .stat.tone{background:color-mix(in srgb,var(--tone) 15%,transparent)}.stat.tone .i{color:var(--tone)}.stat.warn .i,.stat.warn b{color:var(--warn)}.stat.bad .i,.stat.bad b{color:var(--bad)}
+.stats.cloud{grid-template-columns:repeat(5,1fr)}
+@container (max-width:700px){.stats.cloud{grid-template-columns:repeat(3,1fr)}}@container (max-width:430px){.stats.cloud{grid-template-columns:repeat(2,1fr)}}
 .stats.big{margin-bottom:14px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 .line{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .line:first-of-type{border-top:0}.line .ic{width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--mut) 14%,transparent);display:flex;align-items:center;justify-content:center;color:var(--mut)}
@@ -1982,6 +2034,7 @@ button{font:inherit;color:inherit}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mut);margin-top:6px}
 .hint{font-size:12px;color:var(--mut);margin:10px 0 0}.center{text-align:center}
 .empty{text-align:center;padding:48px 16px;color:var(--mut)}.empty .i{font-size:48px}.empty h2{color:var(--fg);font-weight:400;margin:12px 0 6px}
+.prio{font-weight:600}
 .ins{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:14px}.ins li{display:flex;gap:8px;line-height:1.4}.ins .i{color:var(--warn);flex:none;margin-top:1px}
 .axisrow,.drow{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center}.drow{margin:6px 0}
 .hours{position:relative;height:14px}.hours i{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--mut);font-style:normal}
