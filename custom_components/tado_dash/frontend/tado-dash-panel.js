@@ -8,10 +8,9 @@
 const TCE = "tado_ce";
 // Flat UI "Default" palette (flatuicolors.com/palette/defo)
 const C = {
-  turquoise: "#1abc9c", emerald: "#2ecc71", peter: "#3498db", amethyst: "#9b59b6", asphalt: "#34495e",
-  greensea: "#16a085", nephritis: "#27ae60", belize: "#2980b9", wisteria: "#8e44ad", midnight: "#2c3e50",
-  sunflower: "#f1c40f", carrot: "#e67e22", alizarin: "#e74c3c", clouds: "#ecf0f1", concrete: "#95a5a6",
-  orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b", silver: "#bdc3c7", asbestos: "#7f8c8d",
+  turquoise: "#1abc9c", emerald: "#2ecc71", peter: "#3498db", amethyst: "#9b59b6", nephritis: "#27ae60", belize: "#2980b9",
+  sunflower: "#f1c40f", carrot: "#e67e22", alizarin: "#e74c3c", concrete: "#95a5a6",
+  orange: "#f39c12", pumpkin: "#d35400", pomegranate: "#c0392b",
 };
 // The panel's header shows the same logo as the brand images, served next to the panel by the
 // integration (/tado_dash/brand/). Find them from where this script was loaded; the dev harness
@@ -64,7 +63,6 @@ const FA_ALIAS = {
   "thermometer": "temperature-half",
   "bullseye-arrow": "bullseye",
   "wall": "border-all",
-  "refresh": "arrows-rotate",
   "plus": "plus",
   "minus": "minus",
   "menu": "bars",
@@ -104,7 +102,6 @@ const FA_ALIAS = {
   "trend-flat": "minus",
   "chevron-up": "chevron-up",
   "chevron-down": "chevron-down",
-  "confidence": "gauge",
   "home-export-outline": "house",
   "home-account": "house",
   "circle-question": "circle-question",
@@ -139,7 +136,6 @@ const FA = {
   "faucet-drip": [512, "M224 0c17.7 0 32 14.3 32 32l0 12 96-12c17.7 0 32 14.3 32 32s-14.3 32-32 32L256 84l-31-3.9-1-.1-1 .1L192 84 96 96C78.3 96 64 81.7 64 64s14.3-32 32-32l96 12 0-12c0-17.7 14.3-32 32-32zM0 224c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-43.8 32-4 32 4 0 43.8 18.7 0c8.5 0 16.6 3.4 22.6 9.4L320 192l32 0c88.4 0 160 71.6 160 160c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 320c-17.7 0-32-14.3-32-32l0-64zM436.8 423.4c1.9-4.5 6.3-7.4 11.2-7.4s9.2 2.9 11.2 7.4l18.2 42.4c1.8 4.1 2.7 8.6 2.7 13.1l0 1.2c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-1.2c0-4.5 .9-8.9 2.7-13.1l18.2-42.4z"],
   "fire": [448, "M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.5 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-4.5-9-16-9.6-22.5-2l-25.2 29.3c-6.6 7.6-18.5 7.4-24.7-.5c-16.5-21-46-58.5-62.8-79.8c-6.3-8-18.3-8.1-24.7-.1c-33.8 42.5-50.8 69.3-50.8 99.4C112 375.4 162.6 416 225.7 416z"],
   "fire-burner": [640, "M345.7 48.3L358 34.5c5.4-6.1 13.3-8.8 20.9-8.9c7.2 0 14.3 2.6 19.9 7.8c19.7 18.3 39.8 43.2 55 70.6C469 131.2 480 162.2 480 192.2C480 280.8 408.7 352 320 352c-89.6 0-160-71.3-160-159.8c0-37.3 16-73.4 36.8-104.5c20.9-31.3 47.5-59 70.9-80.2C273.4 2.3 280.7-.2 288 0c14.1 .3 23.8 11.4 32.7 21.6c0 0 0 0 0 0c2 2.3 4 4.6 6 6.7l19 19.9zM384 240.2c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C293 167.1 256 203.6 256 240.2c0 35.3 28.7 64 64 64s64-28.7 64-64zM32 288c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 64 448 0 0-64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l0-96zM320 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm160-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM192 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"],
-  "gauge": [512, "M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm320 96c0-26.9-16.5-49.9-40-59.3L280 88c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 204.7c-23.5 9.5-40 32.5-40 59.3c0 35.3 28.7 64 64 64s64-28.7 64-64zM144 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm-16 80a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM400 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"],
   "gear": [512, "M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"],
   "hand": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 272c0 1.5 0 3.1 .1 4.6L67.6 283c-16-15.2-41.3-14.6-56.6 1.4s-14.6 41.3 1.4 56.6L124.8 448c43.1 41.1 100.4 64 160 64l19.2 0c97.2 0 176-78.8 176-176l0-208c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 176c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208z"],
   "hourglass-half": [384, "M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 256 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32s-14.3-32-32-32L320 0 64 0 32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9L192 301.3l67.9 67.9c4.6 4.6 8.6 9.6 12.1 14.9L112 384z"],
@@ -236,7 +232,7 @@ function tempScale(temp, target, minSpan = 3) {
   if (!temps.length) return null;
   const tLo = Math.min(...temps), tHi = Math.max(...temps);
   const near = target.map((p) => p[1]).filter((v) => v >= tLo - 2 && v <= tHi + 2);
-  let lo = Math.min(tLo, ...near) - 1, hi = Math.max(tHi, ...near) + 1;
+  let lo = Math.min(tLo, ...near), hi = Math.max(tHi, ...near);
   if (hi - lo < minSpan) { const m = (hi + lo) / 2; lo = m - minSpan / 2; hi = m + minSpan / 2; }
   return [lo, hi];
 }
@@ -253,12 +249,13 @@ function stepClipped(pts, X, Y, lo, hi, tEnd) {
   return d;
 }
 
+const SPARK_HOURS = 12; // how far back the room-card charts reach
 let SPARKS = {}; // hover data for the room-card charts, rebuilt on every render
 let sparkN = 0;
 
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
-  const now = Date.now(), t0 = now - 6 * HOUR;
+  const now = Date.now(), t0 = now - SPARK_HOURS * HOUR;
   const [lo, hi] = tempScale(temp, target);
   const W = 300, H = 70;
   const X = (t) => ((t - t0) / (now - t0)) * W;
@@ -269,14 +266,16 @@ function sparkline(temp, target, heating) {
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
   const tgt = stepClipped(target, X, Y, lo, hi, now);
   const id = `sp${++sparkN}`;
+  const marks = [9, 6, 3].filter((k) => k < SPARK_HOURS).map((k) => ({ k, x: (1 - k / SPARK_HOURS) * 100 }));
   SPARKS[id] = { temp, target, t0, now, lo, hi, H, color };
-  return `<div class="sparkwrap" data-sp="${id}" title="Last 6 hours, scaled ${f1(lo)}–${f1(hi)} °C">
+  return `<div class="sparkwrap" data-sp="${id}" title="Last ${SPARK_HOURS} hours, scaled ${f1(lo)}–${f1(hi)} °C">
     <svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      ${marks.map((m) => `<path d="M${(m.x * W / 100).toFixed(1)},0V${H}" stroke="var(--mut)" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".18"/>`).join("")}
       <path d="${area}" style="fill:color-mix(in srgb, ${color} 30%, var(--card))"/>
-      ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" opacity=".8"/>` : ""}
+      ${tgt ? `<path d="${tgt}" fill="none" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" opacity=".8"/>` : ""}
       <path d="${line}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     </svg>
-    <span class="sc hi">${f1(hi)}°</span><span class="sc lo">${f1(lo)}°</span>
+    <span class="sc hi">${f1(hi)}°</span><span class="sc lo">${f1(lo)}°</span>${marks.map((m) => `<span class="sx" style="left:${m.x}%">−${m.k}h</span>`).join("")}
     <div class="sline"></div><div class="sdot"></div><div class="stip"></div></div>`;
 }
 
@@ -494,21 +493,19 @@ class TadoDashPanel extends HTMLElement {
       this._layout.rooms[d.floor] = next;
       this._saveLayout();
     }
-    if (this._pendingRender) { this._pendingRender = false; }
     this._render();
   }
 
   set hass(h) {
     const first = !this._hass;
-    this.setAttribute("data-theme", h.themes?.darkMode ? "dark" : "light");
+    const theme = h.themes?.darkMode ? "dark" : "light";
+    if (!first && this.getAttribute("data-theme") !== theme) this._sig = null; // the brand logo follows the theme
+    this.setAttribute("data-theme", theme);
     this._hass = h;
     if (first) this._init();
     else this._maybeRender();
   }
-  get hass() { return this._hass; }
   set narrow(v) { if (this._narrow !== v) { this._narrow = v; if (this._map) this._render(); } }
-  set route(_) {}
-  set panel(_) {}
 
   connectedCallback() {
     this._timer = setInterval(() => this._refreshHistory(), 5 * MIN);
@@ -540,12 +537,17 @@ class TadoDashPanel extends HTMLElement {
   _val(id) { const s = this._st(id); return s && !["unknown", "unavailable"].includes(s.state) ? s.state : null; }
   _n(id) { return num(this._val(id)); }
 
+  // Building every room's view-model is the costly part of a render, and a render asks for them many times
+  // over, so while one is running the list is built once.
   get _zones() {
+    if (this._zc) return this._zc;
     if (!this._home) return [];
-    return Object.values(this._home.zones)
+    const zones = Object.values(this._home.zones)
       .map((z) => this._zoneVM(z))
       .filter((z) => z.main)
       .sort((a, b) => a.name.localeCompare(b.name));
+    if (this._inRender) this._zc = zones;
+    return zones;
   }
 
   _zoneVM(z) {
@@ -658,7 +660,7 @@ class TadoDashPanel extends HTMLElement {
     if (!this._home) return;
     const zones = this._zones;
     const ids = zones.flatMap((z) => [z.ents.temp, z.ents.target]);
-    this._spark = await this._history(ids, 6);
+    this._spark = await this._history(ids, SPARK_HOURS);
     this._render();
   }
 
@@ -689,7 +691,12 @@ class TadoDashPanel extends HTMLElement {
     this.dispatchEvent(new CustomEvent("hass-notification", { detail: { message }, bubbles: true, composed: true }));
   }
 
-  _zoneById(id) { return this._zones.find((z) => z.id === id); }
+  _zoneById(id) {
+    if (this._zc) return this._zc.find((z) => z.id === id);
+    const z = Object.values(this._home?.zones || {}).find((x) => x.id === id);
+    const vm = z && this._zoneVM(z);
+    return vm?.main ? vm : undefined;
+  }
 
   _setTarget(z, t) {
     t = Math.min(z.max, Math.max(z.min, Math.round(t / z.step) * z.step));
@@ -747,6 +754,9 @@ class TadoDashPanel extends HTMLElement {
     const { a, z, v } = el.dataset;
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
+      case "more-info":
+        this.dispatchEvent(new CustomEvent("hass-more-info", { detail: { entityId: el.dataset.e }, bubbles: true, composed: true }));
+        break;
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
       case "compact": this._layout.compact = !this._layout.compact; this._saveLayout(); break;
       case "settings": this._settingsOpen = !this._settingsOpen; break;
@@ -785,7 +795,6 @@ class TadoDashPanel extends HTMLElement {
     const el = e.target.closest("[data-c]");
     if (!el) return;
     if (el.dataset.c === "select") this._call("select", "select_option", { entity_id: el.dataset.id, option: el.value });
-    if (el.dataset.c === "sel") { this._sel = el.value; this._render(); }
     if (el.dataset.c === "setting" && el.dataset.key in SHOW_DEFAULTS) {
       this._layout.show[el.dataset.key] = el.checked;
       this._saveLayout();
@@ -808,23 +817,26 @@ class TadoDashPanel extends HTMLElement {
 
   _render() {
     if (!this._hass) return;
-    if (this._drag) { this._pendingRender = true; return; } // don't rebuild the page under a card being dragged
+    if (this._drag) return; // don't rebuild the page under a card being dragged
     const scroller = this.shadowRoot.querySelector(".content");
     const top = scroller ? scroller.scrollTop : 0;
     const prevTab = this._renderedKey;
     this._charts = {};
     SPARKS = {};
+    this._inRender = true;
+    try {
+    const room = this._zone && this._zoneById(this._zone);
     let body;
     if (this._mapError) body = this._empty("alert-circle-outline", "Couldn't read Tado CE", esc(this._mapError));
     else if (!this._map) body = this._empty("timer-sand", "Loading…", "");
     else if (!this._zones.length) body = this._empty("radiator-off", "No Tado CE rooms found",
       "Tado Dash reads the entities Tado CE creates. Make sure Tado CE is set up and has finished its first sync.");
-    else if (this._zone && this._zoneById(this._zone)) body = this._viewRoom(this._zoneById(this._zone));
+    else if (room) body = this._viewRoom(room);
     else body = { rooms: () => this._viewRooms(), trvs: () => this._viewTrvs(), analytics: () => this._viewAnalytics(),
       schedules: () => this._viewSchedules(), confidence: () => this._viewConfidence(), system: () => this._viewSystem() }[this._tab]();
 
-    const inRoom = this._zone && this._zoneById(this._zone);
-    const title = inRoom ? this._zoneById(this._zone).name : "Tado Dash";
+    const inRoom = room;
+    const title = room ? room.name : "Tado Dash";
     const tabs = [["rooms", "Rooms"], ["trvs", "TRV's"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
     this.shadowRoot.innerHTML = `<style>${STYLE}</style>
       <div class="page">
@@ -838,6 +850,7 @@ class TadoDashPanel extends HTMLElement {
         <div class="content"><div class="wrap">${body}</div></div>
         ${this._settingsOpen && !inRoom ? this._settingsModal() : ""}${this._pollOpen && !inRoom ? this._pollingModal() : ""}
       </div>`;
+    } finally { this._inRender = false; this._zc = null; }
     const sc = this.shadowRoot.querySelector(".content");
     const key = `${this._tab}:${this._zone}`;
     if (sc) sc.scrollTop = prevTab === key ? top : 0;
@@ -922,8 +935,6 @@ class TadoDashPanel extends HTMLElement {
     return `<div class="chips">${chips}</div>${boiler}${body}`;
   }
 
-  // The boiler's output temperature from the Internet Bridge (flow temperature on eBUS boilers),
-  // as a chip for the Rooms and TRV tabs. Nothing if Tado CE doesn't report one.
   // Toggles between full and compact cards on the Rooms and TRV tabs (kept with the user's layout).
   _compactChip() {
     return chip("compact", "Compact", "", `push ${this._layout.compact ? "on" : ""}`, `data-a="compact" title="Smaller cards, so more fit on the screen"`);
@@ -976,6 +987,12 @@ class TadoDashPanel extends HTMLElement {
       ${rows}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
   }
 
+  // The entity behind the boiler temperature, for the standard Home Assistant history dialog.
+  _boilerEntity() {
+    const h = this._hub;
+    return h.n("boiler_output_temperature") != null ? h.ids.boiler_output_temperature : h.n("boiler_flow_temp") != null ? h.ids.boiler_flow_temp : "";
+  }
+
   // The boiler in the middle with the rooms of the upper floors above it and the rest below, in the
   // user's floor and room order. Pipework joins them (see _drawWires): copper while a room is calling
   // for heat, thicker the more open its valve is; thin and dashed when it isn't.
@@ -998,7 +1015,7 @@ class TadoDashPanel extends HTMLElement {
       <div class="row top"><span class="name">${icon("fire-burner")}Boiler</span>
         <span class="pill ${calling ? "heating" : ""}" title="Inferred from the rooms; Tado CE has no flame signal">${calling ? icon("fire") + "Calling for heat" : "Idle"}</span></div>
       <div class="bflow"><svg class="bwires" aria-hidden="true"></svg>
-        ${side(groups.slice(0, split), "top")}<div class="bimg">${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
+        ${side(groups.slice(0, split), "top")}<div class="bimg" ${this._boilerEntity() ? `data-a="more-info" data-e="${this._boilerEntity()}" title="Boiler output temperature history"` : ""}>${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
   }
 
   // Pipework: one main pipe from the boiler for each floor runs to a horizontal pipe along that
@@ -1103,7 +1120,7 @@ class TadoDashPanel extends HTMLElement {
     flows.forEach((f) => { this._ro.observe(f); this._drawWires(f); });
   }
 
-  // It turns orange while any room (or hot water) is calling for heat (see _callingForHeat).
+  // It turns orange while any heating room is calling for heat (see _callingForHeat).
   _boilerChip() {
     const h = this._hub;
     const v = h.n("boiler_output_temperature") ?? h.n("boiler_flow_temp");
@@ -1112,7 +1129,7 @@ class TadoDashPanel extends HTMLElement {
     const tip = calling
       ? "Boiler output temperature. Orange: at least one room is calling for heat (inferred from the rooms, not a flame sensor)."
       : "Boiler output temperature. Grey: no room is calling for heat right now.";
-    return chip("fire-burner", "Boiler", `${f1(v)} °C`, calling ? "fire" : "", `title="${tip}"`);
+    return chip("fire-burner", "Boiler", `${f1(v)} °C`, calling ? "fire" : "", `title="${tip}" data-a="more-info" data-e="${this._boilerEntity()}"`);
   }
 
   /* ----- TRVs ----- */
@@ -1158,27 +1175,34 @@ class TadoDashPanel extends HTMLElement {
     const ext = extId ? this._n(extId) : null;
     const sign = (v) => (v == null ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}`);
     const offline = trvs.some((d) => this._st(d.entities.connection)?.state === "off");
-    const lowBat = trvs.some((d) => /low|crit/i.test(this._val(d.entities.battery) || ""));
-    const flag = offline ? `<span class="pill bad">Offline</span>` : lowBat ? `<span class="pill preheat">${icon("battery-alert")}Battery low</span>` : "";
+    // A low battery shows on the red battery chip, so the status pill stays about the valve.
+    const flag = offline ? `<span class="pill bad">Offline</span>` : "";
+    // Tado reports the battery as a state (Normal / Low), not a percentage; with several valves show the worst.
+    const bats = trvs.map((d) => this._val(d.entities.battery)).filter(Boolean);
+    const bat = bats.find((b) => /low|crit/i.test(b)) || bats[0] || null;
+    const batRow = `<div class="batpill ${!bat ? "" : /low|crit/i.test(bat) ? "bad" : "good"}" title="Battery state reported by the valve">${icon(!bat ? "battery-unknown" : /low|crit/i.test(bat) ? "battery-alert" : "battery")}${esc(bat || "–")}</div>`;
+    // Tapping the valve opens Home Assistant's own history for the room's climate entity.
+    const valve = `<span class="valvetap" ${z.main ? `data-a="more-info" data-e="${z.main}" title="Show history"` : ""}>${trvSVG(pct, calling)}</span>`;
     const rawTip = reported != null ? `Reported ${f1(reported)} °C − offset ${f1(offset ?? 0)} °C` : "No reading from Tado";
-    const head = `<div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? "Valve open" : "Valve closed"}</span>`}</div>`;
+    const head = `<div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? `<span class="vl">Valve open</span><span class="vs">Open</span>` : `<span class="vl">Valve closed</span><span class="vs">Closed</span>`}</span>`}</div>`;
     if (this._layout.compact) {
       // Compact: a small valve beside the three temperatures as one-line rows.
       return `<div class="card trvcard compact" data-a="open" data-z="${z.id}">${head}
-        <div class="trvbody">${trvSVG(pct, calling)}<div class="trvlist">
+        <div class="trvbody">${valve}<div class="trvlist">
           <div class="trvr" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}°` : "–"}</b></div>
-          <div class="trvr" title="${extId ? "External room sensor" : "No external room sensor set up"}"><span>Room</span><b>${ext != null ? `${f1(ext)}°` : "–"}</b></div>
+          ${extId ? `<div class="trvr" title="External room sensor"><span>Room</span><b>${ext != null ? `${f1(ext)}°` : "–"}</b></div>` : ""}
           <div class="trvr" title="${offset != null ? "Offset applied to the TRV" : "Offset not enabled in Tado CE"}"><span>Offset</span><b>${offset != null ? `${sign(offset)}°` : "–"}</b></div>
+          ${batRow}
         </div></div></div>`;
     }
     return `<div class="card trvcard" data-a="open" data-z="${z.id}">
       ${head}
-      ${trvSVG(pct, calling)}
-      <div class="trvtemps">
+      ${valve}
+      <div class="trvtemps ${extId ? "" : "nosensor"}">
         <div class="trvt" title="${esc(rawTip)}"><span>TRV</span><b>${raw != null ? `${f1(raw)}<small>°C</small>` : "–"}</b><em>before offset</em></div>
-        <div class="trvt"><span>Room sensor</span><b>${ext != null ? `${f1(ext)}<small>°C</small>` : "–"}</b><em>${extId ? "external" : "none set up"}</em></div>
+        ${extId ? `<div class="trvt"><span>Room sensor</span><b>${ext != null ? `${f1(ext)}<small>°C</small>` : "–"}</b><em>external</em></div>` : ""}
         <div class="trvt"><span>Offset</span><b>${offset != null ? `${sign(offset)}<small>°C</small>` : "–"}</b><em>${offset != null ? "applied" : "not enabled"}</em></div>
-      </div></div>`;
+      </div>${batRow}</div>`;
   }
 
   // Compact version of the room card: tighter, a slim chart, and one row of controls.
@@ -1286,6 +1310,7 @@ class TadoDashPanel extends HTMLElement {
 
     const next = ov.next_change ? new Date(ov.next_change) : null;
     const nextTemp = ov.next_temperature ?? this._n(e.next_sched_temp);
+    const rate = this._rateChip(z);
     const hero = `<div class="card hero">
       <div class="row top"><span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
       <div class="row mid">
@@ -1295,7 +1320,7 @@ class TadoDashPanel extends HTMLElement {
       ${hasTemp ? sparkline(sp[e.temp] || [], sp[e.target] || [], z.heating) : ""}
       <div class="facts">
         ${z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}% humidity</span>` : ""}
-        ${this._rateChip(z) ? `<span>${this._rateChip(z)}</span>` : ""}
+        ${rate ? `<span>${rate}</span>` : ""}
         ${outside != null ? `<span>${icon("thermometer")}${f1(outside)} °C outside</span>` : ""}
         ${surface != null ? `<span>${icon("wall")}wall ${f1(surface)} °C</span>` : ""}
         ${z.power != null ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
@@ -1310,9 +1335,8 @@ class TadoDashPanel extends HTMLElement {
     const air = this._airPanel(z);
     const devs = this._devicePanel(z);
     const ins = insightsList.length ? `<div class="card"><h3>Insights for this room</h3>${insRows(insightsList, "lightbulb-on-outline", "warn")}</div>` : "";
-    const ctrl = [["early_start", "Early start", "Let Tado start heating ahead of the schedule", "clock-start"]]
-      .filter(([k]) => e[k]).map(([k, l, d, ic]) => `<div class="line"><span class="ic">${icon(ic)}</span><div class="tx"><b>${l}</b><small>${d}</small></div>
-        <button class="sw ${st(k)?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${e[k]}" aria-label="${l}"></button></div>`).join("");
+    const ctrl = e.early_start ? `<div class="line"><span class="ic">${icon("clock-start")}</span><div class="tx"><b>Early start</b><small>Let Tado start heating ahead of the schedule</small></div>
+        <button class="sw ${st("early_start")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${e.early_start}" aria-label="Early start"></button></div>` : "";
 
     const chartId = "room-chart";
     return `<div class="cols"><div class="col">${hero}${learn}</div>
@@ -1368,10 +1392,12 @@ class TadoDashPanel extends HTMLElement {
     if (!z.devices.length) return "";
     const rows = z.devices.map((d) => {
       const bat = this._val(d.entities.battery), conn = this._st(d.entities.connection)?.state;
-      const kind = d.serial.slice(0, 2) === "VA" || d.serial.slice(0, 2) === "RU" ? "radiator-disabled" : "thermostat";
       const batIc = !bat ? "battery-unknown" : /low|crit/i.test(bat) ? "battery-alert" : "battery";
-      return `<div class="line"><span class="ic">${icon(kind === "thermostat" ? "thermostat" : "radiator")}</span><div class="tx"><b>${esc(d.serial)}</b>
-        <small>${conn === "on" ? "Connected" : conn === "off" ? "Disconnected" : "Unknown connection"}</small></div>
+      // Model and firmware are attributes on the device's battery / connection sensors.
+      const at = { ...this._st(d.entities.battery)?.attributes, ...this._st(d.entities.connection)?.attributes };
+      const info = [at.device_type, at.firmware_version ? `Firmware ${at.firmware_version}` : ""].filter(Boolean).map(esc).join(" · ");
+      return `<div class="line"><span class="ic">${icon(["VA", "RU"].includes(d.serial.slice(0, 2)) ? "radiator" : "thermostat")}</span><div class="tx"><b>${esc(d.serial)}</b>
+        <small>${conn === "on" ? "Connected" : conn === "off" ? "Disconnected" : "Unknown connection"}</small>${info ? `<small>${info}</small>` : ""}</div>
         <span class="val ${bat && /low|crit/i.test(bat) ? "bad" : ""}">${icon(batIc)}${esc(bat || "–")}</span></div>`;
     }).join("");
     return `<div class="card"><div class="cardhead"><h3>Devices</h3><small>${z.devices.length} device${z.devices.length === 1 ? "" : "s"}</small></div>${rows}</div>`;
@@ -1601,9 +1627,9 @@ class TadoDashPanel extends HTMLElement {
   /* ----- schedules ----- */
 
   async _loadCalendars() {
-    if (this._calLoading) return;
+    if (this._calLoading || (this._cal.at && Date.now() - this._cal.at < 10 * MIN)) return;
     const zones = this._zones.filter((z) => z.ents.schedule);
-    if (!zones.length || (this._cal.at && Date.now() - this._cal.at < 10 * MIN)) return;
+    if (!zones.length) return;
     this._calLoading = true;
     const monday = new Date(); monday.setHours(0, 0, 0, 0); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
     const end = new Date(monday.getTime() + 7 * 86400000);
@@ -1649,13 +1675,13 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const z = zones.find((x) => x.id === this._sel) || zones[0];
     const monday = this._cal.monday, now = new Date();
     const todayIdx = (now.getDay() + 6) % 7;
-    // Blue at 15 °C and below, green at 19 °C, orange at 22 °C and above, fading between. The scale is fixed
+    // Blue at 16 °C and below, green at 19 °C, orange at 21 °C and above, fading between. The scale is fixed
     // so a colour always means the same temperature, whichever room or week is showing.
     const color = (t) => {
       if (t == null) return "var(--mut)";
-      if (t <= 15) return C.peter;
-      if (t >= 22) return C.carrot;
-      const [from, to] = t < 19 ? [[15, C.peter], [19, C.nephritis]] : [[19, C.nephritis], [22, C.carrot]];
+      if (t <= 16) return C.peter;
+      if (t >= 21) return C.carrot;
+      const [from, to] = t < 19 ? [[16, C.peter], [19, C.nephritis]] : [[19, C.nephritis], [21, C.carrot]];
       return `color-mix(in srgb, ${to[1]} ${Math.round(((t - from[0]) / (to[0] - from[0])) * 100)}%, ${from[1]})`;
     };
     const blocksFor = (zid, day) => {
@@ -1673,7 +1699,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const week = DAYS.map((dn, i) => `<div class="drow"><span class="dn ${i === todayIdx ? "today" : ""}">${dn}${i === todayIdx ? "<small>today</small>" : ""}</span>
       <div class="track">${blocksFor(z.id, i)}${i === todayIdx ? `<div class="nowline" style="left:${nowPct}%"></div>` : ""}</div></div>`).join("");
     const all = zones.map((zz) => `<div class="drow"><span class="dn small">${esc(zz.name)}</span><div class="track thin">${blocksFor(zz.id, todayIdx)}<div class="nowline" style="left:${nowPct}%"></div></div></div>`).join("");
-    const legend = `<div class="legend grad"><span>15°</span><div class="gscale"><i style="background:linear-gradient(90deg,${C.peter},${C.nephritis} 57.14%,${C.carrot})"></i><b style="left:57.14%">19°</b></div><span>22°</span>
+    const legend = `<div class="legend grad"><span>16°</span><div class="gscale"><i style="background:linear-gradient(90deg,${C.peter},${C.nephritis} 60%,${C.carrot})"></i><b style="left:60%">19°</b></div><span>21°</span>
       <em>Blocks are periods Tado CE reports in the room's schedule calendar</em></div>`;
     const busy = this._schedBusy;
     const canRefresh = zones.some((x) => x.ents.refresh_schedule);
@@ -1841,7 +1867,7 @@ button{font:inherit;color:inherit}
 .i{height:1em;width:auto;font-size:16px;display:inline-block;vertical-align:-.14em;flex:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:13px;color:var(--mut)}
-.chip b{color:var(--fg)} .chip.heat .i{color:var(--heat)} .chip.warn .i{color:var(--warn)} .chip[data-a]{cursor:pointer;font:inherit;font-size:13px}
+.chip b{color:var(--fg)} .chip.heat .i{color:var(--heat)} .chip.warn .i{color:var(--warn)} .chip[data-a]{cursor:pointer}
 .chip[data-a]:hover{border-color:var(--mut)}
 .chip.on,.chip.on:hover{background:var(--go);border-color:var(--go);color:#fff}.chip.on b,.chip.on .i{color:#fff}
 .chip.fire{background:var(--heat);border-color:var(--heat);color:#fff}.chip.fire b,.chip.fire .i{color:#fff}
@@ -1851,19 +1877,19 @@ button{font:inherit;color:inherit}
 .grid .card{margin:0}
 .card h3{margin:0 0 12px;font-size:16px;font-weight:500}
 .cardhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.cardhead h3{margin:0}
-.room{cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}.room:hover{border-color:var(--mut)}
+.room{cursor:pointer;display:flex;flex-direction:column;gap:6px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .name{font-weight:500;display:flex;align-items:center;gap:8px}.name .i{color:var(--mut)}
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mut);padding:2px 8px;border-radius:999px}
-.pill.heating{color:var(--heat);background:color-mix(in srgb,var(--heat) 14%,transparent)}
-.pill.preheat{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
-.pill.window{color:var(--cold);background:color-mix(in srgb,var(--cold) 16%,transparent)}.pill.over{color:var(--wis);background:color-mix(in srgb,var(--wis) 16%,transparent)}
-.pill.off{color:var(--mut)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mut);padding:2px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.pill.heating{color:var(--heat);border-color:color-mix(in srgb,var(--heat) 40%,transparent);background:color-mix(in srgb,var(--heat) 14%,transparent)}
+.card.room .pill.heating,.trvcard .pill.heating,.boilercard .pill.heating{background:var(--heat);border-color:transparent;color:#fff}.card.room .pill.heating .i,.trvcard .pill.heating .i,.boilercard .pill.heating .i{color:#fff}
+.pill.preheat{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.pill.window{color:var(--cold);border-color:color-mix(in srgb,var(--cold) 40%,transparent);background:color-mix(in srgb,var(--cold) 16%,transparent)}.pill.over{color:var(--wis);border-color:color-mix(in srgb,var(--wis) 40%,transparent);background:color-mix(in srgb,var(--wis) 16%,transparent)}
 .mid{align-items:flex-end}
 .temp{font-size:46px;font-weight:300;line-height:1.1}.temp small{font-size:18px;color:var(--mut);margin-left:2px;vertical-align:top}
 .hum{font-size:13px;color:var(--mut);margin-left:10px;vertical-align:middle}
 .tgt{text-align:right;display:flex;flex-direction:column;font-size:12px;color:var(--mut)}.tgt b{font-size:17px;color:var(--fg);font-weight:500}
-.sparkwrap{position:relative;margin:0 -16px}.spark{width:100%;height:64px;display:block}.spark.empty{height:24px}
+.sparkwrap{position:relative;margin:0 -16px}.spark{width:100%;height:70px;display:block}.spark.empty{height:24px}
 .rate{display:inline-flex;align-items:center;gap:2px;margin-left:8px;font-size:13px;font-weight:500;vertical-align:middle;white-space:nowrap}
 .rate .i{font-size:13px}.rate.up{color:var(--ok)}.rate.down{color:var(--bad)}.rate.flat{color:var(--mut)}
 .hum.hi{color:var(--humhi)}
@@ -1871,6 +1897,9 @@ button{font:inherit;color:inherit}
 /* temperature left, humidity + rate in the middle of the card, target right */
 .cardmid{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:6px}
 .cardmid .tgt{justify-self:end}
+.bimg[data-a]{cursor:pointer}
+.cardmid{margin-top:4px}
+.cardmid .temp{font-size:39px;line-height:27px;margin:3px 0 4px}.cardmid .meta{height:34px;margin:0 0 1px;justify-content:space-between}
 .meta{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 0 7px;text-align:center}
 .meta .hum,.meta .rate{margin-left:0}
 .hum{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.tgt{white-space:nowrap}
@@ -1879,15 +1908,17 @@ button{font:inherit;color:inherit}
 .sdot{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid var(--card);transform:translate(-50%,-50%);display:none;pointer-events:none}
 .stip{position:absolute;top:2px;display:none;flex-direction:column;gap:1px;padding:4px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.3);font-size:11px;color:var(--mut);white-space:nowrap;pointer-events:none;z-index:3}
 .stip b{font-size:14px;color:var(--fg);font-weight:500}
-.sc{position:absolute;left:16px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none}.sc.hi{top:2px}.sc.lo{bottom:3px}
+.sc{position:absolute;left:18px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none;background:color-mix(in srgb,var(--card) 70%,transparent);padding:1px 3px;border-radius:3px}.sc.hi{top:2px}.sc.lo{bottom:3px}
+.sx{position:absolute;bottom:2px;transform:translateX(-50%);font-size:9px;line-height:1;color:var(--mut);opacity:.7;pointer-events:none}
 .infopill{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:7px 12px;border-radius:999px;text-align:center;font-size:12px;
   color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent)}
 .infopill .i{color:var(--mut);font-size:13px}
 .infopill.over{color:var(--fg);background:color-mix(in srgb,var(--wis) 22%,transparent)}.infopill.over .i{color:var(--wis)}
 .note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent);padding:4px 10px;border-radius:999px;align-self:flex-start}
-.note.faint{background:none;color:var(--mut);padding-left:0}.note.adv{margin-top:12px;border-radius:8px;align-self:stretch;padding:8px 10px}
+.note.adv{margin-top:12px;border-radius:8px;align-self:stretch;padding:8px 10px}
 .seg{display:flex;gap:4px;background:color-mix(in srgb,var(--mut) 10%,transparent);padding:4px;border-radius:12px;margin-top:6px}
-.seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:0;border-radius:8px;padding:8px 4px;color:var(--mut);font-size:13px;font-weight:500;cursor:pointer}
+.seg button{flex:1;min-width:0;white-space:normal;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:0;border-radius:8px;padding:8px 4px;color:var(--mut);font-size:13px;font-weight:500;cursor:pointer}
+.seg button .i{flex:none}
 .seg button:hover{color:var(--fg)}
 .seg button.on{background:var(--go);color:#fff}
 .seg button.off.on{background:${C.pomegranate}}
@@ -1906,7 +1937,7 @@ button{font:inherit;color:inherit}
 .cside{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
 .ctgt{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;white-space:nowrap}.ctgt .i{color:var(--mut);font-size:12px}
 .cmeta{display:inline-flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}.cmeta .rate{margin-left:0;font-size:12px}.cmeta .hum{margin-left:0;font-size:12px}
-.compact .sparkwrap{margin:0 -12px}.compact .spark{height:34px}.compact .sc{display:none}
+.compact .sparkwrap{margin:0 -12px}.compact .spark{height:34px}.compact .sc,.compact .sx{display:none}
 .crow{display:flex;gap:6px}.crow .seg.icons{flex:2.2}.crow .seg.stepbar{flex:1}
 .compact .seg{padding:3px;border-radius:10px}
 .compact .seg.icons button,.compact .seg.stepbar button{min-height:30px;padding:4px 2px}
@@ -1920,6 +1951,7 @@ button{font:inherit;color:inherit}
 @container (max-width:613px){.grid:not(.trvs):not(.compact)>.boilercard{grid-column:1/-1}}
 @container (max-width:513px){.grid.trvs:not(.compact)>.boilercard{grid-column:1/-1}}
 @container (max-width:469px){.grid.compact>.boilercard{grid-column:1/-1}}
+@container (max-width:520px){.grid.trvs.compact .batpill,.grid.trvs.compact .batpill .i{font-size:11px}.grid.trvs.compact .vl{display:none}.grid.trvs.compact .vs{display:inline}.grid.trvs.compact .trvr b{font-size:11px}.grid.trvs.compact{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.trvs.compact>.boilercard{grid-column:1/-1}}
 .bflow{position:relative;display:flex;flex-direction:column;gap:40px;padding:2px 0}
 .bwires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:0}
 .bside{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
@@ -1946,7 +1978,7 @@ button{font:inherit;color:inherit}
 /* Fixed to the screen, not the page: in Home Assistant the page can be much taller than the window */
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
 .modal{width:min(380px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border-radius:14px;padding:16px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
-.mhead{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
+.mhead{display:flex;align-items:baseline;gap:10px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
 .mhead .sp{flex:1}.mhead .icon-btn{align-self:center;padding:6px}
 .srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
 .srow input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--go);flex:none;cursor:pointer}
@@ -1956,6 +1988,9 @@ button{font:inherit;color:inherit}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
 .trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .trvr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+.vs{display:none}
+.batpill{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);font-size:12px;font-weight:500}.trvcard{position:relative}.trvcard>.batpill{position:absolute;top:42px;right:16px;padding:3px 9px;font-size:11px}.trvcard>.batpill .i{font-size:11px}.batpill .i{font-size:12px}.batpill.good .i{color:var(--ok)}.batpill.bad,.batpill.bad .i{color:var(--bad)}
+.valvetap{display:contents}.valvetap[data-a] svg{cursor:pointer}
 .trvr span{font-size:11px;color:var(--mut)}.trvr b{font-size:15px;font-weight:500}
 .card.room .infopill{margin-top:10px} /* with the 6px gap: the same 16px as the card's padding below the - / + bar */
 @keyframes applying{50%{opacity:.55}}
@@ -1964,7 +1999,7 @@ button{font:inherit;color:inherit}
 .insrows{display:flex;flex-direction:column;gap:6px}
 .insrow{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--mut) 12%,transparent)}
 .insrow .i{margin-top:2px;color:var(--mut)}.insrow.warn .i{color:var(--warn)}.insrow.cold .i{color:var(--cold)}.insrow.go .i{color:var(--go)}
-.seg.hold{flex-wrap:wrap;margin-top:4px}.seg.hold button{flex:1 1 30%;white-space:nowrap;min-height:36px;padding:8px 10px;font-size:13px}
+.seg.hold{flex-wrap:wrap;margin-top:4px}.seg.hold button{flex:1 1 30%;min-width:0;white-space:normal;min-height:36px;padding:8px 10px;font-size:13px}
 .seg.hold button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
 .optrow{padding:10px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px;margin-bottom:2px}
 .optrow .seg button{min-height:36px}.optrow .seg button:hover:not(.on){background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
@@ -1973,7 +2008,7 @@ button{font:inherit;color:inherit}
 .floorico .i{font-size:15px}
 .fbadge{position:absolute;right:-3px;bottom:-3px;min-width:14px;height:14px;padding:0 2px;border-radius:7px;background:var(--go);color:#fff;font-size:9px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--bg)}
 .fbadge .i{font-size:8px;color:#fff}.toolbar .chips{flex:1}
-.hero .mid{align-items:flex-end;margin-top:4px}.hero .bigtemp{margin:0}.tgt.big b{font-size:22px}
+.hero .mid{margin-top:4px}.tgt.big b{font-size:22px}
 .hero .seg,.hero .infopill{margin-top:0}.hero{display:flex;flex-direction:column;gap:6px}
 .hero .facts{margin:2px 0}.hero .lbl{margin-top:6px}
 /* Dark theme: our own near-black surfaces. Light theme follows Home Assistant. Cards have no border in either. */
@@ -1983,13 +2018,13 @@ button{font:inherit;color:inherit}
 .card,.card:hover{border-color:transparent}
 .grid.trvs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .trvcard{cursor:pointer;display:flex;flex-direction:column;gap:8px}.trvcard:hover{border-color:var(--mut)}
-.trv{width:120px;height:160px;align-self:center;display:block}
+.trv{width:100px;height:133px;align-self:center;display:block}
 .trvpct{font-size:26px;font-weight:500;fill:var(--fg)}.trvlbl{font-size:11px;fill:var(--mut)}
-.trvtemps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.trvt{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:8px 4px;text-align:center;min-width:0}
+.trvtemps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.trvtemps.nosensor{grid-template-columns:repeat(2,1fr)}
+.trvt{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:8px 4px;text-align:center;min-width:0;height:62px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
 .trvt span{display:block;font-size:11px;color:var(--mut)}.trvt b{display:block;font-size:19px;font-weight:500;margin:2px 0}.trvt b small{font-size:11px;color:var(--mut);font-weight:400;margin-left:1px}
 .trvt em{display:block;font-size:10px;color:var(--mut);font-style:normal}
-.pill.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 16%,transparent)}
+.pill.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent);background:color-mix(in srgb,var(--bad) 16%,transparent)}
 .floor{margin-bottom:24px}
 .floorhead{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.floorhead h2{font-size:17px;font-weight:500;margin:0}.floorhead small{color:var(--mut);font-size:12px}.floorhead .sp{flex:1}
 .mv{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -2005,7 +2040,6 @@ button{font:inherit;color:inherit}
 .hero .bigtemp{font-size:72px;font-weight:300;line-height:1.1;margin:8px 0 0}.bigtemp small{font-size:26px;color:var(--mut);vertical-align:top}
 .hero .spark{height:70px}
 .facts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin:8px 0}.facts span{display:inline-flex;align-items:center;gap:4px}
-.divider{border-top:1px solid var(--line);margin:12px 0}
 .lbl{font-size:12px;color:var(--mut);display:block;margin-top:4px}
 .learn{display:flex;align-items:center;gap:14px;margin:6px 0 10px}.lt b{display:block;font-size:17px;font-weight:500}.lt small{color:var(--mut);font-size:12px}
 .ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
@@ -2027,6 +2061,7 @@ button{font:inherit;color:inherit}
 .line{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .line:first-of-type{border-top:0}.line .ic{width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--mut) 14%,transparent);display:flex;align-items:center;justify-content:center;color:var(--mut)}
 .tx{flex:1;min-width:0}.tx b{font-weight:500;font-size:14px;display:block}.tx small{font-size:12px;color:var(--mut)}
+.tx small+small{display:block}
 .val{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--mut)}.val.bad{color:var(--bad)}
 .sw{width:42px;height:24px;border-radius:12px;border:0;background:var(--mut);position:relative;cursor:pointer;flex:none;opacity:.7}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
@@ -2047,7 +2082,6 @@ button{font:inherit;color:inherit}
 .hint{font-size:12px;color:var(--mut);margin:10px 0 0}.center{text-align:center}
 .empty{text-align:center;padding:48px 16px;color:var(--mut)}.empty .i{font-size:48px}.empty h2{color:var(--fg);font-weight:400;margin:12px 0 6px}
 .prio{font-weight:600}
-.ins{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:14px}.ins li{display:flex;gap:8px;line-height:1.4}.ins .i{color:var(--warn);flex:none;margin-top:1px}
 .axisrow,.drow{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center}.drow{margin:6px 0}
 .hours{position:relative;height:14px}.hours i{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--mut);font-style:normal}
 .track{position:relative;height:34px;background:color-mix(in srgb,var(--mut) 10%,transparent);border-radius:8px;overflow:hidden;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:12.5% 100%}
@@ -2068,7 +2102,7 @@ button{font:inherit;color:inherit}
 .meter{margin-bottom:14px}.mhead{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
 .bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--mut) 20%,transparent);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}
 .meter small{color:var(--mut);font-size:12px}
-@media(max-width:860px){.cols{grid-template-columns:1fr}.lgrid{grid-template-columns:1fr}.lrow{grid-template-columns:56px 1fr 1fr}.lrow .lname{grid-column:2/4}.two{grid-template-columns:1fr}.temp{font-size:40px}}
+@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}.lgrid{grid-template-columns:1fr}.lrow{grid-template-columns:56px 1fr 1fr}.lrow .lname{grid-column:2/4}.two{grid-template-columns:1fr}.temp{font-size:40px}}
 `;
 
 customElements.define("tado-dash-panel", TadoDashPanel);

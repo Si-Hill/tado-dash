@@ -23,7 +23,7 @@ ALIAS = {
     "home-map-marker": "location-dot", "cloud-check-outline": "cloud", "apple": "house-signal",
     "thermometer-low": "temperature-low", "thermometer-high": "temperature-high",
     "thermometer": "temperature-half", "bullseye-arrow": "bullseye", "wall": "border-all",
-    "refresh": "arrows-rotate", "plus": "plus", "minus": "minus", "menu": "bars", "arrow-left": "arrow-left",
+    "plus": "plus", "minus": "minus", "menu": "bars", "arrow-left": "arrow-left",
     "lightbulb-on-outline": "lightbulb", "clock-fast": "clock", "clock-check-outline": "clock",
     "calendar-arrow-right": "calendar-check", "infinity": "infinity", "timer-outline": "stopwatch",
     "home-outline": "house", "lightbulb-alert-outline": "lightbulb", "home-analytics": "house-circle-check",
@@ -34,7 +34,7 @@ ALIAS = {
     "radiator": "temperature-half", "thermostat": "temperature-half", "battery": "battery-full",
     "battery-alert": "battery-quarter", "battery-unknown": "battery-half", "air-conditioner": "snowflake",
     "floor-other": "layer-group", "cloud-arrow": "cloud-arrow-down", "settings": "gear", "close": "xmark", "compact": "table-cells", "trend-up": "caret-up", "trend-down": "caret-down", "trend-flat": "minus",
-    "chevron-up": "chevron-up", "chevron-down": "chevron-down", "confidence": "gauge", "home-export-outline": "house",
+    "chevron-up": "chevron-up", "chevron-down": "chevron-down", "home-export-outline": "house",
     "home-account": "house", "circle-question": "circle-question",
 }
 

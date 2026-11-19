@@ -7,7 +7,6 @@ that reads the entities Tado CE already creates and calls Tado CE's services.
 from __future__ import annotations
 
 import json
-import logging
 from pathlib import Path
 
 from homeassistant.components.frontend import (
@@ -33,7 +32,6 @@ from .const import (
     PANEL_URL_PATH,
 )
 
-_LOGGER = logging.getLogger(__name__)
 
 _PANEL_JS = Path(__file__).parent / "frontend" / f"{PANEL_ELEMENT}.js"
 _BRAND_DIR = Path(__file__).parent / "brand"

@@ -7,3 +7,4 @@ node_modules/
 
 # a mock of a real home (private); see dev/index.html ?mine
 dev/mock.local.js
+dev/live.local.html
