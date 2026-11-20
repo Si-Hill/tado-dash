@@ -105,10 +105,15 @@ const FA_ALIAS = {
   "home-export-outline": "house",
   "home-account": "house",
   "circle-question": "circle-question",
+  "fan": "fan",
+  "swing-v": "arrows-up-down",
+  "swing-h": "arrows-left-right",
 };
 const FA = {
   "arrow-left": [448, "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"],
+  "arrows-left-right": [512, "M406.6 374.6l96-96c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224l-293.5 0 41.4-41.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288l293.5 0-41.4 41.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"],
   "arrows-rotate": [512, "M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"],
+  "arrows-up-down": [320, "M182.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L128 109.3l0 293.5L86.6 361.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 402.7l0-293.5 41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z"],
   "bacteria": [640, "M304.9 .7c-9.6-2.7-19.5 2.8-22.3 12.4l-4.3 15.2c-8.3-.6-16.8 0-25.2 1.9c-7.3 1.7-14.3 3.5-21.1 5.5l-5.5-12.7c-3.9-9.1-14.5-13.4-23.6-9.5s-13.4 14.5-9.5 23.6l4.4 10.4c-16.6 6.7-31.7 14.4-45.4 22.8L147 62c-5.5-8.3-16.7-10.5-25-5s-10.5 16.7-5 25l6 9c-13.7 11-25.5 22.8-35.8 34.9l-10-8c-7.8-6.2-19.1-5-25.3 2.8s-5 19.1 2.8 25.3L65.9 155c-1.8 2.8-3.5 5.7-5.1 8.5c-6.6 11.4-11.8 22.6-16 33l-8-3.2c-9.2-3.7-19.7 .8-23.4 10s.8 19.7 10 23.4l10.4 4.2c-.2 .8-.4 1.5-.5 2.3c-2.2 9.3-3.4 17.3-4.1 23.4c-.4 3.1-.6 5.7-.8 7.8c-.1 1.1-.1 2-.2 2.8l-.1 1.1 0 .5 0 .2 0 .1c0 0 0 .1 29.1 1c0 0 0 0-.1 0L28 269.3c-.1 3.1 0 6.1 .2 9.1l-15.2 4.3C3.5 285.4-2 295.4 .7 304.9s12.7 15.1 22.3 12.4l15.6-4.5c7.6 13.6 18.9 25 32.6 32.6L66.7 361c-2.7 9.6 2.8 19.5 12.4 22.3s19.5-2.8 22.3-12.4l4.3-15.2c1.2 .1 2.4 .2 3.6 .2c15.6 .5 30.3-3.3 43-10.2l9 9c7 7 18.4 7 25.5 0s7-18.4 0-25.5l-7.2-7.2c9.3-12.6 15.2-27.8 16.3-44.5l7.1 3c9.1 3.9 19.7-.3 23.6-9.5s-.3-19.7-9.5-23.6l-8.6-3.7c6.4-9.9 17.3-22.4 36.9-33.3l1.3 4.4c2.7 9.6 12.7 15.1 22.3 12.4s15.1-12.7 12.4-22.3l-2.3-8.1c3.8-1.1 7.7-2.1 11.9-3.1c11.6-2.7 22.1-7.7 31.1-14.4l7.2 7.2c7 7 18.4 7 25.5 0s7-18.4 0-25.5l-9-9c7.6-13.9 11.3-30.1 10.1-46.6l15.2-4.3c9.6-2.7 15.1-12.7 12.4-22.3S370.6 64 361 66.7l-15.6 4.5c-7.7-13.9-19.1-25.1-32.6-32.6l4.5-15.6c2.7-9.6-2.8-19.5-12.4-22.3zM112 272l-48-1.5c0 0 0 0 0 0c11.7 .4 27.3 .9 48 1.6zm16-80a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm64-48a16 16 0 1 1 32 0 16 16 0 1 1 -32 0zM322.7 489c-2.7 9.6 2.8 19.5 12.4 22.3s19.5-2.8 22.2-12.4l4.3-15.2c8.3 .6 16.8 0 25.2-1.9c7.3-1.7 14.3-3.5 21.1-5.5l5.5 12.7c3.9 9.1 14.5 13.4 23.6 9.5s13.4-14.5 9.5-23.6l-4.4-10.4c16.6-6.7 31.7-14.4 45.4-22.8L493 450c5.5 8.3 16.7 10.5 25 5s10.5-16.7 5-25l-6-9c13.7-11 25.5-22.8 35.8-34.9l10 8c7.8 6.2 19.1 5 25.3-2.8s5-19.1-2.8-25.3L574.1 357c1.8-2.8 3.5-5.7 5.1-8.5c6.6-11.4 11.8-22.6 16-33l8 3.2c9.2 3.7 19.7-.8 23.4-10s-.8-19.7-10-23.4l-10.4-4.2c.2-.8 .4-1.5 .5-2.3c2.2-9.3 3.4-17.3 4.1-23.4c.4-3.1 .6-5.7 .8-7.8c.1-1.1 .1-2 .2-2.8l.1-1.1 0-.5 0-.2 0-.1c0 0 0-.1-29.1-1c0 0 0 0 .1 0l29.1 .9c.1-3.1 0-6.1-.2-9.1l15.2-4.3c9.6-2.7 15.1-12.7 12.4-22.3s-12.7-15.1-22.3-12.4l-15.6 4.5c-7.6-13.6-18.9-25-32.6-32.6l4.5-15.6c2.7-9.6-2.8-19.5-12.4-22.3s-19.5 2.8-22.3 12.4l-4.3 15.2c-1.2-.1-2.4-.2-3.6-.2c-15.6-.5-30.3 3.3-43 10.2l-9-9c-7-7-18.4-7-25.5 0s-7 18.4 0 25.5l7.2 7.2c-9.3 12.6-15.2 27.8-16.3 44.5l-7.1-3c-9.1-3.9-19.7 .3-23.6 9.5s.3 19.7 9.5 23.6l8.6 3.7c-6.4 9.9-17.3 22.4-36.9 33.3l-1.3-4.4c-2.7-9.6-12.7-15.1-22.3-12.4s-15.1 12.7-12.4 22.3l2.3 8.1c-3.8 1.1-7.7 2.1-11.9 3.1c-11.6 2.7-22.1 7.7-31.1 14.4l-7.2-7.2c-7-7-18.4-7-25.5 0s-7 18.4 0 25.5l9 9c-7.6 13.9-11.3 30.1-10.1 46.6l-15.2 4.3c-9.6 2.7-15.1 12.7-12.4 22.2s12.7 15.1 22.3 12.4l15.6-4.5c7.7 13.9 19.1 25.1 32.6 32.6L322.7 489zM576 241.5c0 0 0 0 0 0c-11.7-.4-27.3-.9-48-1.6l48 1.5zM448 384a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z"],
   "bars": [448, "M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"],
   "battery-full": [576, "M464 160c8.8 0 16 7.2 16 16l0 160c0 8.8-7.2 16-16 16L80 352c-8.8 0-16-7.2-16-16l0-160c0-8.8 7.2-16 16-16l384 0zM80 96C35.8 96 0 131.8 0 176L0 336c0 44.2 35.8 80 80 80l384 0c44.2 0 80-35.8 80-80l0-16c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l0-16c0-44.2-35.8-80-80-80L80 96zm368 96L96 192l0 128 352 0 0-128z"],
@@ -133,6 +138,7 @@ const FA = {
   "cloud-arrow-down": [640, "M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39L344 184c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 134.1-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z"],
   "droplet": [384, "M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0l1.8 0c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"],
   "face-smile": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM164.1 325.5C182 346.2 212.6 368 256 368s74-21.8 91.9-42.5c5.8-6.7 15.9-7.4 22.6-1.6s7.4 15.9 1.6 22.6C349.8 372.1 311.1 400 256 400s-93.8-27.9-116.1-53.5c-5.8-6.7-5.1-16.8 1.6-22.6s16.8-5.1 22.6 1.6zM144.4 208a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm192-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"],
+  "fan": [512, "M258.6 0c-1.7 0-3.4 .1-5.1 .5C168 17 115.6 102.3 130.5 189.3c2.9 17 8.4 32.9 15.9 47.4L32 224l-2.6 0C13.2 224 0 237.2 0 253.4c0 1.7 .1 3.4 .5 5.1C17 344 102.3 396.4 189.3 381.5c17-2.9 32.9-8.4 47.4-15.9L224 480l0 2.6c0 16.2 13.2 29.4 29.4 29.4c1.7 0 3.4-.1 5.1-.5C344 495 396.4 409.7 381.5 322.7c-2.9-17-8.4-32.9-15.9-47.4L480 288l2.6 0c16.2 0 29.4-13.2 29.4-29.4c0-1.7-.1-3.4-.5-5.1C495 168 409.7 115.6 322.7 130.5c-17 2.9-32.9 8.4-47.4 15.9L288 32l0-2.6C288 13.2 274.8 0 258.6 0zM256 224a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"],
   "faucet-drip": [512, "M224 0c17.7 0 32 14.3 32 32l0 12 96-12c17.7 0 32 14.3 32 32s-14.3 32-32 32L256 84l-31-3.9-1-.1-1 .1L192 84 96 96C78.3 96 64 81.7 64 64s14.3-32 32-32l96 12 0-12c0-17.7 14.3-32 32-32zM0 224c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-43.8 32-4 32 4 0 43.8 18.7 0c8.5 0 16.6 3.4 22.6 9.4L320 192l32 0c88.4 0 160 71.6 160 160c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 320c-17.7 0-32-14.3-32-32l0-64zM436.8 423.4c1.9-4.5 6.3-7.4 11.2-7.4s9.2 2.9 11.2 7.4l18.2 42.4c1.8 4.1 2.7 8.6 2.7 13.1l0 1.2c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-1.2c0-4.5 .9-8.9 2.7-13.1l18.2-42.4z"],
   "fire": [448, "M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.5 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-4.5-9-16-9.6-22.5-2l-25.2 29.3c-6.6 7.6-18.5 7.4-24.7-.5c-16.5-21-46-58.5-62.8-79.8c-6.3-8-18.3-8.1-24.7-.1c-33.8 42.5-50.8 69.3-50.8 99.4C112 375.4 162.6 416 225.7 416z"],
   "fire-burner": [640, "M345.7 48.3L358 34.5c5.4-6.1 13.3-8.8 20.9-8.9c7.2 0 14.3 2.6 19.9 7.8c19.7 18.3 39.8 43.2 55 70.6C469 131.2 480 162.2 480 192.2C480 280.8 408.7 352 320 352c-89.6 0-160-71.3-160-159.8c0-37.3 16-73.4 36.8-104.5c20.9-31.3 47.5-59 70.9-80.2C273.4 2.3 280.7-.2 288 0c14.1 .3 23.8 11.4 32.7 21.6c0 0 0 0 0 0c2 2.3 4 4.6 6 6.7l19 19.9zM384 240.2c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C293 167.1 256 203.6 256 240.2c0 35.3 28.7 64 64 64s64-28.7 64-64zM32 288c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 64 448 0 0-64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l0-96zM320 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm160-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM192 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"],
@@ -216,6 +222,30 @@ function pathOf(pts, X, Y, step, x1) {
   return d;
 }
 
+// A smooth curve through the points (monotone cubic, so it never swings past a reading: the
+// chart scale is the readings' own min and max and an overshoot would leave the chart).
+function smoothPath(pts, X, Y) {
+  const n = pts.length;
+  if (n < 3) return pathOf(pts, X, Y, false);
+  const x = pts.map((p) => X(p[0])), y = pts.map((p) => Y(p[1]));
+  const dx = [], s = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = x[i + 1] - x[i] || 1e-6; s[i] = (y[i + 1] - y[i]) / dx[i]; }
+  const m = [s[0]];
+  for (let i = 1; i < n - 1; i++) m[i] = s[i - 1] * s[i] <= 0 ? 0 : (s[i - 1] + s[i]) / 2;
+  m[n - 1] = s[n - 2];
+  for (let i = 0; i < n - 1; i++) {
+    if (s[i] === 0) { m[i] = m[i + 1] = 0; continue; }
+    const a = m[i] / s[i], b = m[i + 1] / s[i], h = a * a + b * b;
+    if (h > 9) { const t = 3 / Math.sqrt(h); m[i] = t * a * s[i]; m[i + 1] = t * b * s[i]; }
+  }
+  let d = `M${x[0].toFixed(1)},${y[0].toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) {
+    const c = dx[i] / 3;
+    d += `C${(x[i] + c).toFixed(1)},${(y[i] + m[i] * c).toFixed(1)} ${(x[i + 1] - c).toFixed(1)},${(y[i + 1] - m[i + 1] * c).toFixed(1)} ${x[i + 1].toFixed(1)},${y[i + 1].toFixed(1)}`;
+  }
+  return d;
+}
+
 function extent(seriesList, pad2 = 0.5) {
   let lo = Infinity, hi = -Infinity;
   for (const s of seriesList) for (const p of s) { if (p[1] < lo) lo = p[1]; if (p[1] > hi) hi = p[1]; }
@@ -249,9 +279,15 @@ function stepClipped(pts, X, Y, lo, hi, tEnd) {
   return d;
 }
 
+// What an air-conditioning unit can be doing (Home Assistant's hvac_action), and its modes.
+const AC_ACTIONS = { cooling: "Cooling", heating: "Heating", drying: "Drying", fan: "Fan" };
+const AC_MODES = { cool: ["air-conditioner", "Cool"], heat: ["fire", "Heat"], dry: ["water-percent", "Dry"], fan_only: ["fan", "Fan"], heat_cool: ["sync-circle", "Auto"] };
 const SPARK_HOURS = 12; // how far back the room-card charts reach
 let SPARKS = {}; // hover data for the room-card charts, rebuilt on every render
 let sparkN = 0;
+
+const PILL_ICON = { heating: "fire", cooling: "air-conditioner", drying: "water-percent", fan: "fan" };
+const pillIcon = (status) => (PILL_ICON[status] ? icon(PILL_ICON[status]) : "");
 
 function sparkline(temp, target, heating) {
   if (!temp.length) return `<div class="spark empty"></div>`;
@@ -261,7 +297,7 @@ function sparkline(temp, target, heating) {
   const X = (t) => ((t - t0) / (now - t0)) * W;
   const Y = (v) => H - 6 - ((v - lo) / (hi - lo)) * (H - 12);
   const color = heating ? HEAT : COLD;
-  const line = pathOf(temp, X, Y, false, now);
+  const line = smoothPath(temp, X, Y);
   const last = temp[temp.length - 1];
   const area = `${line}L${X(last[0]).toFixed(1)},${H}L${X(temp[0][0]).toFixed(1)},${H}Z`;
   const tgt = stepClipped(target, X, Y, lo, hi, now);
@@ -339,6 +375,36 @@ function trvSVG(pct, supply = true) {
   </svg>`;
 }
 
+// A wall-mounted air conditioner. When it runs, air streams out of the vent in the mode's colour (blue to cool,
+// orange to heat, droplets to dry, grey for the fan alone), faster the higher the fan is set; the flap sits at the
+// swing position, or sweeps when the swing is on auto.
+const AC_FLAP = { up: 0.35, mid_up: 0.7, mid: 1.1, mid_down: 1.6, down: 2.2 }; // flap height, as a multiple of the closed one
+function acSVG(z) {
+  const ac = z.ac, on = !z.off && !z.unavailable && !!AC_ACTIONS[z.attrs.hvac_action];
+  const mode = ac.mode, col = mode === "heat" ? HEAT : mode === "fan_only" ? "var(--mut)" : COLD;
+  const fans = ac.fans.filter((f) => f !== "auto"), i = fans.indexOf(ac.fan);
+  const level = ac.fan === "auto" || i < 0 ? 0.5 : fans.length > 1 ? i / (fans.length - 1) : 0.5; // 0 quiet .. 1 full
+  const dur = (2.6 - 1.7 * level).toFixed(2), streams = level < 0.3 ? [38, 80, 122] : [32, 56, 80, 104, 128];
+  const swing = ac.swing, sweeps = swing === "auto" || swing === "on";
+  const flap = sweeps ? 1.1 : AC_FLAP[swing] ?? 1;
+  const drops = mode === "dry";
+  const gap = drops ? 14 : 12, period = gap + (drops ? 0.1 : 8);
+  const flow = on ? streams.map((x, k) => {
+    const d = `M${x},58c${k % 2 ? 8 : -8},14 ${k % 2 ? -8 : 8},28 0,42s${k % 2 ? 8 : -8},26 0,38`;
+    return `<path d="${d}" class="acbase" stroke="${col}"/><path d="${d}" class="acflow" stroke="${col}" style="stroke-dasharray:${drops ? "0.1" : "8"} ${gap};--period:-${period.toFixed(1)};animation-duration:${dur}s;animation-delay:-${(k * 0.37).toFixed(2)}s;stroke-width:${drops ? 6 : 3.4}"/>`;
+  }).join("") : "";
+  const target = z.shownTarget != null && mode !== "dry" && mode !== "fan_only" ? `${f0(z.shownTarget)}°` : mode ? (AC_MODES[mode]?.[1] || "") : "–";
+  return `<svg class="acunit" viewBox="0 0 160 150" role="img" aria-label="${esc(z.label)}${on ? `, fan ${esc(ac.fan || "")}` : ""}">
+    ${flow}
+    <rect x="12" y="8" width="136" height="44" rx="12" style="fill:color-mix(in srgb, var(--mut) 14%, var(--card))" stroke="var(--mut)" stroke-width="3"/>
+    <rect x="24" y="17" width="54" height="20" rx="6" style="fill:color-mix(in srgb, var(--mut) 24%, var(--card))"/>
+    <text x="51" y="32" text-anchor="middle" class="bdisp">${esc(target)}</text>
+    <circle cx="132" cy="22" r="4" fill="${on ? col : "var(--mut)"}" opacity="${on ? 1 : 0.35}"${on ? ` class="acled"` : ""}/>
+    <rect x="24" y="40" width="112" height="6" rx="3" style="fill:color-mix(in srgb, var(--mut) 34%, var(--card))"/>
+    <rect x="26" y="45" width="108" height="${(4.5 * flap).toFixed(1)}" rx="2" fill="var(--mut)" opacity=".8" class="acflap${sweeps && on ? " sweep" : ""}"/>
+  </svg>`;
+}
+
 /* ---------- the panel ---------- */
 
 class TadoDashPanel extends HTMLElement {
@@ -360,7 +426,7 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
-    this._layout = { floors: [], rooms: {}, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
+    this._layout = { floors: [], rooms: {}, sides: {}, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
     this._settingsOpen = false;
     this._pollOpen = false;
     this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
@@ -387,7 +453,9 @@ class TadoDashPanel extends HTMLElement {
     for (const [k, a] of Object.entries(v.rooms && typeof v.rooms === "object" ? v.rooms : {})) rooms[k] = ids(a);
     const show = { ...SHOW_DEFAULTS };
     for (const k of Object.keys(show)) if (typeof v.show?.[k] === "boolean") show[k] = v.show[k];
-    this._layout = { floors: ids(v.floors), rooms, compact: v.compact === true, show };
+    const sides = {};
+    for (const [k, side] of Object.entries(v.sides && typeof v.sides === "object" ? v.sides : {})) if (side === "heat" || side === "cool") sides[k] = side;
+    this._layout = { floors: ids(v.floors), rooms, sides, compact: v.compact === true, show };
   }
 
   _saveLayout() {
@@ -441,7 +509,7 @@ class TadoDashPanel extends HTMLElement {
 
   // Rooms the Rooms tab is allowed to show (the hot water card can be switched off in Settings).
   _roomZones() {
-    return this._zones.filter((z) => this._layout.show.hotWater || z.type !== "hot_water");
+    return this._zones.filter((z) => !z.pairedTo && (this._layout.show.hotWater || z.type !== "hot_water"));
   }
 
   _visibleZones() {
@@ -546,8 +614,30 @@ class TadoDashPanel extends HTMLElement {
       .map((z) => this._zoneVM(z))
       .filter((z) => z.main)
       .sort((a, b) => a.name.localeCompare(b.name));
+    // A room with radiators and an air conditioner is two Tado zones. Pair them when Home Assistant has them in the same area.
+    for (const ac of zones) {
+      if (ac.type !== "ac" || !ac.area) continue;
+      const heat = zones.find((h) => h.type === "heating" && h.area === ac.area && !h.pair);
+      if (heat) { heat.pair = ac; ac.pairedTo = heat.id; }
+    }
     if (this._inRender) this._zc = zones;
     return zones;
+  }
+
+  // Which side of a paired room the card shows: the one the user picked, else the one that is running.
+  _side(z) {
+    const s = this._layout.sides?.[z.id];
+    if (s === "heat" || s === "cool") return s;
+    const ac = z.pair;
+    return ac && !z.heating && !ac.off && AC_ACTIONS[ac.attrs.hvac_action] ? "cool" : "heat";
+  }
+
+  // What a room card shows. A paired room on its Cool side is the air conditioner's own zone (its mode, target and
+  // controls), seen against the room's one temperature, chart and humidity.
+  _sideView(z) {
+    if (!z.pair || this._side(z) !== "cool") return z;
+    const a = z.pair;
+    return { ...a, temp: z.temp, humidity: z.humidity ?? a.humidity, ents: { ...a.ents, temp: z.ents.temp, humidity: z.ents.humidity || a.ents.humidity } };
   }
 
   _zoneVM(z) {
@@ -581,21 +671,27 @@ class TadoDashPanel extends HTMLElement {
     const unavailable = !main || main.state === "unavailable";
     const window = this._st(e.open_window)?.state === "on";
     const preheat = this._st(e.preheat_now)?.state === "on";
-    const heating = a.hvac_action === "heating" || (power ?? 0) > 0 || this._st(e.power)?.state === "on";
-    let status = "idle", label = "Standby";
+    // An AC unit says what it is doing (cooling, heating, drying, fan); only its heat mode counts as heating.
+    const isAc = type === "ac", action = isAc ? a.hvac_action : null;
+    const heating = isAc ? action === "heating" : a.hvac_action === "heating" || (power ?? 0) > 0 || this._st(e.power)?.state === "on";
+    const acNow = AC_ACTIONS[action];
+    let status = "idle", label = isAc && main?.state === "heat_cool" ? "Auto" : "Standby";
     if (unavailable) { status = "off"; label = "Unavailable"; }
     else if (off) { status = "off"; label = "Off"; }
     else if (window) { status = "window"; label = "Window open"; }
-    else if (heating) { status = "heating"; label = type === "ac" ? "Cooling/AC" : "Heating"; }
+    else if (acNow) { status = action; label = acNow; }
+    else if (heating) { status = "heating"; label = "Heating"; }
     else if (preheat) { status = "preheat"; label = "Preheat due"; }
     return {
       id: z.id, ents: e, name: a.friendly_name || `Zone ${z.id}`, main: mainId, mainState: main, attrs: a, type,
       temp, target, shownTarget: pend ? pend.t : target, humidity: num(a.current_humidity) ?? this._n(e.humidity),
-      busy, power, overlayType, boosting: !!overlayType && target != null && target >= 25, off, unavailable, window, preheat, heating, status, label,
-      step: num(a.target_temp_step) || 0.5, min: num(a.min_temp) ?? 5, max: num(a.max_temp) ?? 25,
+      busy, power, overlayType, boosting: !isAc && !!overlayType && target != null && target >= 25, off, unavailable, window, preheat, heating, status, label,
+      step: num(a.target_temp_step) || (isAc ? 1 : 0.5), min: num(a.min_temp) ?? (isAc ? 16 : 5), max: num(a.max_temp) ?? (isAc ? 30 : 25),
+      ac: isAc ? { mode: main?.state, fan: a.fan_mode, fans: a.fan_modes || [], swing: a.swing_mode, swings: a.swing_modes || [],
+        hswing: a.swing_horizontal_mode, hswings: a.swing_horizontal_modes || [], modes: (a.hvac_modes || []).filter((m) => m !== "off") } : null,
       confidence: this._n(e.confidence), confAttrs: this._st(e.confidence)?.attributes || {},
       devices: Object.values(this._home.devices || {}).filter((d) => d.zone === z.id),
-      floorId: this._map?.areas?.[z.area]?.floor_id || null,
+      area: z.area || null, floorId: this._map?.areas?.[z.area]?.floor_id || null,
     };
   }
 
@@ -773,6 +869,9 @@ class TadoDashPanel extends HTMLElement {
       case "menu": this.dispatchEvent(new CustomEvent("hass-toggle-menu", { bubbles: true, composed: true })); return;
       case "step": if (zone) this._setTarget(zone, (zone.shownTarget ?? zone.temp ?? 20) + parseFloat(v) * zone.step); return;
       case "hold": if (zone) this._hold(zone, v); return;
+      case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
+      case "noop": return;
+      case "side": (this._layout.sides ||= {})[z] = v; this._saveLayout(); break;
       case "boost": if (zone?.ents.boost) this._call("button", "press", { entity_id: zone.ents.boost }); return;
       case "press": this._call("button", "press", { entity_id: v }); return;
       case "toggle": this._call("homeassistant", "toggle", { entity_id: v }); return;
@@ -794,6 +893,7 @@ class TadoDashPanel extends HTMLElement {
   _onChange(e) {
     const el = e.target.closest("[data-c]");
     if (!el) return;
+    if (el.dataset.c === "acsel") this._call("climate", `set_${el.dataset.k}`, { entity_id: el.dataset.id, [el.dataset.k]: el.value });
     if (el.dataset.c === "select") this._call("select", "select_option", { entity_id: el.dataset.id, option: el.value });
     if (el.dataset.c === "setting" && el.dataset.key in SHOW_DEFAULTS) {
       this._layout.show[el.dataset.key] = el.checked;
@@ -832,12 +932,13 @@ class TadoDashPanel extends HTMLElement {
     else if (!this._zones.length) body = this._empty("radiator-off", "No Tado CE rooms found",
       "Tado Dash reads the entities Tado CE creates. Make sure Tado CE is set up and has finished its first sync.");
     else if (room) body = this._viewRoom(room);
-    else body = { rooms: () => this._viewRooms(), trvs: () => this._viewTrvs(), analytics: () => this._viewAnalytics(),
+    else body = { rooms: () => this._viewRooms(), trvs: () => this._viewTrvs(), ac: () => this._viewAc(), analytics: () => this._viewAnalytics(),
       schedules: () => this._viewSchedules(), confidence: () => this._viewConfidence(), system: () => this._viewSystem() }[this._tab]();
 
     const inRoom = room;
     const title = room ? room.name : "Tado Dash";
-    const tabs = [["rooms", "Rooms"], ["trvs", "TRV's"], ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
+    const hasAc = this._zones.some((z) => z.type === "ac");
+    const tabs = [["rooms", "Rooms"], ["trvs", "TRV's"], ...(hasAc ? [["ac", "AC"]] : []), ["analytics", "Analytics"], ["schedules", "Schedules"], ["confidence", "Confidence"], ["system", "System"]];
     this.shadowRoot.innerHTML = `<style>${STYLE}</style>
       <div class="page">
         <header>
@@ -1206,14 +1307,15 @@ class TadoDashPanel extends HTMLElement {
   }
 
   // Compact version of the room card: tighter, a slim chart, and one row of controls.
-  _roomCardCompact(z, floor) {
+  _roomCardCompact(p, floor) {
+    const z = this._sideView(p);
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
     const hum = z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}%</span>` : "";
     const pillText = this._infoPill(z).replace(/<[^>]+>/g, "");
-    return `<div class="card room compact ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}" title="${pillText}">
-      <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
-        <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
+    return `<div class="card room compact ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${p.id}" title="${pillText}">
+      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}</span>${this._sideToggle(p)}
+        <span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="cmid">
         <div class="ctemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
         <div class="cside">
@@ -1222,24 +1324,97 @@ class TadoDashPanel extends HTMLElement {
         </div>
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : ""}
+      ${this._acRow(z, !!p.pair)}
       ${this._controls(z, true)}</div>`;
   }
 
-  _roomCard(z, floor) {
-    if (this._layout.compact) return this._roomCardCompact(z, floor);
+  // Heat / Cool switch on a room that has both radiators and an air conditioner. A dot shows the other side is running.
+  _sideToggle(p) {
+    if (!p.pair) return "";
+    const side = this._side(p), ac = p.pair;
+    const live = { heat: p.heating && !p.off, cool: !ac.off && !!AC_ACTIONS[ac.attrs.hvac_action] };
+    const b = (k, ic, tip) => `<button class="${side === k ? "on" : live[k] ? "live" : ""}" title="${tip}" data-a="side" data-z="${p.id}" data-v="${k}">${icon(ic)}</button>`;
+    return `<span class="sidetog" role="group">${b("heat", "fire", "Heating controls")}${b("cool", "air-conditioner", "Air conditioning controls")}</span>`;
+  }
+
+  _roomCard(p, floor) {
+    if (this._layout.compact) return this._roomCardCompact(p, floor);
+    const z = this._sideView(p);
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
-    return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${z.id}">
-      <div class="row top"><span class="name">${icon(z.type === "hot_water" ? "water-boiler" : z.type === "ac" ? "air-conditioner" : "radiator")}${esc(z.name)}</span>
-        <span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
+    return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${p.id}">
+      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}</span>${this._sideToggle(p)}
+        <span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="row mid cardmid">
         <div class="temp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
         <span class="meta">${z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}%</span>` : ""}${this._rateChip(z)}</span>
         ${hasTemp ? `<div class="tgt"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(t, g, z.heating) : `<div class="spark empty"></div>`}
+      ${this._acRow(z, !!p.pair)}
       ${this._infoPill(z)}
       ${this._controls(z)}</div>`;
+  }
+
+  // Air conditioning on a room card: what the unit is set to. On the AC tab the same row is the controls.
+  _acRow(z, interactive = false) {
+    if (!z.ac) return "";
+    return interactive ? this._acPanel(z) : this._acChips(z);
+  }
+
+  _acChips(z) {
+    const ac = z.ac, lbl = (v) => String(v).replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+    if (z.off || z.unavailable || !ac.mode) return "";
+    const pill = (ic, text, tip) => `<span class="pill" title="${tip}">${icon(ic)}${esc(text)}</span>`;
+    return `<div class="acchips">${AC_MODES[ac.mode] ? pill(AC_MODES[ac.mode][0], AC_MODES[ac.mode][1], "Mode") : ""}${ac.fan ? pill("fan", lbl(ac.fan), "Fan speed") : ""}${ac.swing && ac.swing !== "off" ? pill("swing-v", lbl(ac.swing), "Vertical swing") : ""}${ac.hswing && ac.hswing !== "off" ? pill("swing-h", lbl(ac.hswing), "Horizontal swing") : ""}</div>`;
+  }
+
+  // Mode buttons and the fan and swing pickers, for an air-conditioning unit.
+  _acPanel(z) {
+    const ac = z.ac, lbl = (v) => String(v).replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+    const modes = ac.modes.filter((m) => AC_MODES[m]).map((m) => `<button class="${!z.off && ac.mode === m ? "on" : ""}" title="${AC_MODES[m][1]}" data-a="acmode" data-z="${z.id}" data-v="${m}">${icon(AC_MODES[m][0])}<span class="lb">${AC_MODES[m][1]}</span></button>`).join("");
+    const pick = (key, ic, name, cur, list) => list.length ? `<label class="acpick" data-a="noop" title="${name}">${icon(ic)}<select data-c="acsel" data-a="noop" data-k="${key}" data-id="${z.main}" aria-label="${name}">
+      ${list.map((o) => `<option value="${esc(o)}" ${o === cur ? "selected" : ""}>${esc(lbl(o))}</option>`).join("")}</select></label>` : "";
+    const picks = pick("fan_mode", "fan", "Fan speed", ac.fan, ac.fans) + pick("swing_mode", "swing-v", "Vertical swing", ac.swing, ac.swings) + pick("swing_horizontal_mode", "swing-h", "Horizontal swing", ac.hswing, ac.hswings);
+    return `<div class="acpanel"><div class="seg icons acmodes" role="group">${modes}</div>${picks ? `<div class="acpicks">${picks}</div>` : ""}</div>`;
+  }
+
+  // One unit on the AC tab: the unit itself, blowing what it is set to at the speed it is set to.
+  _acCard(z) {
+    const ac = z.ac, hum = z.humidity;
+    const unit = `<span class="valvetap" ${z.main ? `data-a="more-info" data-e="${z.main}" title="Show history"` : ""}>${acSVG(z)}</span>`;
+    const head = `<div class="row top"><span class="name">${icon("air-conditioner")}${esc(z.name)}</span><span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>`;
+    const tgt = z.shownTarget != null && ac.mode !== "dry" && ac.mode !== "fan_only" ? f1(z.shownTarget) : null;
+    if (this._layout.compact) {
+      return `<div class="card accard compact" data-a="open" data-z="${z.id}">${head}
+        <div class="trvbody">${unit}<div class="trvlist">
+          <div class="trvr"><span>Room</span><b>${z.temp != null ? `${f1(z.temp)}°` : "–"}</b></div>
+          <div class="trvr"><span>Target</span><b>${tgt ? `${tgt}°` : "–"}</b></div>
+          ${hum != null ? `<div class="trvr"><span>Humidity</span><b>${f0(hum)}%</b></div>` : ""}
+        </div></div>${this._acPanel(z)}${this._controls(z, true)}</div>`;
+    }
+    return `<div class="card accard" data-a="open" data-z="${z.id}">${head}${unit}
+      <div class="trvtemps ${hum != null ? "" : "nosensor"}">
+        <div class="trvt"><span>Room</span><b>${z.temp != null ? `${f1(z.temp)}<small>°C</small>` : "–"}</b><em>now</em></div>
+        <div class="trvt"><span>Target</span><b>${tgt ? `${tgt}<small>°C</small>` : "–"}</b><em>${z.overlayType ? "manual" : z.off ? "off" : "schedule"}</em></div>
+        ${hum != null ? `<div class="trvt"><span>Humidity</span><b>${f0(hum)}<small>%</small></b><em>${hum > HUM_HIGH ? "high" : "room"}</em></div>` : ""}
+      </div>${this._acPanel(z)}${this._controls(z)}</div>`;
+  }
+
+  // The AC tab: the units, with their mode, fan and swing within reach.
+  _viewAc() {
+    const all = this._zones.filter((z) => z.type === "ac");
+    if (!all.length) return `<div class="card">${this._empty("air-conditioner", "No air conditioning found", "Tado Dash shows rooms that Tado CE reports as an air conditioning zone. None were found.")}</div>`;
+    const on = all.filter((z) => !z.off && AC_ACTIONS[z.mainState?.attributes?.hvac_action]).length;
+    const chips = `<div class="chips">${[
+      chip("air-conditioner", "Units", all.length),
+      chip("power", "Running", on, on ? "cool" : ""),
+      this._compactChip(),
+    ].join("")}</div>`;
+    const body = this._groups(all).map((g) => `<section class="floor">
+      ${g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} unit${g.zones.length === 1 ? "" : "s"}</small></div>` : ""}
+      <div class="grid trvs ${this._layout.compact ? "compact" : ""}">${g.zones.map((z) => this._acCard(z)).join("")}</div></section>`).join("");
+    return `${chips}${body}<p class="hint center">Mode, fan and swing are set through Tado CE. The options come from what your unit supports.</p>`;
   }
 
   // Warming / cooling rate beside the humidity: ▲ orange, ▼ blue, a dash when steady.
@@ -1276,7 +1451,7 @@ class TadoDashPanel extends HTMLElement {
   // otherwise the schedule block that applies now (or comes next).
   _infoPill(z) {
     if (z.overlayType) return `<div class="infopill over">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>`;
-    if (z.off) return `<div class="infopill">${icon("power")}Heating off</div>`;
+    if (z.off) return `<div class="infopill">${icon("power")}${z.ac ? "Off" : "Heating off"}</div>`;
     const range = (b) => `${hhmm(new Date(b.s))} – ${hhmm(new Date(b.e))}${b.temp != null ? ` · ${f1(b.temp)} °C` : ""}`;
     const now = Date.now();
     const blocks = (this._cal.data?.[z.id] || []).slice().sort((a, b) => a.s - b.s);
@@ -1312,7 +1487,7 @@ class TadoDashPanel extends HTMLElement {
     const nextTemp = ov.next_temperature ?? this._n(e.next_sched_temp);
     const rate = this._rateChip(z);
     const hero = `<div class="card hero">
-      <div class="row top"><span class="pill ${z.status}">${z.status === "heating" ? icon("fire") : ""}${esc(z.label)}</span></div>
+      <div class="row top"><span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="row mid">
         <div class="bigtemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
         ${hasTemp ? `<div class="tgt big"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
@@ -1323,10 +1498,11 @@ class TadoDashPanel extends HTMLElement {
         ${rate ? `<span>${rate}</span>` : ""}
         ${outside != null ? `<span>${icon("thermometer")}${f1(outside)} °C outside</span>` : ""}
         ${surface != null ? `<span>${icon("wall")}wall ${f1(surface)} °C</span>` : ""}
-        ${z.power != null ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
+        ${z.power != null && !z.ac ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
         ${next && nextTemp != null ? `<span>${icon("calendar-clock")}next ${f1(nextTemp)} °C at ${hhmm(next)}</span>` : ""}
       </div>
       ${this._infoPill(z)}
+      ${z.ac ? this._acPanel(z) : ""}
       ${this._controls(z)}
       ${timeline}
     </div>`;
@@ -1358,7 +1534,7 @@ class TadoDashPanel extends HTMLElement {
 
   _learnPanel(z, adv) {
     const e = z.ents;
-    if (z.type === "hot_water") return "";
+    if (z.type === "hot_water" || z.ac) return "";
     const c = z.confidence;
     const rate = this._n(e.heating_rate), inertia = this._n(e.thermal_inertia), pre = this._n(e.preheat_time);
     const cycles = z.confAttrs.cycle_count;
@@ -1404,7 +1580,7 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _deferRoomChart(z, id) {
-    this._history([z.ents.temp, z.ents.target, z.ents.heating, z.ents.humidity], 24).then((d) => {
+    this._history([z.ents.temp, z.ents.target, z.ents.heating || z.ents.ac, z.ents.humidity], 24).then((d) => {
       if (this._zone !== z.id) return;
       const host = this.shadowRoot.getElementById(id);
       if (host) { host.innerHTML = this._chartSVG(id, { hours: 24, panels: [this._tempPanel(z, d)] }); this._bindCharts(); }
@@ -1423,7 +1599,7 @@ class TadoDashPanel extends HTMLElement {
         { name: "Temperature", pts: d[e.temp] || [], color: "var(--cold)", w: 3.2, area: true },
         { name: "Target", pts: d[e.target] || [], color: "var(--ok)", step: true, clip: true, dash: "6 4", w: 2 },
       ],
-      band: { name: "Heating", pts: d[e.heating] || [], color: HEAT },
+      band: { name: z.ac ? "AC on" : "Heating", pts: d[e.heating || e.ac] || [], color: z.ac ? COLD : HEAT },
     };
   }
 
@@ -1434,7 +1610,7 @@ class TadoDashPanel extends HTMLElement {
     const key = `${z.id}:${this._range}`;
     if (this._analyticsKey === key && this._analytics) return;
     this._analyticsKey = key;
-    const d = await this._history([z.ents.temp, z.ents.target, z.ents.heating, z.ents.humidity, outId], this._range);
+    const d = await this._history([z.ents.temp, z.ents.target, z.ents.heating || z.ents.ac, z.ents.humidity, outId], this._range);
     if (this._analyticsKey !== key) return;
     this._analytics = d;
     this._render();
@@ -1466,7 +1642,7 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _stats(z, d) {
-    const t = d[z.ents.temp] || [], tg = d[z.ents.target] || [], pw = d[z.ents.heating] || [], hum = d[z.ents.humidity] || [];
+    const t = d[z.ents.temp] || [], tg = d[z.ents.target] || [], pw = d[z.ents.heating || z.ents.ac] || [], hum = d[z.ents.humidity] || [];
     // tone: the colour that goes with what the figure means (cold, heat, good, warning...)
     const s = (ic, l, v, tip = "", tone = "") => `<div class="stat${tone ? " tone" : ""}"${tone ? ` style="--tone:${tone}"` : ""}${tip ? ` title="${esc(tip)}"` : ""}>${icon(ic)}<span>${l}</span><b>${v}</b></div>`;
     let temps = "", humidity = "", heating = "";
@@ -1717,7 +1893,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
   /* ----- confidence ----- */
 
   _viewConfidence() {
-    const zones = this._zones.filter((z) => z.type !== "hot_water");
+    const zones = this._zones.filter((z) => z.type === "heating");
     const hub = this._hub, ha = hub.get("home_insights")?.attributes || {};
     const rows = zones.map((z) => {
       const e = z.ents, c = z.confidence;
@@ -1882,7 +2058,28 @@ button{font:inherit;color:inherit}
 .name{font-weight:500;display:flex;align-items:center;gap:8px}.name .i{color:var(--mut)}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mut);padding:2px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
 .pill.heating{color:var(--heat);border-color:color-mix(in srgb,var(--heat) 40%,transparent);background:color-mix(in srgb,var(--heat) 14%,transparent)}
-.card.room .pill.heating,.trvcard .pill.heating,.boilercard .pill.heating{background:var(--heat);border-color:transparent;color:#fff}.card.room .pill.heating .i,.trvcard .pill.heating .i,.boilercard .pill.heating .i{color:#fff}
+.card.room .pill.heating,.trvcard .pill.heating,.accard .pill.heating,.boilercard .pill.heating{background:var(--heat);border-color:transparent;color:#fff}.card.room .pill.heating .i,.trvcard .pill.heating .i,.accard .pill.heating .i,.boilercard .pill.heating .i{color:#fff}
+.pill.cooling,.pill.drying,.pill.fan{color:var(--cold);border-color:color-mix(in srgb,var(--cold) 40%,transparent);background:color-mix(in srgb,var(--cold) 14%,transparent)}
+.card.room .pill.cooling,.accard .pill.cooling{background:var(--cold);border-color:transparent;color:#fff}.card.room .pill.cooling .i,.accard .pill.cooling .i{color:#fff}
+.sidetog{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px;margin-left:auto;margin-right:8px}
+.sidetog button{position:relative;display:flex;align-items:center;justify-content:center;width:26px;height:22px;border:0;border-radius:999px;background:none;color:var(--mut);cursor:pointer;padding:0;font-size:12px}
+.sidetog button.on{background:var(--cold);color:#fff}.sidetog button.on:first-child{background:var(--heat)}
+.sidetog button.live::after{content:"";position:absolute;top:2px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.accard{cursor:pointer;display:flex;flex-direction:column;gap:8px}.accard:hover{border-color:var(--mut)}.accard .acpanel{margin-top:0}
+.acunit{width:100%;max-width:190px;align-self:center;display:block}.compact .acunit{width:86px;flex:none}
+.acbase{fill:none;stroke-width:7;stroke-linecap:round;opacity:.13}
+.acflow{fill:none;stroke-linecap:round;opacity:.9;animation:pipeflow 1.6s linear infinite}
+.acflap{transform-box:fill-box;transform-origin:top center}.acflap.sweep{animation:acsweep 3.2s ease-in-out infinite alternate}
+@keyframes acsweep{from{transform:scaleY(.4)}to{transform:scaleY(1.9)}}
+.acled{animation:applying 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.acflow,.acflap.sweep,.acled{animation:none}}
+.chip.cool .i{color:var(--cold)}
+.acchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}.acchips .pill{font-size:11px}
+.acpanel{display:flex;flex-direction:column;gap:8px;margin-top:10px}.hero .acpanel{margin-top:0}
+.seg.acmodes button.on{background:var(--cold)}.seg.acmodes button[data-v=heat].on{background:var(--heat)}
+.acpicks{display:flex;flex-wrap:wrap;gap:6px}
+.acpick{flex:1 1 90px;display:flex;align-items:center;gap:6px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--mut);min-width:0}
+.acpick select{flex:1;min-width:0;background:none;border:0;color:var(--fg);font:inherit;font-size:13px;padding:7px 0;outline:none;cursor:pointer}.acpick select option{background:var(--card);color:var(--fg)}
 .pill.preheat{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 14%,transparent)}
 .pill.window{color:var(--cold);border-color:color-mix(in srgb,var(--cold) 40%,transparent);background:color-mix(in srgb,var(--cold) 16%,transparent)}.pill.over{color:var(--wis);border-color:color-mix(in srgb,var(--wis) 40%,transparent);background:color-mix(in srgb,var(--wis) 16%,transparent)}
 .mid{align-items:flex-end}
@@ -1987,7 +2184,7 @@ button{font:inherit;color:inherit}
 .trvbody{display:flex;align-items:center;gap:12px}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
 .trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
-.trvr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+.trvr{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
 .vs{display:none}
 .batpill{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);font-size:12px;font-weight:500}.trvcard{position:relative}.trvcard>.batpill{position:absolute;top:42px;right:16px;padding:3px 9px;font-size:11px}.trvcard>.batpill .i{font-size:11px}.batpill .i{font-size:12px}.batpill.good .i{color:var(--ok)}.batpill.bad,.batpill.bad .i{color:var(--bad)}
 .valvetap{display:contents}.valvetap[data-a] svg{cursor:pointer}

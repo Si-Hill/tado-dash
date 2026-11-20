@@ -36,6 +36,7 @@ ALIAS = {
     "floor-other": "layer-group", "cloud-arrow": "cloud-arrow-down", "settings": "gear", "close": "xmark", "compact": "table-cells", "trend-up": "caret-up", "trend-down": "caret-down", "trend-flat": "minus",
     "chevron-up": "chevron-up", "chevron-down": "chevron-down", "home-export-outline": "house",
     "home-account": "house", "circle-question": "circle-question",
+    "fan": "fan", "swing-v": "arrows-up-down", "swing-h": "arrows-left-right",
 }
 
 

@@ -55,6 +55,22 @@
     home.zones["1"] = { id: "1", entities: e };
   }
 
+  // An air conditioning zone (Tado CE: climate entity with mode, fan and swing; a power sensor; no valves)
+  {
+    const e = { ac_climate: "climate.bedroom_ac" };
+    put(e.ac_climate, "cool", {
+      friendly_name: "Bedroom AC", current_temperature: 24.6, temperature: 23, current_humidity: 55, hvac_action: "cooling", overlay_type: "Manual", ac_power_percentage: 100,
+      hvac_modes: ["off", "cool", "heat", "dry", "fan_only", "heat_cool"], fan_mode: "auto", fan_modes: ["auto", "low", "medium", "high"],
+      swing_mode: "auto", swing_modes: ["auto", "up", "mid_up", "mid", "mid_down", "down", "off"], swing_horizontal_mode: "off", swing_horizontal_modes: ["auto", "left", "mid", "right", "off"],
+      min_temp: 16, max_temp: 30, target_temp_step: 1, zone_id: "12", scheduled_target_temperature: 24,
+    });
+    const sensor = (key, val, attrs = {}, name = key) => { const id = `sensor.bedroom_ac_${key}`; e[key] = id; put(id, val, { friendly_name: `Bedroom AC ${name}`, ...attrs }); };
+    sensor("temp", 24.6); sensor("target", 23); sensor("humidity", 55); sensor("ac", 100); sensor("comfort_level", "Comfortable"); sensor("dew_point", 14.8);
+    sensor("overlay", "Manual", { next_change: new Date(Date.now() + 3 * 3600e3).toISOString(), next_temperature: 24 });
+    e.schedule = "calendar.sched_12"; put(e.schedule, "off");
+    home.zones["12"] = { id: "12", entities: e, area: "master" };
+  }
+
   const hub = (key, id, state, attrs = {}) => { home.hub[key] = id; put(id, state, { friendly_name: key, ...attrs }); };
   hub("outside_temp", "sensor.tado_ce_hub_outside_temp", 6.1, { unit_of_measurement: "°C" });
   hub("api_usage", "sensor.tado_ce_hub_api_usage", 124); hub("api_limit", "sensor.tado_ce_hub_api_limit", 1000);
@@ -96,7 +112,7 @@
   const series = (id) => {
     const s = states[id]; if (!s) return [];
     const base = parseFloat(s.state), out = [], n = 200, span = 7 * 24 * 3600e3;
-    const isHeat = /_heating$/.test(id), isTarget = /_target$/.test(id), isHum = /_humidity$/.test(id), isOut = /outside/.test(id);
+    const isHeat = /_(heating|ac)$/.test(id), isTarget = /_target$/.test(id), isHum = /_humidity$/.test(id), isOut = /outside/.test(id);
     for (let k = 0; k <= n; k++) {
       const t = Date.now() - span + (k / n) * span, h = new Date(t).getHours() + new Date(t).getMinutes() / 60;
       let v;
@@ -135,6 +151,16 @@
       }
       return evs;
     },
-    callService: async (domain, service, data) => { console.log("service", domain, service, data); },
+    callService: async (domain, service, data) => {
+      console.log("service", domain, service, data);
+      // Let the air conditioning controls do something: change the climate entity, then hand the panel the new state.
+      const c = states[data?.entity_id];
+      if (domain === "climate" && c && /^climate\.bedroom_ac/.test(c.entity_id)) {
+        const set = { set_hvac_mode: () => { c.state = data.hvac_mode; c.attributes.hvac_action = { cool: "cooling", heat: "heating", dry: "drying", fan_only: "fan", heat_cool: "idle" }[data.hvac_mode]; },
+          set_fan_mode: () => (c.attributes.fan_mode = data.fan_mode), set_swing_mode: () => (c.attributes.swing_mode = data.swing_mode),
+          set_swing_horizontal_mode: () => (c.attributes.swing_horizontal_mode = data.swing_horizontal_mode), turn_off: () => { c.state = "off"; c.attributes.hvac_action = "off"; } }[service];
+        if (set) { set(); c.last_updated = new Date().toISOString(); document.querySelector("tado-dash-panel").hass = { ...window.mockHass }; }
+      }
+    },
   };
 })();
