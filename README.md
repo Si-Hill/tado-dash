@@ -33,9 +33,30 @@ If Tado CE works for you, Tado Dash works the moment you add it, and removing it
 | **Confidence** | Confidence, cycle count, heating rate, thermal inertia and preheat time for every room, an explanation of how confidence is scored, and Tado CE's home-wide insights. |
 | **System** | API usage against the daily limit, token and sync status, bridge, HomeKit and geofencing, presence mode and override settings, resume-all, and every hub entity. |
 
-### About the confidence score
+## Prerequisites
 
-Tado CE learns from completed heating cycles. Per its source, the score is up to 60% from the number of cycles (10% each, capped at 6) plus up to 40% from how consistent the heating-rate and thermal-inertia results are between cycles. A room parked at exactly 60% has enough cycles but inconsistent ones, usually draughts, open windows, or interrupted heating.
+- Home Assistant 2026.11 or newer, which has the Marketplace built in
+- [Tado CE](https://github.com/hiall-fyi/tado_ce) 4.6 installed and set up (v5 beta is not supported yet)
+- For the Confidence tab: enable Tado CE's *Confidence*, *Heating Rate*, *Thermal Inertia* and *Preheat Time* sensors (disabled by default). Missing sensors are simply left out. Outside temperature likewise needs Tado CE's *Outside Temp* sensor.
+
+## 1. Install from the Marketplace
+
+Tado Dash isn't in the Marketplace's default catalogue yet, so add it from its GitHub link.
+
+1. Open **Settings → Marketplace** (administrators only; accept the notice the first time).
+2. Select **Add from link** in the upper right, enter `Si-Hill/tado-dash`, and select **Add**. If it asks for a type, choose **Integration**.
+3. Select **Tado Dash** in the list, then **Install**, and confirm the version in the dialog.
+4. If the Marketplace says a restart is needed, restart Home Assistant.
+
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Si-Hill&repository=tado-dash&category=integration)
+
+## 2. Add it
+
+If setup didn't open by itself after installing, go to **Settings → Devices & services → Add integration → Tado Dash**, then confirm. A **Tado** item appears in the sidebar. Use the cog on the integration to change the sidebar title or icon, or to limit it to administrators.
+
+## How it finds your rooms
+
+Tado CE entity IDs vary between installs (`climate.lounge_2`, `sensor.lounge_temp`), so Tado Dash doesn't guess them. It reads Tado CE's stable unique IDs from the entity registry and groups them into rooms, so renaming entities doesn't break it. It's exposed to the panel as the `tado_dash/map` WebSocket command.
 
 ## Screenshots
 
@@ -78,31 +99,6 @@ The screenshots use made-up data: three rooms upstairs, four downstairs, and air
 <img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/screenshots/confidence.png" alt="The Confidence tab">
 
 <img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/screenshots/system.png" alt="The System tab">
-
-## Prerequisites
-
-- Home Assistant 2026.11 or newer, which has the Marketplace built in
-- [Tado CE](https://github.com/hiall-fyi/tado_ce) 4.6 installed and set up (v5 beta is not supported yet)
-- For the Confidence tab: enable Tado CE's *Confidence*, *Heating Rate*, *Thermal Inertia* and *Preheat Time* sensors (disabled by default). Missing sensors are simply left out. Outside temperature likewise needs Tado CE's *Outside Temp* sensor.
-
-## 1. Install from the Marketplace
-
-Tado Dash isn't in the Marketplace's default catalogue yet, so add it from its GitHub link.
-
-1. Open **Settings → Marketplace** (administrators only; accept the notice the first time).
-2. Select **Add from link** in the upper right, enter `Si-Hill/tado-dash`, and select **Add**. If it asks for a type, choose **Integration**.
-3. Select **Tado Dash** in the list, then **Install**, and confirm the version in the dialog.
-4. If the Marketplace says a restart is needed, restart Home Assistant.
-
-[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Si-Hill&repository=tado-dash&category=integration)
-
-## 2. Add it
-
-If setup didn't open by itself after installing, go to **Settings → Devices & services → Add integration → Tado Dash**, then confirm. A **Tado** item appears in the sidebar. Use the cog on the integration to change the sidebar title or icon, or to limit it to administrators.
-
-## How it finds your rooms
-
-Tado CE entity IDs vary between installs (`climate.lounge_2`, `sensor.lounge_temp`), so Tado Dash doesn't guess them. It reads Tado CE's stable unique IDs from the entity registry and groups them into rooms, so renaming entities doesn't break it. It's exposed to the panel as the `tado_dash/map` WebSocket command.
 
 ## Credits
 
