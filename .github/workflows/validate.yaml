@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  hacs:
-    name: HACS
+  marketplace:
+    name: Marketplace
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

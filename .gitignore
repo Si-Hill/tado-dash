@@ -5,6 +5,5 @@ __pycache__/
 node_modules/
 .DS_Store
 
-# a mock of a real home (private); see dev/index.html ?mine
-dev/mock.local.js
-dev/live.local.html
+# local development harness, mock data and icon scripts (not published)
+dev/

@@ -1,6 +1,7 @@
 {
   "domain": "tado_dash",
   "name": "Tado Dash",
+  "categories": ["climate.thermostats_heating"],
   "codeowners": ["@Si-Hill"],
   "config_flow": true,
   "dependencies": ["http", "frontend"],
