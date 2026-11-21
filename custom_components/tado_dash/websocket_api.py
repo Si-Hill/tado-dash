@@ -15,7 +15,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import floor_registry as fr
 from homeassistant.loader import IntegrationNotLoaded, async_get_loaded_integration
 
-from .const import TADO_CE_DOMAIN
+from .const import DOMAIN, TADO_CE_DOMAIN
 from .mapping import build_map
 
 
@@ -31,6 +31,16 @@ class _Entry:
 def async_register(hass: HomeAssistant) -> None:
     """Register the panel's WebSocket commands."""
     websocket_api.async_register_command(hass, ws_map)
+    websocket_api.async_register_command(hass, ws_version)
+
+
+@websocket_api.websocket_command({vol.Required("type"): "tado_dash/version"})
+@callback
+def ws_version(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Return the Tado Dash version Home Assistant is serving, so an open page can tell it is out of date."""
+    connection.send_result(msg["id"], {"version": hass.data.get(DOMAIN, {}).get("version", "")})
 
 
 @websocket_api.websocket_command({vol.Required("type"): "tado_dash/map"})
@@ -55,6 +65,7 @@ def ws_map(
         entries.append(_Entry(entry.entity_id, entry.unique_id, entry.device_id, area_id))
 
     result = build_map(entries)
+    result["dash_version"] = hass.data.get(DOMAIN, {}).get("version", "")
     # Which Tado CE is installed, so the panel can show it and adapt to it.
     try:
         result["tado_ce_version"] = str(async_get_loaded_integration(hass, TADO_CE_DOMAIN).version or "")

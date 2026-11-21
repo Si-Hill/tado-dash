@@ -18,6 +18,7 @@ const C = {
 const SELF = document.currentScript?.src || "";
 const BASE = SELF ? SELF.replace(/[^/?]*(\?.*)?$/, "") : window.TADO_DASH_BASE || "/tado_dash/";
 const VERSION_Q = SELF.includes("?") ? SELF.slice(SELF.indexOf("?")) : "";
+const LOADED_VERSION = new URLSearchParams(VERSION_Q).get("v") || window.TADO_DASH_VERSION || ""; // the Tado Dash version this page loaded (the dev harness sets the global)
 const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
 const TABS = ["rooms", "trvs", "ac", "analytics", "schedules", "confidence", "system"];
 const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true, boilerTemp: true, boilerTarget: true }; // what the Rooms / TRV's tabs show
@@ -435,6 +436,7 @@ class TadoDashPanel extends HTMLElement {
     this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
     this._drag = null;
     this._onPopState = (e) => this._onPop(e);
+    this._onVisible = () => { if (!document.hidden) this._checkVersion(); };
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
     this.shadowRoot.addEventListener("dragstart", (e) => this._onDragStart(e));
@@ -580,7 +582,8 @@ class TadoDashPanel extends HTMLElement {
   set narrow(v) { if (this._narrow !== v) { this._narrow = v; if (this._map) this._render(); } }
 
   connectedCallback() {
-    this._timer = setInterval(() => this._refreshHistory(), 5 * MIN);
+    this._timer = setInterval(() => { this._refreshHistory(); this._checkVersion(); }, 5 * MIN);
+    document.addEventListener("visibilitychange", this._onVisible);
     window.addEventListener("keydown", this._onKey);
     window.addEventListener("popstate", this._onPopState);
   }
@@ -588,6 +591,7 @@ class TadoDashPanel extends HTMLElement {
     clearInterval(this._timer);
     window.removeEventListener("keydown", this._onKey);
     window.removeEventListener("popstate", this._onPopState);
+    document.removeEventListener("visibilitychange", this._onVisible);
     this._ro?.disconnect();
   }
 
@@ -598,6 +602,7 @@ class TadoDashPanel extends HTMLElement {
     } catch (err) {
       this._mapError = err?.message || String(err);
     }
+    this._latest = this._map?.dash_version || "";
     const home = this._map?.homes?.[0];
     this._home = home || null;
     if (home) await this._loadLayout();
@@ -610,6 +615,15 @@ class TadoDashPanel extends HTMLElement {
 
   // The installed Tado CE version ("4.6.0", "5.0.0-beta.1"), and its major number for anything that differs between them.
   get _ceVersion() { return this._map?.tado_ce_version || ""; }
+  // Home Assistant is now serving a newer Tado Dash than this page loaded (an update since the page was opened).
+  get _stale() { return !!LOADED_VERSION && !!this._latest && LOADED_VERSION !== this._latest; }
+
+  _checkVersion() {
+    this._hass?.callWS({ type: "tado_dash/version" }).then((r) => {
+      if (r?.version && r.version !== this._latest) { this._latest = r.version; this._render(); }
+    }, () => { /* Home Assistant is restarting, or the page is older than this command */ });
+  }
+
   get _ceMajor() { return parseInt(this._ceVersion, 10) || 0; }
 
   _st(id) { return id ? this._hass.states[id] : undefined; }
@@ -901,6 +915,7 @@ class TadoDashPanel extends HTMLElement {
       case "hold": if (zone) this._hold(zone, v); return;
       case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
       case "noop": return;
+      case "reload": location.reload(); return;
       case "side": (this._layout.sides ||= {})[z] = v; this._saveLayout(); break;
       case "boost": if (zone?.ents.boost) this._call("button", "press", { entity_id: zone.ents.boost }); return;
       case "press": this._call("button", "press", { entity_id: v }); return;
@@ -977,6 +992,7 @@ class TadoDashPanel extends HTMLElement {
             : this._narrow ? `<button class="icon-btn" data-a="menu" title="Menu">${icon("menu")}</button>` : ""}
           ${inRoom ? `<h1>${esc(title)}</h1>` : `<img class="brand" alt="Tado Dash" src="${BASE}brand/${this.getAttribute("data-theme") === "dark" ? "dark_logo" : "logo"}.png${VERSION_Q}"
             onerror="this.outerHTML='<h1>Tado Dash</h1>'">`}
+          ${this._stale ? `<div class="newver" role="status" title="You are viewing a previous version. Refresh the page to see the latest version."><span class="nl">You are viewing a previous version. Refresh the page to see the latest version.</span><span class="ns">Previous version</span><button class="btn" data-a="reload">Refresh</button></div>` : ""}
           ${inRoom || !this._ceVersion ? "" : `<span class="ceversion" title="The Tado CE version this Home Assistant is running">Tado CE v${esc(this._ceVersion)}</span>`}
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
@@ -2089,6 +2105,12 @@ const STYLE = `
 *{box-sizing:border-box}
 .page{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
+.newver{flex:0 1 auto;min-width:0;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 auto;padding:3px 12px;border-radius:999px;font-size:12px;line-height:1.3;text-align:center;color:var(--heat);background:var(--card);border:1px solid var(--heat)}
+.newver .btn{flex:none;padding:0;background:none;color:var(--heat);font-size:12px;font-weight:600;text-decoration:underline}
+.newver .ns{display:none}
+header:has(.newver) .ceversion{margin-left:0}
+@media (min-width:900px){header{position:relative}.newver{position:absolute;left:50%;transform:translateX(-50%);margin:0}header:has(.newver) .ceversion{margin-left:auto}}
+@media (max-width:640px){.newver{padding:3px 10px;gap:6px;font-size:11px}.newver .nl{display:none}.newver .ns{display:inline;white-space:nowrap}header:has(.newver) .ceversion{display:none}}
 .ceversion{margin-left:auto;font-size:12px;color:var(--mut);padding:3px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
 h1{font-size:20px;font-weight:400;margin:0}
 .brand{height:40px;width:auto;display:block}

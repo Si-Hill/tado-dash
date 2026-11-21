@@ -16,7 +16,7 @@ from custom_components.tado_dash.const import (
     DOMAIN,
     PANEL_URL_PATH,
 )
-from custom_components.tado_dash.websocket_api import ws_map
+from custom_components.tado_dash.websocket_api import ws_map, ws_version
 
 
 @pytest.fixture(autouse=True)
@@ -116,9 +116,22 @@ async def test_ws_map_returns_rooms(hass: HomeAssistant) -> None:
     ws_map(hass, Conn(), {"id": 7, "type": "tado_dash/map"})
     await hass.async_block_till_done()
     assert sent["id"] == 7
+    assert "dash_version" in sent["result"]
     assert "tado_ce_version" in sent["result"]  # empty here: Tado CE isn't installed in the test setup
     (home,) = sent["result"]["homes"]
     assert home["zones"]["9"]["entities"]["climate"] == "climate.lounge_2"
     assert home["zones"]["9"]["area"] == area.id
     assert sent["result"]["areas"][area.id] == {"name": "Lounge", "floor_id": floor.floor_id}
     assert {"id": floor.floor_id, "name": "Downstairs", "level": 0} in sent["result"]["floors"]
+
+
+async def test_ws_version_reports_the_served_version(hass: HomeAssistant) -> None:
+    hass.data.setdefault("tado_dash", {})["version"] = "9.9.9"
+    sent = {}
+
+    class Conn:
+        def send_result(self, msg_id, result):
+            sent["id"], sent["result"] = msg_id, result
+
+    ws_version(hass, Conn(), {"id": 3, "type": "tado_dash/version"})
+    assert sent == {"id": 3, "result": {"version": "9.9.9"}}
