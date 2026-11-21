@@ -22,6 +22,10 @@ const LOADED_VERSION = new URLSearchParams(VERSION_Q).get("v") || window.TADO_DA
 const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
 const TABS = ["rooms", "trvs", "ac", "analytics", "schedules", "confidence", "system"];
 const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true, boilerTemp: true, boilerTarget: true }; // what the Rooms / TRV's tabs show
+// The colours the Analytics figures already use, which is all the colour picker offers.
+const STAT_COLORS = [["Blue", "var(--cold)"], ["Orange", "var(--heat)"], ["Teal", "var(--accent)"], ["Green", "var(--ok)"], ["Amber", "var(--warn)"],
+  ["Red", "var(--bad)"], ["Purple", "var(--wis)"], ["Pale blue", "var(--humhi)"], ["Grey", "var(--mut)"]];
+const STAT_KEYS = ["lowest", "highest", "average", "hum_low", "hum_high", "hum_avg", "heating_on", "within", "mold_risk", "mold_pct", "comfort", "abs_hum", "condensation", "dew_point", "heating_rate", "thermal_inertia", "preheat_time", "schedule_deviation"];
 const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
@@ -341,9 +345,9 @@ function boilerSVG(calling, temp) {
   const fire = FA.fire;
   return `<svg class="boiler" viewBox="0 10 120 120" role="img" aria-label="Boiler${calling ? ", calling for heat" : ""}">
     <rect x="10" y="14" width="100" height="110" rx="14" style="fill:color-mix(in srgb, var(--mut) 16%, var(--card))" stroke="var(--mut)" stroke-width="3"/>
-    <rect x="26" y="30" width="68" height="30" rx="7" style="fill:color-mix(in srgb, var(--mut) 24%, var(--card))"/>
-    <text x="60" y="51" text-anchor="middle" class="bdisp">${temp != null ? `${f1(temp)}°` : "–"}</text>
-    <svg x="46" y="74" width="28" height="34" viewBox="0 0 ${fire[0]} 512"><path d="${fire[1]}" fill="${calling ? HEAT : "var(--mut)"}" opacity="${calling ? 1 : 0.35}"/></svg>
+    ${temp != null ? `<rect x="26" y="30" width="68" height="30" rx="7" style="fill:color-mix(in srgb, var(--mut) 24%, var(--card))"/>
+    <text x="60" y="51" text-anchor="middle" class="bdisp">${f1(temp)}°</text>` : ""}
+    <svg x="46" y="${temp != null ? 74 : 52}" width="28" height="34" viewBox="0 0 ${fire[0]} 512"><path d="${fire[1]}" fill="${calling ? HEAT : "var(--mut)"}" opacity="${calling ? 1 : 0.35}"/></svg>
   </svg>`;
 }
 
@@ -430,7 +434,7 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
-    this._layout = { floors: [], rooms: {}, sides: {}, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
+    this._layout = { floors: [], rooms: {}, sides: {}, boilerCols: 2, statsCfg: { hidden: [], colors: {} }, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
     this._settingsOpen = false;
     this._pollOpen = false;
     this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
@@ -461,7 +465,9 @@ class TadoDashPanel extends HTMLElement {
     for (const k of Object.keys(show)) if (typeof v.show?.[k] === "boolean") show[k] = v.show[k];
     const sides = {};
     for (const [k, side] of Object.entries(v.sides && typeof v.sides === "object" ? v.sides : {})) if (side === "heat" || side === "cool") sides[k] = side;
-    this._layout = { floors: ids(v.floors), rooms, sides, compact: v.compact === true, show };
+    const statsCfg = { hidden: ids(v.statsCfg?.hidden).filter((k) => STAT_KEYS.includes(k)), colors: {} };
+    for (const [k, c] of Object.entries(v.statsCfg?.colors && typeof v.statsCfg.colors === "object" ? v.statsCfg.colors : {})) if (STAT_KEYS.includes(k) && STAT_COLORS.some(([, v2]) => v2 === c)) statsCfg.colors[k] = c;
+    this._layout = { floors: ids(v.floors), rooms, sides, boilerCols: [2, 3, 4].includes(v.boilerCols) ? v.boilerCols : 2, statsCfg, compact: v.compact === true, show };
   }
 
   _saveLayout() {
@@ -593,6 +599,7 @@ class TadoDashPanel extends HTMLElement {
     window.removeEventListener("popstate", this._onPopState);
     document.removeEventListener("visibilitychange", this._onVisible);
     this._ro?.disconnect();
+    this._roStats?.disconnect();
   }
 
   async _init() {
@@ -898,7 +905,7 @@ class TadoDashPanel extends HTMLElement {
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
       case "compact": this._layout.compact = !this._layout.compact; this._saveLayout(); break;
       case "settings": this._settingsOpen = !this._settingsOpen; break;
-      case "settings-close": this._settingsOpen = false; break;
+      case "settings-close": this._settingsOpen = false; this._colourOpen = null; break;
       case "opt": {
         const id = el.dataset.id;
         this._selOpt[id] = v;
@@ -915,6 +922,13 @@ class TadoDashPanel extends HTMLElement {
       case "hold": if (zone) this._hold(zone, v); return;
       case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
       case "noop": return;
+      case "stat-colour": this._colourOpen = this._colourOpen === el.dataset.k ? null : el.dataset.k; break;
+      case "stat-colour-set": {
+        const k = el.dataset.k, colors = this._layout.statsCfg.colors;
+        if (v) colors[k] = v; else delete colors[k];
+        this._colourOpen = null; this._saveLayout(); break;
+      }
+      case "bcols": this._layout.boilerCols = parseInt(v, 10); this._saveLayout(); break;
       case "reload": location.reload(); return;
       case "side": (this._layout.sides ||= {})[z] = v; this._saveLayout(); break;
       case "boost": if (zone?.ents.boost) this._call("button", "press", { entity_id: zone.ents.boost }); return;
@@ -940,6 +954,11 @@ class TadoDashPanel extends HTMLElement {
     const el = e.target.closest("[data-c]");
     if (!el) return;
     if (el.dataset.c === "acsel") this._call("climate", `set_${el.dataset.k}`, { entity_id: el.dataset.id, [el.dataset.k]: el.value });
+    if (el.dataset.c === "stat" && STAT_KEYS.includes(el.dataset.key)) {
+      const hidden = this._layout.statsCfg.hidden, k = el.dataset.key;
+      this._layout.statsCfg.hidden = el.checked ? hidden.filter((x) => x !== k) : [...new Set([...hidden, k])];
+      this._saveLayout(); this._render();
+    }
     if (el.dataset.c === "select") this._call("select", "select_option", { entity_id: el.dataset.id, option: el.value });
     if (el.dataset.c === "setting" && el.dataset.key in SHOW_DEFAULTS) {
       this._layout.show[el.dataset.key] = el.checked;
@@ -1007,6 +1026,7 @@ class TadoDashPanel extends HTMLElement {
     this._bindCharts();
     this._bindSparks();
     this._bindBoiler();
+    this._bindStats();
     this._afterRender();
   }
 
@@ -1070,7 +1090,7 @@ class TadoDashPanel extends HTMLElement {
       this._settingsChip(),
     ].join("");
     // In a grid of its own with the same columns as the room cards, spanning two of them.
-    const boiler = this._layout.show.boilerRooms ? `<div class="grid boilerrow ${this._layout.compact ? "compact" : ""}">${this._boilerCard(zones.filter((z) => z.type === "heating"))}</div>` : "";
+    const boiler = this._layout.show.boilerRooms ? `<div class="grid boilerrow bc${this._layout.boilerCols} ${this._layout.compact ? "compact" : ""}">${this._boilerCard(zones.filter((z) => z.type === "heating"))}</div>` : "";
     const shown = this._visibleZones();
     const groups = this._groups(shown);
     const body = !shown.length
@@ -1122,19 +1142,48 @@ class TadoDashPanel extends HTMLElement {
       <div class="mfoot"><button class="btn ghost" data-a="polling-close">Close</button><button class="btn" data-a="tado-settings">Open Tado CE settings</button></div></div></div>`;
   }
 
+  // Analytics: every figure, reported or not (the ones Tado CE doesn't report are greyed out), each with a show / hide
+  // switch and a colour dot that opens the colours the figures already use.
+  _statsSettings() {
+    const z = this._zoneById(this._sel), cfg = this._layout.statsCfg;
+    const d = z && this._analytics && this._analyticsKey === `${z.id}:${this._range}` ? this._analytics : null;
+    const list = z ? this._statList(z, d) : [];
+    const groups = [["Temperature", ["lowest", "highest", "average"]], ["Humidity", ["hum_low", "hum_high", "hum_avg"]], ["Heating", ["heating_on", "within"]],
+      ["Air & comfort", ["mold_risk", "mold_pct", "comfort", "abs_hum", "condensation", "dew_point"]], ["Learned by Tado CE", ["heating_rate", "thermal_inertia", "preheat_time", "schedule_deviation"]]];
+    const row = (x) => {
+      const colour = cfg.colors[x.key] || x.tone, open = this._colourOpen === x.key;
+      const palette = open ? `<div class="palette" role="group" aria-label="Colour">${STAT_COLORS.map(([name, c]) =>
+        `<button class="dot ${cfg.colors[x.key] === c ? "on" : ""}" style="background:${c}" title="${name}" data-a="stat-colour-set" data-k="${x.key}" data-v="${c}"></button>`).join("")}
+        <button class="auto ${cfg.colors[x.key] ? "" : "on"}" title="Use the colour that fits the value" data-a="stat-colour-set" data-k="${x.key}" data-v="">Auto</button></div>` : "";
+      return `<div class="strow ${x.v == null ? "dim" : ""}"><label class="sl"><span class="lv"><b>${x.label}</b><small title="${x.v == null ? "Tado CE does not report this one" : ""}">${x.v == null ? "Not reported" : x.v}</small></span>
+          <input type="checkbox" class="tgl" data-c="stat" data-key="${x.key}" ${cfg.hidden.includes(x.key) ? "" : "checked"}></label>
+        <button class="dot big" style="background:${colour}" title="Colour" aria-label="Colour of ${x.label}" data-a="stat-colour" data-k="${x.key}"></button>${palette}</div>`;
+    };
+    const block = ([title, keys]) => `<div class="sgroup">${title}</div>${keys.map((k) => list.find((x) => x.key === k)).filter(Boolean).map(row).join("")}`;
+    return `<div class="mcols"><div class="mcol">${groups.slice(0, 3).map(block).join("")}</div><div class="mcol">${groups.slice(3).map(block).join("")}</div></div>`;
+  }
+
   _settingsModal() {
+    if (this._tab === "analytics") {
+      return `<div class="modal-back"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Settings">
+        <div class="mhead"><h3>Settings</h3><small>Analytics tab</small><span class="sp"></span>
+          <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
+        <p class="hint">Choose which figures show under the chart, and their colour.</p>
+        ${this._statsSettings()}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+    }
     const s = this._layout.show, onTrvs = this._tab === "trvs";
-    const row = (key, label, note, off = false, sub = false) => `<label class="srow ${off ? "dim" : ""} ${sub ? "sub" : ""}"><input type="checkbox" data-c="setting" data-key="${key}" ${s[key] ? "checked" : ""} ${off ? "disabled" : ""}>
-      <span><b>${label}</b><small>${note}</small></span></label>`;
+    const row = (key, label, note, off = false) => `<label class="srow ${off ? "dim" : ""}"><span><b>${label}</b><small>${note}</small></span>
+      <input type="checkbox" class="tgl" data-c="setting" data-key="${key}" ${s[key] ? "checked" : ""} ${off ? "disabled" : ""}></label>`;
     const boiler = onTrvs ? "boilerTrvs" : "boilerRooms";
     const group = (title, body) => `<div class="sgroup">${title}</div>${body}`;
-    const temps = row("boilerTemp", "Room temperatures", "Each room's current temperature on its chip.", !s[boiler], true) +
-      row("boilerTarget", "Target temperatures", "Each room's target temperature on its chip.", !s[boiler], true);
-    const rows = onTrvs
-      ? group("Boiler card", row("boilerTrvs", "Show the boiler card", "The boiler with a line to each room that has a valve.") + temps)
+    const width = `<div class="optrow"><b>Columns wide</b><div class="seg" role="group">${[2, 3, 4].map((n) => `<button class="${this._layout.boilerCols === n ? "on" : ""}" data-a="bcols" data-v="${n}">${n}</button>`).join("")}</div></div>`;
+    const temps = group("On the room chips", row("boilerTemp", "Room temperatures", "Each room's current temperature.", !s[boiler]) +
+      row("boilerTarget", "Target temperatures", "Each room's target temperature.", !s[boiler]));
+    const rows = `<div class="mcols"><div class="mcol">${onTrvs
+      ? group("Boiler card", row("boilerTrvs", "Show the boiler card", "The boiler with a line to each room that has a valve.") + width)
       : group("Hot water", row("hotWater", "Show the hot water card", "The hot water cylinder, if Tado CE has one.")) +
-        group("Boiler card", row("boilerRooms", "Show the boiler card", "The boiler with a line to each heating room.") + temps);
-    return `<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-label="Settings">
+        group("Boiler card", row("boilerRooms", "Show the boiler card", "The boiler with a line to each heating room.") + width)}</div><div class="mcol">${temps}</div></div>`;
+    return `<div class="modal-back"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="mhead"><h3>Settings</h3><small>${onTrvs ? "TRV's tab" : "Rooms tab"}</small><span class="sp"></span>
         <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
       ${rows}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
@@ -1166,11 +1215,12 @@ class TadoDashPanel extends HTMLElement {
       const nodes = `<div class="bnodes">${g.zones.map((z) => node(z, name)).join("")}</div>`;
       return `<div class="bgroup">${name === "top" ? label + nodes : nodes + label}</div>`;
     }).join("")}</div>`;
+    const top = groups.slice(0, split);
     return `<div class="card boilercard ${this._layout.compact ? "compact" : ""}">
       <div class="row top"><span class="name">${icon("fire-burner")}Boiler</span>
         <span class="pill ${calling ? "heating" : ""}" title="Inferred from the rooms; Tado CE has no flame signal">${calling ? icon("fire") + "Calling for heat" : "Idle"}</span></div>
       <div class="bflow"><svg class="bwires" aria-hidden="true"></svg>
-        ${side(groups.slice(0, split), "top")}<div class="bimg" ${this._boilerEntity() ? `data-a="more-info" data-e="${this._boilerEntity()}" title="Boiler output temperature history"` : ""}>${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
+        ${top.length ? side(top, "top") : ""}<div class="bimg" ${this._boilerEntity() ? `data-a="more-info" data-e="${this._boilerEntity()}" title="Boiler output temperature history"` : ""}>${boilerSVG(calling, temp)}</div>${side(groups.slice(split), "bottom")}</div></div>`;
   }
 
   // Pipework: one main pipe from the boiler for each floor runs to a horizontal pipe along that
@@ -1267,6 +1317,39 @@ class TadoDashPanel extends HTMLElement {
     svg.innerHTML = out;
   }
 
+  // The figures under the Analytics chart go on one line if there is room for all of them (each tile as wide as it needs,
+  // the spare room shared out), otherwise on as few lines as fit, with the same number of tiles on each line (11 tiles:
+  // six, then five) in equal columns.
+  _fitStats() {
+    for (const el of this.shadowRoot.querySelectorAll(".stats.fit")) {
+      const kids = [...el.children], n = kids.length;
+      if (!n) continue;
+      el.style.gridTemplateColumns = `repeat(${n}, max-content)`; // measure what each tile needs
+      const need = kids.map((k) => Math.ceil(k.getBoundingClientRect().width));
+      const width = el.getBoundingClientRect().width, gap = parseFloat(getComputedStyle(el).columnGap) || 10;
+      el.style.gridTemplateColumns = "";
+      if (need.reduce((a, b) => a + b, 0) + (n - 1) * gap <= width) {
+        el.style.gridTemplateColumns = need.map((w) => `minmax(${w}px, 1fr)`).join(" ");
+        continue;
+      }
+      const widest = Math.max(...need);
+      let rows = 2;
+      const cols = () => Math.ceil(n / rows);
+      while (rows < n && cols() * widest + (cols() - 1) * gap > width) rows++;
+      el.style.gridTemplateColumns = `repeat(${cols()}, minmax(0, 1fr))`;
+    }
+  }
+
+  _bindStats() {
+    this._roStats?.disconnect();
+    const els = [...this.shadowRoot.querySelectorAll(".stats.fit")];
+    if (!els.length) return;
+    this._fitStats();
+    let last = 0;
+    this._roStats = new ResizeObserver(() => { const w = els[0].getBoundingClientRect().width; if (Math.abs(w - last) > 0.5) { last = w; this._fitStats(); } });
+    els.forEach((el) => this._roStats.observe(el));
+  }
+
   _bindBoiler() {
     this._ro?.disconnect();
     const flows = [...this.shadowRoot.querySelectorAll(".bflow")];
@@ -1305,7 +1388,7 @@ class TadoDashPanel extends HTMLElement {
       this._compactChip(),
       this._settingsChip(),
     ].join("")}</div>`;
-    const boiler = this._layout.show.boilerTrvs ? `<div class="grid trvs boilerrow ${this._layout.compact ? "compact" : ""}">${this._boilerCard(all)}</div>` : "";
+    const boiler = this._layout.show.boilerTrvs ? `<div class="grid trvs boilerrow bc${this._layout.boilerCols} ${this._layout.compact ? "compact" : ""}">${this._boilerCard(all)}</div>` : "";
     const zones = f === "heating" ? all.filter((z) => z.heating) : all;
     if (!zones.length) {
       return `${chips}${boiler}<div class="card">${this._empty("radiator-off", "No rooms are heating", "Nothing is calling for heat right now. Select Rooms to see them all.")}</div>`;
@@ -1504,7 +1587,11 @@ class TadoDashPanel extends HTMLElement {
   // One line of status under the chart, always present: the override if there is one,
   // otherwise the schedule block that applies now (or comes next).
   _infoPill(z) {
-    if (z.overlayType) return `<div class="infopill over">${icon("hand-back-right-outline")}Manual override · ${esc(z.overlayType)}</div>`;
+    if (z.overlayType) {
+      // Tado CE uses the Tado app's wording, which is long: "Until you resume schedule", "Until next automatic change".
+      const how = { "Until you resume schedule": "Until resumed", "Until next automatic change": "Until next change" }[z.overlayType] || z.overlayType;
+      return `<div class="infopill over" title="Manual override · ${esc(z.overlayType)}">${icon("hand-back-right-outline")}Manual override · ${esc(how)}</div>`;
+    }
     if (z.off) return `<div class="infopill">${icon("power")}${z.ac ? "Off" : "Heating off"}</div>`;
     const range = (b) => `${hhmm(new Date(b.s))} – ${hhmm(new Date(b.e))}${b.temp != null ? ` · ${f1(b.temp)} °C` : ""}`;
     const now = Date.now();
@@ -1693,7 +1780,8 @@ class TadoDashPanel extends HTMLElement {
     const picker = this._picker(z.id);
     const ranges = [[6, "6 h"], [24, "24 h"], [72, "3 d"], [168, "7 d"]]
       .map(([h, l]) => `<button class="${this._range === h ? "on" : ""}" data-a="range" data-v="${h}">${l}</button>`).join("");
-    if (!d) return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div><div class="card">${this._empty("timer-sand", "Loading history…", "")}</div>`;
+    const tools = `<div class="toolbar">${picker}<div class="seg small">${ranges}</div>${this._settingsChip()}</div>`;
+    if (!d) return `${tools}<div class="card">${this._empty("timer-sand", "Loading history…", "")}</div>`;
 
     const outId = this._hub.ids.outside_temp;
     const panels = [this._tempPanel(z, d)];
@@ -1705,24 +1793,34 @@ class TadoDashPanel extends HTMLElement {
     const legend = [["var(--cold)", "Temperature"], ["var(--ok)", z.pair ? "Heating target" : "Target"], ...(z.pair ? [[COLD, "AC target"]] : []),
       [z.ac ? COLD : HEAT, `${z.ac ? "AC on" : "Heating"} (right scale, %)`], ...(z.pair ? [[COLD, "AC on"]] : []), ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
       .map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
-    return `<div class="toolbar">${picker}<div class="seg small">${ranges}</div></div>
+    return `${tools}
       <div class="card"><h3>History</h3><div class="chart" id="an">${this._chartSVG("an", { hours: this._range, panels })}</div>
         <div class="legend">${legend}</div><p class="hint">Hover or touch the chart to read values.</p></div>
-      <div class="stats big">${stats}</div>`;
+      <div class="stats big fit">${stats}</div>`;
   }
 
-  _stats(z, d) {
-    const t = d[z.ents.temp] || [], tg = d[z.ents.target] || [], pw = d[z.ents.heating || z.ents.ac] || [], hum = d[z.ents.humidity] || [];
-    // tone: the colour that goes with what the figure means (cold, heat, good, warning...)
-    const s = (ic, l, v, tip = "", tone = "") => `<div class="stat${tone ? " tone" : ""}"${tone ? ` style="--tone:${tone}"` : ""}${tip ? ` title="${esc(tip)}"` : ""}>${icon(ic)}<span>${l}</span><b>${v}</b></div>`;
-    let temps = "", humidity = "", heating = "";
-    if (t.length) {
-      const vals = t.map((p) => p[1]);
-      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-      temps = s("thermometer-low", "Lowest", `${f1(Math.min(...vals))} °C`, "", "var(--cold)") + s("thermometer-high", "Highest", `${f1(Math.max(...vals))} °C`, "", "var(--heat)") +
-        s("thermometer", "Average", `${f1(avg)} °C`, "", "var(--accent)");
+  // Every figure the Analytics page can show, in order, whether or not it is reported (v is null when it isn't).
+  // tone is the colour that goes with what the figure means; base is the colour to show for it when there is no figure.
+  _statList(z, d) {
+    const t = d?.[z.ents.temp] || [], tg = d?.[z.ents.target] || [], pw = d?.[z.ents.heating || z.ents.ac] || [], hum = d?.[z.ents.humidity] || [];
+    const out = [];
+    const add = (key, ic, label, v, tip, tone, base) => out.push({ key, ic, label, v, tip, tone: tone || base, base });
+    const vals = t.map((p) => p[1]), have = vals.length > 0;
+    const avg = have ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    add("lowest", "thermometer-low", "Lowest", have ? `${f1(Math.min(...vals))} °C` : null, "", "", "var(--cold)");
+    add("highest", "thermometer-high", "Highest", have ? `${f1(Math.max(...vals))} °C` : null, "", "", "var(--heat)");
+    add("average", "thermometer", "Average", have ? `${f1(avg)} °C` : null, "", "", "var(--accent)");
+    // Coloured by where it falls against the comfortable 40-60% range: dry, comfortable, damp, or very damp.
+    const hv = hum.map((p) => p[1]), hhave = hv.length > 0, havg = hhave ? hv.reduce((a, b) => a + b, 0) / hv.length : null;
+    const htone = (v) => (v < 40 ? "var(--warn)" : v <= HUM_HIGH ? "var(--ok)" : v <= 70 ? "var(--humhi)" : "var(--bad)");
+    const range = "Comfortable range is 40–60%";
+    add("hum_low", "water-percent", "Lowest humidity", hhave ? `${f0(Math.min(...hv))}%` : null, range, hhave ? htone(Math.min(...hv)) : "", "var(--ok)");
+    add("hum_high", "water-percent", "Highest humidity", hhave ? `${f0(Math.max(...hv))}%` : null, range, hhave ? htone(Math.max(...hv)) : "", "var(--ok)");
+    add("hum_avg", "water-percent", "Average humidity", hhave ? `${f0(havg)}%` : null, range, hhave ? htone(havg) : "", "var(--ok)");
+    let heatMs = 0, within = null;
+    if (have) {
       const from = Date.now() - this._range * HOUR;
-      let heatMs = 0, onTarget = 0, covered = 0;
+      let onTarget = 0, covered = 0;
       for (let i = 0; i < pw.length; i++) {
         const end = i + 1 < pw.length ? pw[i + 1][0] : Date.now();
         if (pw[i][1] > 0) heatMs += end - Math.max(pw[i][0], from);
@@ -1735,30 +1833,40 @@ class TadoDashPanel extends HTMLElement {
         covered += span;
         if (Math.abs(t[i][1] - target) <= 0.5) onTarget += span;
       }
-      const within = covered ? Math.round((onTarget / covered) * 100) : null;
-      heating = s("fire", "Heating on", `${(heatMs / HOUR).toFixed(1)} h`, "", "var(--heat)") +
-        (within != null ? s("bullseye-arrow", "Within 0.5° of target", `${within}%`, "", within >= 70 ? "var(--ok)" : within >= 40 ? "var(--warn)" : "var(--bad)") : "");
+      within = covered ? Math.round((onTarget / covered) * 100) : null;
     }
-    if (hum.length) {
-      // Coloured by where it falls against the comfortable 40-60% range: dry, comfortable, damp, or very damp.
-      const tone = (v) => (v < 40 ? "var(--warn)" : v <= HUM_HIGH ? "var(--ok)" : v <= 70 ? "var(--humhi)" : "var(--bad)");
-      const hv = hum.map((p) => p[1]), havg = hv.reduce((a, b) => a + b, 0) / hv.length;
-      const range = "Comfortable range is 40–60%";
-      humidity = s("water-percent", "Lowest humidity", `${f0(Math.min(...hv))}%`, range, tone(Math.min(...hv))) + s("water-percent", "Highest humidity", `${f0(Math.max(...hv))}%`, range, tone(Math.max(...hv))) +
-        s("water-percent", "Average humidity", `${f0(havg)}%`, range, tone(havg));
-    }
+    add("heating_on", "fire", "Heating on", have ? `${(heatMs / HOUR).toFixed(1)} h` : null, "", "", "var(--heat)");
+    add("within", "bullseye-arrow", "Within 0.5° of target", within != null ? `${within}%` : null, "", within != null ? (within >= 70 ? "var(--ok)" : within >= 40 ? "var(--warn)" : "var(--bad)") : "", "var(--ok)");
+    // Tado CE's air and comfort sensors (the same ones as the room page's "Comfort & air"): how it is now, not the charted period.
+    const sv = (k) => this._val(z.ents[k]), nv = (k) => this._n(z.ents[k]);
+    const risk = (v) => ({ low: "var(--ok)", none: "var(--ok)", medium: "var(--warn)", high: "var(--bad)", critical: "var(--bad)" })[String(v).toLowerCase()] || "";
+    const surface = nv("mold_risk_pct"), absHum = nv("absolute_humidity"), dew = nv("dew_point");
+    add("mold_risk", "mushroom-outline", "Mold risk", sv("mold_risk"), "Critical, High, Medium, Low or None, from how close the walls are to the dew point", risk(sv("mold_risk")), "var(--ok)");
+    add("mold_pct", "water-percent", "Mold risk indicator", surface != null ? `${f0(surface)}%` : null, "Relative humidity at the wall surface: mold grows above about 70–80%",
+      surface != null ? (surface < 70 ? "var(--ok)" : surface <= 80 ? "var(--warn)" : "var(--bad)") : "", "var(--ok)");
+    add("comfort", "emoticon-outline", "Comfort level", sv("comfort_level"), "How the room feels, from its temperature and humidity", "var(--accent)", "var(--accent)");
+    add("abs_hum", "water-outline", "Absolute humidity", absHum != null ? `${f1(absHum)} g/m³` : null, "Water in the air, whatever the temperature", "var(--humhi)", "var(--humhi)");
+    add("condensation", "water-alert-outline", "Condensation risk", sv("condensation"), "How likely water is to condense on the walls and windows", risk(sv("condensation")), "var(--ok)");
+    add("dew_point", "water-thermometer-outline", "Dew point", dew != null ? `${f1(dew)} °C` : null, "Surfaces colder than this collect condensation", "var(--humhi)", "var(--humhi)");
     // What Tado CE has learned about this room (the same figures as the Confidence tab). These describe the
     // room as it is now, not the period charted above, and are left out when Tado CE doesn't provide them.
     const m = (k) => this._n(z.ents[k]);
     const signed = (v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)} °C`;
-    const learned = [
-      ["trend-up", "Heating rate", m("heating_rate"), (v) => `${f1(v)} °C/h`, "How fast this room warms while heating", (v) => (v > 0 ? "var(--ok)" : "var(--bad)")],
-      ["timer-sand", "Thermal inertia", m("thermal_inertia"), (v) => `${f0(v)} min`, "Delay before the room responds to heat", () => "var(--wis)"],
-      ["clock-fast", "Preheat time", m("preheat_time"), (v) => `${f0(v)} min`, "Learned lead time for the next target", () => "var(--warn)"],
-      ["calendar-clock", "Schedule deviation", m("schedule_deviation"), signed, "How far the room is from its usual temperature at this time of day",
-        (v) => (v < -0.3 ? "var(--cold)" : v > 0.3 ? "var(--heat)" : "var(--mut)")],
-    ].filter(([, , v]) => v != null).map(([ic, l, v, fmt, tip, tone]) => s(ic, l, fmt(v), tip, tone(v))).join("");
-    return temps + humidity + heating + learned;
+    for (const [key, ic, label, v, fmt, tip, tone, base] of [
+      ["heating_rate", "trend-up", "Heating rate", m("heating_rate"), (x) => `${f1(x)} °C/h`, "How fast this room warms while heating", (x) => (x > 0 ? "var(--ok)" : "var(--bad)"), "var(--ok)"],
+      ["thermal_inertia", "timer-sand", "Thermal inertia", m("thermal_inertia"), (x) => `${f0(x)} min`, "Delay before the room responds to heat", () => "var(--wis)", "var(--wis)"],
+      ["preheat_time", "clock-fast", "Preheat time", m("preheat_time"), (x) => `${f0(x)} min`, "Learned lead time for the next target", () => "var(--warn)", "var(--warn)"],
+      ["schedule_deviation", "calendar-clock", "Schedule deviation", m("schedule_deviation"), signed, "How far the room is from its usual temperature at this time of day",
+        (x) => (x < -0.3 ? "var(--cold)" : x > 0.3 ? "var(--heat)" : "var(--mut)"), "var(--mut)"],
+    ]) add(key, ic, label, v != null ? fmt(v) : null, tip, v != null ? tone(v) : "", base);
+    return out;
+  }
+
+  // The figures shown: the ones reported, minus any hidden in Settings, in the colour chosen there (or the one that fits the value).
+  _stats(z, d) {
+    const cfg = this._layout.statsCfg;
+    return this._statList(z, d).filter((x) => x.v != null && !cfg.hidden.includes(x.key)).map((x) =>
+      `<div class="stat tone" style="--tone:${cfg.colors[x.key] || x.tone}"${x.tip ? ` title="${esc(x.tip)}"` : ""}>${icon(x.ic)}<span>${x.label}</span><b>${x.v}</b></div>`).join("");
   }
 
   // The room pills, in card order. With more than one floor they are split into groups, each led by a
@@ -2188,7 +2296,7 @@ button{font:inherit;color:inherit}
 .stip b{font-size:14px;color:var(--fg);font-weight:500}
 .sc{position:absolute;left:18px;font-size:10px;color:var(--mut);line-height:1;pointer-events:none;background:color-mix(in srgb,var(--card) 70%,transparent);padding:1px 3px;border-radius:3px}.sc.hi{top:2px}.sc.lo{bottom:3px}
 .sx{position:absolute;bottom:2px;transform:translateX(-50%);font-size:9px;line-height:1;color:var(--mut);opacity:.7;pointer-events:none}
-.infopill{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:7px 12px;border-radius:999px;text-align:center;font-size:12px;
+.infopill{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 12px;border-radius:999px;text-align:center;font-size:12px;
   color:var(--fg);background:color-mix(in srgb,var(--mut) 14%,transparent)}
 .infopill .i{color:var(--mut);font-size:13px}
 .infopill.over{color:var(--fg);background:color-mix(in srgb,var(--wis) 22%,transparent)}.infopill.over .i{color:var(--wis)}
@@ -2224,6 +2332,13 @@ button{font:inherit;color:inherit}
 /* ----- boiler card ----- */
 .boilerrow{margin-bottom:22px}
 .boilercard{grid-column:span 2;display:flex;flex-direction:column;gap:8px}
+.boilerrow.bc3>.boilercard{grid-column:span 3}.boilerrow.bc4>.boilercard{grid-column:span 4}
+@container (max-width:941px){.grid:not(.trvs):not(.compact).boilerrow.bc3>.boilercard{grid-column:1/-1}}
+@container (max-width:1269px){.grid:not(.trvs):not(.compact).boilerrow.bc4>.boilercard{grid-column:1/-1}}
+@container (max-width:777px){.grid.trvs:not(.compact).boilerrow.bc3>.boilercard{grid-column:1/-1}}
+@container (max-width:1041px){.grid.trvs:not(.compact).boilerrow.bc4>.boilercard{grid-column:1/-1}}
+@container (max-width:719px){.grid.compact.boilerrow.bc3>.boilercard{grid-column:1/-1}}
+@container (max-width:969px){.grid.compact.boilerrow.bc4>.boilercard{grid-column:1/-1}}
 /* Where only one column fits, the boiler card takes the whole width instead of spilling into a second. */
 .wrap{container-type:inline-size}
 @container (max-width:613px){.grid:not(.trvs):not(.compact)>.boilercard{grid-column:1/-1}}
@@ -2258,11 +2373,15 @@ button{font:inherit;color:inherit}
 .modal{width:min(380px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border-radius:14px;padding:16px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
 .mhead{display:flex;align-items:baseline;gap:10px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
 .mhead .sp{flex:1}.mhead .icon-btn{align-self:center;padding:6px}
-.srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
-.sgroup{margin-top:14px;padding-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}.srow.sub{padding-left:28px}
-.srow.dim{opacity:.45;cursor:default}.srow.dim input{cursor:default}
-.srow input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--go);flex:none;cursor:pointer}
+.srow{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
+.sgroup{margin-top:14px;padding-bottom:2px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}.mcol>.sgroup:first-child{margin-top:0}
+.srow.dim{opacity:.45;cursor:default}.srow.dim .tgl{cursor:default}
 .srow b{display:block;font-weight:500;font-size:14px}.srow small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.tgl{appearance:none;-webkit-appearance:none;width:40px;height:22px;border-radius:999px;background:color-mix(in srgb,var(--mut) 45%,var(--card));position:relative;flex:none;cursor:pointer;margin:0;transition:background .15s}
+.tgl::before{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.tgl:checked{background:var(--heat)}.tgl:checked::before{left:21px}.tgl:focus-visible{outline:2px solid var(--heat);outline-offset:2px}
+.modal.wide{width:min(760px,100%)}.modal .hint{margin:0 0 8px}.mcols{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}.mcol{min-width:0}
+@media (max-width:640px){.mcols{grid-template-columns:1fr}.mcol+.mcol>.sgroup:first-child{margin-top:14px}}
 .mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .trvbody{display:flex;align-items:center;gap:12px}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
@@ -2352,6 +2471,13 @@ button{font:inherit;color:inherit}
 .btn .i{margin-right:7px}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.strow{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:9px 0;border-top:1px solid var(--line)}.strow.dim{opacity:.45}
+.strow .lv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}.strow .sl small{margin-top:0;display:inline}
+.strow .sl{display:flex;gap:12px;align-items:center;justify-content:space-between;flex:1;min-width:0;cursor:pointer}
+.strow .sl b{display:block;font-weight:500;font-size:14px}.strow .sl small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;flex:none}.dot.big{border-color:var(--line)}.dot.on{border-color:var(--fg)}
+.palette{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:2px 0 4px}
+.palette .auto{border:1px solid var(--line);background:none;color:var(--mut);border-radius:999px;font-size:12px;padding:2px 10px;cursor:pointer}.palette .auto.on{color:var(--fg);border-color:var(--fg)}
 .pick{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .chart{position:relative}.chartsvg{width:100%;height:auto;display:block;touch-action:pan-y}
 .grid{}.chartsvg .grid{stroke:var(--line);stroke-width:1}.chartsvg .vgrid{stroke:var(--line);stroke-width:1;opacity:.45}
