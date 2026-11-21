@@ -136,6 +136,7 @@ const FA_ALIAS = {
   "swing-v": "arrows-up-down",
   "swing-h": "arrows-left-right",
   "arrow-right": "arrow-right",
+  "save": "floppy-disk",
 };
 const FA = {
   "arrow-left": [448, "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"],
@@ -171,6 +172,7 @@ const FA = {
   "faucet-drip": [512, "M224 0c17.7 0 32 14.3 32 32l0 12 96-12c17.7 0 32 14.3 32 32s-14.3 32-32 32L256 84l-31-3.9-1-.1-1 .1L192 84 96 96C78.3 96 64 81.7 64 64s14.3-32 32-32l96 12 0-12c0-17.7 14.3-32 32-32zM0 224c0-17.7 14.3-32 32-32l96 0 22.6-22.6c6-6 14.1-9.4 22.6-9.4l18.7 0 0-43.8 32-4 32 4 0 43.8 18.7 0c8.5 0 16.6 3.4 22.6 9.4L320 192l32 0c88.4 0 160 71.6 160 160c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32s-14.3-32-32-32l-36.1 0c-20.2 29-53.9 48-91.9 48s-71.7-19-91.9-48L32 320c-17.7 0-32-14.3-32-32l0-64zM436.8 423.4c1.9-4.5 6.3-7.4 11.2-7.4s9.2 2.9 11.2 7.4l18.2 42.4c1.8 4.1 2.7 8.6 2.7 13.1l0 1.2c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-1.2c0-4.5 .9-8.9 2.7-13.1l18.2-42.4z"],
   "fire": [448, "M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.5 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-4.5-9-16-9.6-22.5-2l-25.2 29.3c-6.6 7.6-18.5 7.4-24.7-.5c-16.5-21-46-58.5-62.8-79.8c-6.3-8-18.3-8.1-24.7-.1c-33.8 42.5-50.8 69.3-50.8 99.4C112 375.4 162.6 416 225.7 416z"],
   "fire-burner": [640, "M345.7 48.3L358 34.5c5.4-6.1 13.3-8.8 20.9-8.9c7.2 0 14.3 2.6 19.9 7.8c19.7 18.3 39.8 43.2 55 70.6C469 131.2 480 162.2 480 192.2C480 280.8 408.7 352 320 352c-89.6 0-160-71.3-160-159.8c0-37.3 16-73.4 36.8-104.5c20.9-31.3 47.5-59 70.9-80.2C273.4 2.3 280.7-.2 288 0c14.1 .3 23.8 11.4 32.7 21.6c0 0 0 0 0 0c2 2.3 4 4.6 6 6.7l19 19.9zM384 240.2c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C293 167.1 256 203.6 256 240.2c0 35.3 28.7 64 64 64s64-28.7 64-64zM32 288c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 64 448 0 0-64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l0-96zM320 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm160-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM192 480a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"],
+  "floppy-disk": [448, "M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm0 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L96 224c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"],
   "gear": [512, "M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"],
   "hand": [512, "M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 272c0 1.5 0 3.1 .1 4.6L67.6 283c-16-15.2-41.3-14.6-56.6 1.4s-14.6 41.3 1.4 56.6L124.8 448c43.1 41.1 100.4 64 160 64l19.2 0c97.2 0 176-78.8 176-176l0-208c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-176c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 176c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208z"],
   "hourglass-half": [384, "M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 256 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32s-14.3-32-32-32L320 0 64 0 32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9L192 301.3l67.9 67.9c4.6 4.6 8.6 9.6 12.1 14.9L112 384z"],
@@ -981,6 +983,7 @@ class TadoDashPanel extends HTMLElement {
     const el = e.target.closest("[data-a]");
     if (!el) return;
     const { a, z, v } = el.dataset;
+    if (a !== "reset-settings") this._resetArm = null; // anything else disarms the reset
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
       case "more-info":
@@ -989,7 +992,7 @@ class TadoDashPanel extends HTMLElement {
       case "floor-mv": this._moveFloor(el.dataset.f, parseInt(v, 10)); break;
       case "compact": this._layout.compact = !this._layout.compact; this._saveLayout(); break;
       case "settings": this._settingsOpen = !this._settingsOpen; break;
-      case "settings-close": this._settingsOpen = false; this._colourOpen = null; break;
+      case "settings-close": this._settingsOpen = false; this._colourOpen = null; this._resetArm = null; break;
       case "opt": {
         const id = el.dataset.id;
         this._selOpt[id] = v;
@@ -1006,6 +1009,9 @@ class TadoDashPanel extends HTMLElement {
       case "hold": if (zone) this._hold(zone, v); return;
       case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
       case "noop": return;
+      case "reset-settings":
+        if (this._resetArm === this._tab) this._resetSettings(); else this._resetArm = this._tab;
+        break;
       case "explain": this._explainOpen = !this._explainOpen; break;
       case "sys-set": {
         const k = el.dataset.k, cur = this._sysLists;
@@ -1044,6 +1050,7 @@ class TadoDashPanel extends HTMLElement {
   _onChange(e) {
     const el = e.target.closest("[data-c]");
     if (!el) return;
+    this._resetArm = null; // a change disarms the reset
     if (el.dataset.c === "pick") { this._sel = el.value; this._render(); return; }
     if (el.dataset.c === "acsel") this._call("climate", `set_${el.dataset.k}`, { entity_id: el.dataset.id, [el.dataset.k]: el.value });
     if (el.dataset.c === "stat" && STAT_KEYS.includes(el.dataset.key)) {
@@ -1252,6 +1259,22 @@ class TadoDashPanel extends HTMLElement {
     return `<div class="mcols"><div class="mcol">${groups.slice(0, 3).map(block).join("")}</div><div class="mcol">${groups.slice(3).map(block).join("")}</div></div>`;
   }
 
+  // Resets this page's settings to what a fresh install has. The first click arms it; a second one does it.
+  _resetButton() {
+    const armed = this._resetArm === this._tab;
+    return `<button class="btn ${armed ? "danger" : "ghost"} reset" data-a="reset-settings" title="Put this page's settings back to how a fresh install has them">${armed ? "Click again to reset" : "Reset to defaults"}</button>`;
+  }
+
+  _resetSettings() {
+    const tab = this._tab, l = this._layout;
+    if (tab === "analytics") { l.statsCfg = { hidden: [], colors: {}, order: [] }; this._colourOpen = null; }
+    else if (tab === "system") l.sys = null;
+    else { l.show = { ...SHOW_DEFAULTS }; l.boilerCols = 2; } // the Rooms and TRV's tabs share these
+    this._resetArm = null;
+    this._saveLayout();
+    this._toast("Settings reset to the defaults");
+  }
+
   _settingsModal() {
     if (this._tab === "system") return this._systemSettings();
     if (this._tab === "analytics") {
@@ -1259,7 +1282,7 @@ class TadoDashPanel extends HTMLElement {
         <div class="mhead"><h3>Settings</h3><small>Analytics tab</small><span class="sp"></span>
           <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
         <p class="hint">Choose which figures show under the chart, and their colour.</p>
-        ${this._statsSettings()}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+        ${this._statsSettings()}<div class="mfoot">${this._resetButton()}<button class="btn" data-a="settings-close">${icon("save")}Done</button></div></div></div>`;
     }
     const s = this._layout.show, onTrvs = this._tab === "trvs";
     const row = (key, label, note, off = false) => `<label class="srow ${off ? "dim" : ""}"><span><b>${label}</b><small>${note}</small></span>
@@ -1276,7 +1299,7 @@ class TadoDashPanel extends HTMLElement {
     return `<div class="modal-back"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="mhead"><h3>Settings</h3><small>${onTrvs ? "TRV's tab" : "Rooms tab"}</small><span class="sp"></span>
         <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
-      ${rows}<div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+      ${rows}<div class="mfoot">${this._resetButton()}<button class="btn" data-a="settings-close">${icon("save")}Done</button></div></div></div>`;
   }
 
   // The entity behind the boiler temperature, for the standard Home Assistant history dialog.
@@ -2180,10 +2203,10 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
       return `<div class="card lrow" data-a="open" data-z="${z.id}">
         ${ringSVG(c, col, 56)}
         <div class="lname"><b>${esc(z.name)}</b><small>${z.confAttrs.cycle_count != null ? `${z.confAttrs.cycle_count} cycles` : "no cycle data"}</small></div>
-        <div class="lm"><span>Heating rate</span><b>${m("heating_rate", " °C/h")}</b></div>
+        <div class="lms"><div class="lm"><span>Heating rate</span><b>${m("heating_rate", " °C/h")}</b></div>
         <div class="lm"><span>Inertia</span><b>${m("thermal_inertia", " min", 0)}</b></div>
         <div class="lm"><span>Preheat</span><b>${m("preheat_time", " min", 0)}</b></div>
-        <div class="lm"><span>Schedule dev.</span><b>${m("schedule_deviation", " °C")}</b></div></div>`;
+        <div class="lm"><span>Schedule dev.</span><b>${m("schedule_deviation", " °C")}</b></div></div></div>`;
     }).join("");
     const lists = [["actions_needed", "Actions needed", "clipboard-check-outline", "warn"], ["persistent_insights", "Ongoing", "history", "cold"], ["cross_zone_insights", "Whole house", "home-analytics", "go"]]
       .filter(([k]) => Array.isArray(ha[k]) && ha[k].length)
@@ -2296,7 +2319,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
         <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
       <p class="hint">Choose where each figure shows: in the Tado cloud group, the Tado CE group, or off (then it is in the lists at the bottom of the page). Drag the boxes on the page to reorder them.</p>
       <div class="mcols"><div class="mcol">${order.slice(0, half).map(row).join("")}</div><div class="mcol">${order.slice(half).map(row).join("")}</div></div>
-      <div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+      <div class="mfoot">${this._resetButton()}<button class="btn" data-a="settings-close">${icon("save")}Done</button></div></div></div>`;
   }
 
   _viewSystem() {
@@ -2333,7 +2356,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
           ${state("api_reset") ? `<small>Resets ${ago(state("api_reset"))}</small>` : ""}</div>` : ""}
         ${cloud.html}</div>
       ${second.html ? `<div class="card"><h3>Tado CE</h3>${second.html}</div>` : ""}
-      <div class="card"><h3>Controls</h3>${resume}${selects}${quota}</div>
+      <div class="card"><h3>Controls</h3><div class="ctrls">${resume}${selects}${quota}</div></div>
       ${this._hubEntities(ids, known)}
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
   }
@@ -2549,7 +2572,7 @@ button{font:inherit;color:inherit}
 .tgl:checked{background:var(--heat)}.tgl:checked::before{left:21px}.tgl:focus-visible{outline:2px solid var(--heat);outline-offset:2px}
 .modal.wide{width:min(760px,100%)}.modal .hint{margin:0 0 8px}.mcols{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}.mcol{min-width:0}
 @media (max-width:640px){.mcols{grid-template-columns:1fr}.mcol+.mcol>.sgroup:first-child{margin-top:14px}}
-.mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}.mfoot .reset{margin-right:auto}.btn.danger{background:var(--bad);color:#fff}
 .trvbody{display:flex;align-items:center;gap:12px}
 .compact .trv{width:58px;height:77px;flex:none}.compact .trvlbl{display:none}
 .trvlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -2567,8 +2590,20 @@ button{font:inherit;color:inherit}
 .insrow .i{margin-top:2px;color:var(--mut)}.insrow.warn .i{color:var(--warn)}.insrow.cold .i{color:var(--cold)}.insrow.go .i{color:var(--go)}
 .seg.hold{flex-wrap:wrap;margin-top:4px}.seg.hold button{flex:1 1 30%;min-width:0;white-space:normal;min-height:36px;padding:8px 10px;font-size:13px}
 .seg.hold button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
-.optrow{padding:10px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px;margin-bottom:2px}
-.optrow .seg button{min-height:36px}.optrow .seg button:hover:not(.on){background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
+.optrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px}
+.optrow .seg{margin-top:0;padding:2px;border-radius:999px;flex:none}
+.optrow .seg button{min-height:0;flex:none;padding:5px 12px;line-height:17px;border-radius:999px;white-space:nowrap}.optrow .seg button.on{background:var(--heat)}
+.optrow .seg button:hover:not(.on){background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
+/* The controls on the System page: two columns, each row a name with its choices beside it. */
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+.ctrls>.line,.ctrls>.optrow{border-top:1px solid var(--line)}.ctrls>:nth-child(-n+2){border-top:0}
+@container (max-width:700px){.ctrls{grid-template-columns:1fr}.ctrls>:nth-child(2){border-top:1px solid var(--line)}}
+.ctrls>.line{flex-wrap:wrap}.ctrls>.line .tx{flex:1 1 220px;min-width:0}
+@container (max-width:520px){
+  .ctrls .optrow{flex-direction:column;align-items:stretch;gap:6px}.ctrls .optrow .seg{width:100%}.ctrls .optrow .seg button{flex:1}
+  .ctrls .optrow .seg button{padding:5px 6px;font-size:12px;min-width:0}
+  .ctrls .btns{flex:1 1 100%;min-width:0}.ctrls .btns .btn{flex:1;min-width:0;padding-left:8px;padding-right:8px}
+}
 .chips.pickers{margin-bottom:0}.chips.pickers.grouped{gap:10px 22px}.pgroup{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .floorico{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;flex:none;color:var(--mut);background:color-mix(in srgb,var(--mut) 15%,transparent)}
 .floorico .i{font-size:15px}
@@ -2601,7 +2636,8 @@ button{font:inherit;color:inherit}
 .seg.icons .lb{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .2s,opacity .2s,margin .2s}
 .seg.icons button:hover .lb,.seg.icons button.on .lb{max-width:80px;opacity:1;margin-left:6px}
 .seg.icons button:not(.on):hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}
-.seg.small button{padding:6px 12px;white-space:nowrap}
+.seg.small{padding:2px;margin-top:0;border-radius:999px}.seg.small button{padding:5px 12px;line-height:17px;border-radius:999px;white-space:nowrap}
+.seg.small button.on{background:var(--heat)}
 .cols{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:16px;align-items:start}
 .hero .bigtemp{font-size:72px;font-weight:300;line-height:1.1;margin:8px 0 0}.bigtemp small{font-size:26px;color:var(--mut);vertical-align:top}
 .hero .spark{height:70px}
@@ -2631,9 +2667,9 @@ button{font:inherit;color:inherit}
 .val{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--mut)}.val.bad{color:var(--bad)}
 .sw{width:42px;height:24px;border-radius:12px;border:0;background:var(--mut);position:relative;cursor:pointer;flex:none;opacity:.7}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
-.sw.on{background:var(--go);opacity:1}.sw.on::after{left:21px}
-.btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{background:var(--go);color:#fff;border-radius:10px;padding:9px 16px}.btn:hover{filter:brightness(1.1)}
-.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn.ghost{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.sw.on{background:var(--heat);opacity:1}.sw.on::after{left:21px}
+.btn,.link{background:none;border:0;color:var(--accent);cursor:pointer;font-weight:500;font-size:14px}.btn{background:var(--heat);color:#fff;border-radius:10px;padding:9px 16px}.btn:hover{filter:brightness(1.1)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn.ghost{background:color-mix(in srgb,var(--heat) 16%,transparent);color:var(--heat)}
 .btn.idle,.btn:disabled{background:var(--chip,rgba(128,128,128,.18));color:var(--mut);cursor:default;filter:none}
 .btn .i{margin-right:7px}
 .link{padding:0;font-size:13px}
@@ -2702,11 +2738,19 @@ button{font:inherit;color:inherit}
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:6px}
 .lrow{display:grid;grid-template-columns:56px 1.3fr repeat(4,1fr);gap:10px;align-items:center;margin:0;cursor:pointer;padding:12px}.lrow:hover{border-color:var(--mut)}
 .lname small,.lm span{display:block;font-size:11px;color:var(--mut)}.lm b{font-size:13px;font-weight:500}
+.lms{display:contents}
+/* On a narrow page the card is the ring and name on top, then the four figures in a two by two block under them. */
+@container (max-width:560px){
+  .lrow{grid-template-columns:56px minmax(0,1fr);gap:10px 12px}
+  .lms{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px}
+  .lm{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 10px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+  .lm span{white-space:nowrap}.lm b{white-space:nowrap}
+}
 .sect{font-size:18px;font-weight:400;margin:22px 0 12px}.sumtxt{margin:0;font-size:14px;line-height:1.5}
 .meter{margin-bottom:14px}.mhead{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
 .bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--mut) 20%,transparent);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}
 .meter small{color:var(--mut);font-size:12px}
-@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}.lgrid{grid-template-columns:1fr}.lrow{grid-template-columns:56px 1fr 1fr}.lrow .lname{grid-column:2/4}.two{grid-template-columns:1fr}.temp{font-size:40px}}
+@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}.lgrid{grid-template-columns:1fr}.two{grid-template-columns:1fr}.temp{font-size:40px}}
 `;
 
 customElements.define("tado-dash-panel", TadoDashPanel);
