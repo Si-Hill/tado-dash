@@ -13,6 +13,7 @@ from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import floor_registry as fr
+from homeassistant.loader import IntegrationNotFound, async_get_integration
 
 from .const import TADO_CE_DOMAIN
 from .mapping import build_map
@@ -33,8 +34,8 @@ def async_register(hass: HomeAssistant) -> None:
 
 
 @websocket_api.websocket_command({vol.Required("type"): "tado_dash/map"})
-@callback
-def ws_map(
+@websocket_api.async_response
+async def ws_map(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
     """Return which Tado CE entities belong to which room, and which floor that is on."""
@@ -54,6 +55,11 @@ def ws_map(
         entries.append(_Entry(entry.entity_id, entry.unique_id, entry.device_id, area_id))
 
     result = build_map(entries)
+    # Which Tado CE is installed, so the panel can show it and adapt to it.
+    try:
+        result["tado_ce_version"] = str((await async_get_integration(hass, TADO_CE_DOMAIN)).version or "")
+    except IntegrationNotFound:
+        result["tado_ce_version"] = ""
     result["floors"] = [
         {"id": floor.floor_id, "name": floor.name, "level": floor.level}
         for floor in floor_reg.async_list_floors()

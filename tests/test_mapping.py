@@ -98,3 +98,23 @@ def test_room_area_comes_from_the_main_entity_only() -> None:
 
 def test_no_entries_gives_no_homes() -> None:
     assert build_map([]) == {"homes": []}
+
+
+def test_tado_ce_5_hub_ids_and_renames() -> None:
+    """Tado CE 5 re-keys some hub entities (the entity IDs stay) and drops the window-predicted sensor."""
+    v5 = [
+        entry("climate.lounge_2", f"tado_ce_{HOME}_zone_9_climate", "dev-lounge"),
+        entry("binary_sensor.lounge_window", f"tado_ce_{HOME}_zone_9_open_window", "dev-lounge"),
+        entry("button.tado_ce_hub_refresh_ac_capabilities", f"tado_ce_{HOME}_refresh_zone_capabilities", "dev-hub"),
+        entry("sensor.tado_ce_hub_data_age", f"tado_ce_{HOME}_data_age", "dev-hub"),
+        entry("sensor.boiler_flow", f"tado_ce_{HOME}_boiler_flow_temp", "dev-hub"),
+        entry("sensor.bridge_out", f"tado_ce_{HOME}_boiler_output_temperature", "dev-bridge"),
+        entry("sensor.bridge_caps", f"tado_ce_{HOME}_bridge_capabilities", "dev-bridge"),
+    ]
+    (home,) = build_map(v5)["homes"]
+    assert home["zones"]["9"]["entities"]["open_window"] == "binary_sensor.lounge_window"
+    assert "window_predicted" not in home["zones"]["9"]["entities"]
+    assert home["hub"]["refresh_zone_capabilities"] == "button.tado_ce_hub_refresh_ac_capabilities"
+    assert home["hub"]["data_age"] == "sensor.tado_ce_hub_data_age"
+    assert home["hub"]["boiler_output_temperature"] == "sensor.bridge_out"
+    assert home["hub"]["bridge_capabilities"] == "sensor.bridge_caps"

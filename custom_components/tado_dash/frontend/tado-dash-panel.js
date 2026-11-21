@@ -19,7 +19,8 @@ const SELF = document.currentScript?.src || "";
 const BASE = SELF ? SELF.replace(/[^/?]*(\?.*)?$/, "") : window.TADO_DASH_BASE || "/tado_dash/";
 const VERSION_Q = SELF.includes("?") ? SELF.slice(SELF.indexOf("?")) : "";
 const OPT_MS = 90000; // how long to show a requested change while waiting for Tado CE to confirm it
-const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true }; // what the Rooms / TRV's tabs show
+const TABS = ["rooms", "trvs", "ac", "analytics", "schedules", "confidence", "system"];
+const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true, boilerTemp: true, boilerTarget: true }; // what the Rooms / TRV's tabs show
 const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
@@ -108,9 +109,11 @@ const FA_ALIAS = {
   "fan": "fan",
   "swing-v": "arrows-up-down",
   "swing-h": "arrows-left-right",
+  "arrow-right": "arrow-right",
 };
 const FA = {
   "arrow-left": [448, "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"],
+  "arrow-right": [448, "M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"],
   "arrows-left-right": [512, "M406.6 374.6l96-96c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224l-293.5 0 41.4-41.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288l293.5 0-41.4 41.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"],
   "arrows-rotate": [512, "M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"],
   "arrows-up-down": [320, "M182.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L128 109.3l0 293.5L86.6 361.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 402.7l0-293.5 41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z"],
@@ -431,6 +434,7 @@ class TadoDashPanel extends HTMLElement {
     this._pollOpen = false;
     this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
     this._drag = null;
+    this._onPopState = (e) => this._onPop(e);
     this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
     this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
     this.shadowRoot.addEventListener("dragstart", (e) => this._onDragStart(e));
@@ -578,10 +582,12 @@ class TadoDashPanel extends HTMLElement {
   connectedCallback() {
     this._timer = setInterval(() => this._refreshHistory(), 5 * MIN);
     window.addEventListener("keydown", this._onKey);
+    window.addEventListener("popstate", this._onPopState);
   }
   disconnectedCallback() {
     clearInterval(this._timer);
     window.removeEventListener("keydown", this._onKey);
+    window.removeEventListener("popstate", this._onPopState);
     this._ro?.disconnect();
   }
 
@@ -595,11 +601,16 @@ class TadoDashPanel extends HTMLElement {
     const home = this._map?.homes?.[0];
     this._home = home || null;
     if (home) await this._loadLayout();
+    try { history.replaceState({ ...history.state, tadoDash: { tab: this._tab, zone: this._zone } }, "", location.href); } catch (e) { /* not allowed here */ }
     this._render();
     if (home) this._refreshHistory();
   }
 
   /* ----- model ----- */
+
+  // The installed Tado CE version ("4.6.0", "5.0.0-beta.1"), and its major number for anything that differs between them.
+  get _ceVersion() { return this._map?.tado_ce_version || ""; }
+  get _ceMajor() { return parseInt(this._ceVersion, 10) || 0; }
 
   _st(id) { return id ? this._hass.states[id] : undefined; }
   _val(id) { const s = this._st(id); return s && !["unknown", "unavailable"].includes(s.state) ? s.state : null; }
@@ -760,6 +771,25 @@ class TadoDashPanel extends HTMLElement {
     this._render();
   }
 
+  /* ----- the browser's Back button: steps between Tado Dash's own tabs and rooms ----- */
+
+  // Each change of tab or room adds a history entry (the address stays the same), so Back returns to the page
+  // you were on in Tado Dash instead of leaving it.
+  _pushNav() {
+    const cur = { tab: this._tab, zone: this._zone }, prev = history.state?.tadoDash;
+    if (prev && prev.tab === cur.tab && prev.zone === cur.zone) return;
+    try { history.pushState({ ...history.state, tadoDash: cur }, "", location.href); } catch (e) { /* not allowed here */ }
+  }
+
+  _onPop(e) {
+    const s = e.state?.tadoDash;
+    if (!s) return; // some other page's entry: Home Assistant handles it
+    this._tab = TABS.includes(s.tab) ? s.tab : "rooms";
+    this._zone = typeof s.zone === "string" ? s.zone : null;
+    this._settingsOpen = this._pollOpen = false;
+    this._render();
+  }
+
   /* ----- actions ----- */
 
   // Resolves true if the service call worked, false (after a notification) if not.
@@ -887,6 +917,7 @@ class TadoDashPanel extends HTMLElement {
       case "tado-refresh-one": if (zone) this._refreshFromTado([zone]); return;
       default: return;
     }
+    this._pushNav();
     this._render();
   }
 
@@ -946,6 +977,7 @@ class TadoDashPanel extends HTMLElement {
             : this._narrow ? `<button class="icon-btn" data-a="menu" title="Menu">${icon("menu")}</button>` : ""}
           ${inRoom ? `<h1>${esc(title)}</h1>` : `<img class="brand" alt="Tado Dash" src="${BASE}brand/${this.getAttribute("data-theme") === "dark" ? "dark_logo" : "logo"}.png${VERSION_Q}"
             onerror="this.outerHTML='<h1>Tado Dash</h1>'">`}
+          ${inRoom || !this._ceVersion ? "" : `<span class="ceversion" title="The Tado CE version this Home Assistant is running">Tado CE v${esc(this._ceVersion)}</span>`}
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
         <div class="content"><div class="wrap">${body}</div></div>
@@ -1076,12 +1108,16 @@ class TadoDashPanel extends HTMLElement {
 
   _settingsModal() {
     const s = this._layout.show, onTrvs = this._tab === "trvs";
-    const row = (key, label, note) => `<label class="srow"><input type="checkbox" data-c="setting" data-key="${key}" ${s[key] ? "checked" : ""}>
+    const row = (key, label, note, off = false, sub = false) => `<label class="srow ${off ? "dim" : ""} ${sub ? "sub" : ""}"><input type="checkbox" data-c="setting" data-key="${key}" ${s[key] ? "checked" : ""} ${off ? "disabled" : ""}>
       <span><b>${label}</b><small>${note}</small></span></label>`;
+    const boiler = onTrvs ? "boilerTrvs" : "boilerRooms";
+    const group = (title, body) => `<div class="sgroup">${title}</div>${body}`;
+    const temps = row("boilerTemp", "Room temperatures", "Each room's current temperature on its chip.", !s[boiler], true) +
+      row("boilerTarget", "Target temperatures", "Each room's target temperature on its chip.", !s[boiler], true);
     const rows = onTrvs
-      ? row("boilerTrvs", "Show the boiler card", "The boiler with a line to each room that has a valve.")
-      : row("hotWater", "Show the hot water card", "The hot water cylinder, if Tado CE has one.") +
-        row("boilerRooms", "Show the boiler card", "The boiler with a line to each heating room.");
+      ? group("Boiler card", row("boilerTrvs", "Show the boiler card", "The boiler with a line to each room that has a valve.") + temps)
+      : group("Hot water", row("hotWater", "Show the hot water card", "The hot water cylinder, if Tado CE has one.")) +
+        group("Boiler card", row("boilerRooms", "Show the boiler card", "The boiler with a line to each heating room.") + temps);
     return `<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="mhead"><h3>Settings</h3><small>${onTrvs ? "TRV's tab" : "Rooms tab"}</small><span class="sp"></span>
         <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
@@ -1103,8 +1139,10 @@ class TadoDashPanel extends HTMLElement {
     const groups = this._groups(rooms), n = groups.length, split = n >= 2 ? Math.ceil(n / 2) : 0;
     const node = (z, side) => {
       const on = z.heating && !z.off, pct = on ? Math.round(z.power ?? 40) : 0;
-      return `<span class="bnode ${on ? "on" : ""}" data-a="open" data-z="${z.id}" data-side="${side}" data-pct="${pct}"
-        title="${esc(z.name)}: ${on ? `calling for heat, valve ${pct}% open` : "not calling for heat"}">${esc(z.name)}${on ? `<small>${pct}%</small>` : ""}</span>`;
+      const sh = this._layout.show, nowT = sh.boilerTemp && z.temp != null ? `${f1(z.temp)}°` : "", goalT = sh.boilerTarget && z.shownTarget != null ? `${f1(z.shownTarget)}°` : "";
+      const temps = nowT || goalT ? `<span class="bt">${[nowT, goalT].filter(Boolean).join(icon("arrow-right"))}</span>` : "";
+      return `<span class="bnode ${on ? "on" : ""} ${temps ? "bx" : ""}" data-a="open" data-z="${z.id}" data-side="${side}" data-pct="${pct}"
+        title="${esc(z.name)}: ${z.temp != null ? `${f1(z.temp)} °C, ` : ""}${z.shownTarget != null ? `target ${f1(z.shownTarget)} °C, ` : ""}${on ? `calling for heat, valve ${pct}% open` : "not calling for heat"}"><span class="bl">${esc(z.name)}${on ? `<small>${pct}%</small>` : ""}</span>${temps}</span>`;
     };
     // The floor name goes on the far side of its rooms from the boiler, so no wire runs through it.
     const side = (gs, name) => `<div class="bside" data-side="${name}">${gs.map((g) => {
@@ -2051,6 +2089,7 @@ const STYLE = `
 *{box-sizing:border-box}
 .page{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
+.ceversion{margin-left:auto;font-size:12px;color:var(--mut);padding:3px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
 h1{font-size:20px;font-weight:400;margin:0}
 .brand{height:40px;width:auto;display:block}
 nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
@@ -2177,7 +2216,7 @@ button{font:inherit;color:inherit}
 .bnodes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .bnode{display:inline-flex;align-items:baseline;justify-content:center;box-sizing:border-box;min-width:var(--bw,0);gap:5px;padding:5px 11px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--fg);
   background:color-mix(in srgb,var(--mut) 16%,var(--card))}
-.bnode small{font-size:11px;color:var(--mut)}
+.bnode small{font-size:inherit;color:var(--mut)}.bnode .bl{display:inline-flex;align-items:baseline;gap:5px}.bnode.bx{flex-direction:column;align-items:center;gap:1px;padding:5px 11px 6px;border-radius:18px}.bnode .bt{font-size:12px;color:var(--mut);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}.bnode .bt .i{font-size:9px}.bnode.on .bt{color:var(--fg);opacity:.9}
 .bnode.on{background:color-mix(in srgb,var(--heat) 32%,var(--card))}.bnode.on small{color:var(--fg)}
 .bimg{display:flex;justify-content:center;position:relative;z-index:1}
 .boiler{width:104px;height:104px;display:block}.bdisp{font-size:17px;font-weight:500;fill:var(--fg)}
@@ -2198,6 +2237,8 @@ button{font:inherit;color:inherit}
 .mhead{display:flex;align-items:baseline;gap:10px}.mhead h3{margin:0;font-size:17px;font-weight:500}.mhead small{color:var(--mut);font-size:12px}
 .mhead .sp{flex:1}.mhead .icon-btn{align-self:center;padding:6px}
 .srow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
+.sgroup{margin-top:14px;padding-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}.srow.sub{padding-left:28px}
+.srow.dim{opacity:.45;cursor:default}.srow.dim input{cursor:default}
 .srow input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--go);flex:none;cursor:pointer}
 .srow b{display:block;font-weight:500;font-size:14px}.srow small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
 .mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}

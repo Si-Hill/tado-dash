@@ -114,7 +114,9 @@ async def test_ws_map_returns_rooms(hass: HomeAssistant) -> None:
             sent["id"], sent["result"] = msg_id, result
 
     ws_map(hass, Conn(), {"id": 7, "type": "tado_dash/map"})
+    await hass.async_block_till_done()
     assert sent["id"] == 7
+    assert "tado_ce_version" in sent["result"]  # empty here: Tado CE isn't installed in the test setup
     (home,) = sent["result"]["homes"]
     assert home["zones"]["9"]["entities"]["climate"] == "climate.lounge_2"
     assert home["zones"]["9"]["area"] == area.id
