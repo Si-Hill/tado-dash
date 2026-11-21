@@ -26,6 +26,27 @@ const SHOW_DEFAULTS = { hotWater: true, boilerRooms: true, boilerTrvs: true, boi
 const STAT_COLORS = [["Blue", "var(--cold)"], ["Orange", "var(--heat)"], ["Teal", "var(--accent)"], ["Green", "var(--ok)"], ["Amber", "var(--warn)"],
   ["Red", "var(--bad)"], ["Purple", "var(--wis)"], ["Pale blue", "var(--humhi)"], ["Grey", "var(--mut)"]];
 const STAT_KEYS = ["lowest", "highest", "average", "hum_low", "hum_high", "hum_avg", "heating_on", "within", "mold_risk", "mold_pct", "comfort", "abs_hum", "condensation", "dew_point", "heating_rate", "thermal_inertia", "preheat_time", "schedule_deviation"];
+// The System page's tiles: these hub entities are controls or the API meter, not tiles. Every other sensor can be a tile.
+const SYS_CONTROLS = ["api_usage", "api_limit", "api_reset", "resume_all", "presence_mode", "overlay_mode", "overlay_timer", "quota_reserve_enabled"];
+// Where the tiles start out: the Tado cloud group and the second one (Settings changes both, and their order).
+const SYS_DEFAULTS = {
+  cloud: ["bridge_connected", "token_status", "homekit_connected", "api_status", "home", "polling_interval", "last_sync", "next_sync", "data_age"],
+  second: ["boiler_flow_temp", "boiler_output_temperature", "wc_target_flow_temp", "outside_temp", "home_insights"],
+};
+const SYS_NAMES = { boiler_flow_temp: ["Boiler flow", "fire-burner", "°C"], boiler_output_temperature: ["Boiler output", "fire-burner", "°C"], wc_target_flow_temp: ["Weather comp. target", "fire-burner", "°C"],
+  wc_status: ["Weather comp.", "fire-burner"], boiler_wiring_state: ["Boiler wiring", "fire-burner"], outside_temp: ["Outside", "thermometer"], home_insights: ["Home insights", "lightbulb-alert-outline"],
+  zone_count: ["Zones", "home-outline"], call_history: ["API calls", "cloud"], home_id: ["Home ID", "home-outline"], bridge_capabilities: ["Bridge type", "router-wireless"],
+  bridge_schema_version: ["Bridge schema", "router-wireless"], homekit_reads_saved: ["HomeKit reads saved", "apple"], homekit_writes_saved: ["HomeKit writes saved", "apple"],
+  api_breakdown: ["API breakdown", "cloud"], boiler_output_temperature_time: ["Boiler output read", "clock-check-outline"] };
+// The room entity each Analytics figure comes from, for copying its ID.
+const STAT_ENTITY = { lowest: "temp", highest: "temp", average: "temp", hum_low: "humidity", hum_high: "humidity", hum_avg: "humidity", heating_on: "heating", within: "target",
+  mold_risk: "mold_risk", mold_pct: "mold_risk_pct", comfort: "comfort_level", abs_hum: "absolute_humidity", condensation: "condensation", dew_point: "dew_point",
+  heating_rate: "heating_rate", thermal_inertia: "thermal_inertia", preheat_time: "preheat_time", schedule_deviation: "schedule_deviation" };
+// Shorter names for the figure boxes on a narrow page, where a name and its value share one line.
+const STAT_SHORT = { within: "Within 0.5°", abs_hum: "Abs. hum.", schedule_deviation: "Deviation", mold_pct: "Mold indicator", condensation: "Condensation" };
+const SYS_SHORT = { bridge_connected: "Bridge", home: "Geofence", data_age: "Freshness", boiler_output_temperature: "Boiler out", wc_target_flow_temp: "WC target" };
+// A name or value that has a short form: both are in the page and the style picks one by the page's width.
+const both = (long, short) => (short && short !== long ? `<span class="ll">${long}</span><span class="ls">${esc(short)}</span>` : long);
 const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
@@ -434,7 +455,7 @@ class TadoDashPanel extends HTMLElement {
     this._charts = {};
     this._sig = "";
     this._narrow = false;
-    this._layout = { floors: [], rooms: {}, sides: {}, boilerCols: 2, statsCfg: { hidden: [], colors: {} }, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
+    this._layout = { floors: [], rooms: {}, sides: {}, sys: null, boilerCols: 2, statsCfg: { hidden: [], colors: {}, order: [] }, compact: false, show: { ...SHOW_DEFAULTS } }; // user's floor order, room order within each floor, card size, and what to show
     this._settingsOpen = false;
     this._pollOpen = false;
     this._onKey = (e) => { if (e.key === "Escape" && (this._settingsOpen || this._pollOpen)) { this._settingsOpen = this._pollOpen = false; this._render(); } };
@@ -465,9 +486,10 @@ class TadoDashPanel extends HTMLElement {
     for (const k of Object.keys(show)) if (typeof v.show?.[k] === "boolean") show[k] = v.show[k];
     const sides = {};
     for (const [k, side] of Object.entries(v.sides && typeof v.sides === "object" ? v.sides : {})) if (side === "heat" || side === "cool") sides[k] = side;
-    const statsCfg = { hidden: ids(v.statsCfg?.hidden).filter((k) => STAT_KEYS.includes(k)), colors: {} };
+    const statsCfg = { hidden: ids(v.statsCfg?.hidden).filter((k) => STAT_KEYS.includes(k)), colors: {}, order: ids(v.statsCfg?.order).filter((k) => STAT_KEYS.includes(k)) };
     for (const [k, c] of Object.entries(v.statsCfg?.colors && typeof v.statsCfg.colors === "object" ? v.statsCfg.colors : {})) if (STAT_KEYS.includes(k) && STAT_COLORS.some(([, v2]) => v2 === c)) statsCfg.colors[k] = c;
-    this._layout = { floors: ids(v.floors), rooms, sides, boilerCols: [2, 3, 4].includes(v.boilerCols) ? v.boilerCols : 2, statsCfg, compact: v.compact === true, show };
+    const sys = v.sys && typeof v.sys === "object" ? { cloud: ids(v.sys.cloud), second: ids(v.sys.second) } : null;
+    this._layout = { floors: ids(v.floors), rooms, sides, sys, boilerCols: [2, 3, 4].includes(v.boilerCols) ? v.boilerCols : 2, statsCfg, compact: v.compact === true, show };
   }
 
   _saveLayout() {
@@ -532,6 +554,14 @@ class TadoDashPanel extends HTMLElement {
   /* ----- drag a card to reorder it within its own floor ----- */
 
   _onDragStart(e) {
+    const tile = e.target.closest?.(".stat[data-sk]");
+    if (tile) {
+      this._drag = { kind: "tile", el: tile, group: tile.parentElement.dataset.sys };
+      tile.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", tile.dataset.sk);
+      return;
+    }
     const card = e.target.closest?.(".card.room[draggable]");
     if (!card) return;
     this._drag = { el: card, floor: card.dataset.floor };
@@ -543,6 +573,18 @@ class TadoDashPanel extends HTMLElement {
   _onDragOver(e) {
     const d = this._drag;
     if (!d) return;
+    if (d.kind === "tile") { // a System tile: it can be moved within its own group
+      const box = e.target.closest?.(".stats[data-sys]");
+      if (!box || box.dataset.sys !== d.group) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      const over = e.target.closest(".stat[data-sk]");
+      if (!over || over === d.el || over.parentElement !== box) return;
+      const r = over.getBoundingClientRect(), dr = d.el.getBoundingClientRect();
+      const before = Math.abs(r.top - dr.top) < 20 ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
+      box.insertBefore(d.el, before ? over : over.nextSibling);
+      return;
+    }
     const grid = e.target.closest?.(".grid");
     // Only this floor's grid accepts the card, so it can never be dropped on another floor.
     if (!grid || grid.dataset.floor !== d.floor) return;
@@ -559,6 +601,20 @@ class TadoDashPanel extends HTMLElement {
   _onDragEnd() {
     const d = this._drag;
     if (!d) return;
+    if (d.kind === "tile") {
+      this._drag = null;
+      d.el.classList.remove("dragging");
+      const dom = [...d.el.parentElement.querySelectorAll(".stat[data-sk]")].map((t) => t.dataset.sk), domSet = new Set(dom);
+      const full = d.group === "stats" ? this._statOrder() : this._sysLists[d.group]; // tiles with nothing to show keep their place in the list
+      const slots = full.map((k, i) => (domSet.has(k) ? i : -1)).filter((i) => i >= 0);
+      const next = full.slice();
+      slots.forEach((slot, n) => { next[slot] = dom[n]; });
+      if (d.group === "stats") this._layout.statsCfg.order = next;
+      else this._layout.sys = { ...this._sysLists, [d.group]: next };
+      this._saveLayout();
+      this._render();
+      return;
+    }
     this._drag = null;
     d.el.classList.remove("dragging");
     const grid = d.el.closest(".grid");
@@ -577,13 +633,41 @@ class TadoDashPanel extends HTMLElement {
   }
 
   set hass(h) {
-    const first = !this._hass;
-    const theme = h.themes?.darkMode ? "dark" : "light";
-    if (!first && this.getAttribute("data-theme") !== theme) this._sig = null; // the brand logo follows the theme
-    this.setAttribute("data-theme", theme);
+    const prev = this._hass, first = !prev;
     this._hass = h;
+    if (first || h.themes !== prev.themes || h.selectedTheme !== prev.selectedTheme) this._applyTheme();
     if (first) this._init();
     else this._maybeRender();
+  }
+
+  // Is the theme dark? Home Assistant's darkMode flag says whether the profile is in dark mode, but a theme can be dark
+  // without it (a single-mode dark theme), so go by the colour the theme gives the cards, which is what the header sits on.
+  _isDark() {
+    const probe = document.createElement("span");
+    probe.style.cssText = "display:none;background-color:var(--card-background-color,#1c1c1c)";
+    this.shadowRoot.appendChild(probe); // inside the shadow root, where it is rendered and so has a computed colour
+    const bg = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    const m = bg.match(/-?[\d.]+(?:e-?\d+)?/g)?.map(Number);
+    if (m && m.length >= 3 && (m.length < 4 || m[3] > 0.5)) {
+      const scale = bg.startsWith("color(") ? 255 : 1; // rgb() has channels 0 to 255, color(srgb ...) 0 to 1
+      const [r, g, b] = m.slice(0, 3).map((v) => v * scale);
+      return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
+    }
+    return !!this._hass?.themes?.darkMode;
+  }
+
+  _applyTheme() {
+    const set = () => {
+      const theme = this._isDark() ? "dark" : "light";
+      if (this.getAttribute("data-theme") === theme) return false;
+      this.setAttribute("data-theme", theme);
+      this._sig = null; // the brand logo follows the theme
+      return true;
+    };
+    set();
+    // Home Assistant applies a new theme's colours just after it hands over the new hass, so look again once they are in.
+    requestAnimationFrame(() => { if (set()) this._maybeRender(); });
   }
   set narrow(v) { if (this._narrow !== v) { this._narrow = v; if (this._map) this._render(); } }
 
@@ -922,6 +1006,13 @@ class TadoDashPanel extends HTMLElement {
       case "hold": if (zone) this._hold(zone, v); return;
       case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
       case "noop": return;
+      case "explain": this._explainOpen = !this._explainOpen; break;
+      case "sys-set": {
+        const k = el.dataset.k, cur = this._sysLists;
+        const lists = { cloud: cur.cloud.filter((x) => x !== k), second: cur.second.filter((x) => x !== k) }; // a figure is in one place at a time
+        if (v === "cloud" || v === "second") lists[v] = [...lists[v], k]; // it joins the end of that group; dragging sets the order
+        this._layout.sys = lists; this._saveLayout(); break;
+      }
       case "stat-colour": this._colourOpen = this._colourOpen === el.dataset.k ? null : el.dataset.k; break;
       case "stat-colour-set": {
         const k = el.dataset.k, colors = this._layout.statsCfg.colors;
@@ -953,6 +1044,7 @@ class TadoDashPanel extends HTMLElement {
   _onChange(e) {
     const el = e.target.closest("[data-c]");
     if (!el) return;
+    if (el.dataset.c === "pick") { this._sel = el.value; this._render(); return; }
     if (el.dataset.c === "acsel") this._call("climate", `set_${el.dataset.k}`, { entity_id: el.dataset.id, [el.dataset.k]: el.value });
     if (el.dataset.c === "stat" && STAT_KEYS.includes(el.dataset.key)) {
       const hidden = this._layout.statsCfg.hidden, k = el.dataset.key;
@@ -1079,16 +1171,13 @@ class TadoDashPanel extends HTMLElement {
     const alerts = hub.n("home_insights");
     const showHomeChip = (this._map?.homes?.length || 0) > 1;
     const f = this._filter;
-    const chips = [
-      chip("home-outline", "Rooms", zones.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`),
-      chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
-      outside != null ? chip("thermometer", "Outside", `${f1(outside)} °C`) : "",
-      this._boilerChip(),
-      showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
-      alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : "",
-      this._compactChip(),
-      this._settingsChip(),
-    ].join("");
+    const chips = chipBar(
+      chip("home-outline", "Rooms", zones.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`)
+        + chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
+      [outside != null ? chip("thermometer", "Outside", `${f1(outside)} °C`) : "", this._boilerChip(),
+        showHomeChip && hub.get("home") ? chip(away ? "home-export-outline" : "home-account", "Home", away ? "Away" : "Home") : "",
+        alerts ? chip("lightbulb-alert-outline", "Insights", alerts, alerts > 0 ? "warn" : "", `data-a="tab" data-v="confidence"`) : ""].join(""),
+      this._compactChip() + this._settingsChip());
     // In a grid of its own with the same columns as the room cards, spanning two of them.
     const boiler = this._layout.show.boilerRooms ? `<div class="grid boilerrow bc${this._layout.boilerCols} ${this._layout.compact ? "compact" : ""}">${this._boilerCard(zones.filter((z) => z.type === "heating"))}</div>` : "";
     const shown = this._visibleZones();
@@ -1101,12 +1190,12 @@ class TadoDashPanel extends HTMLElement {
           <button class="mv" title="Move this floor down" data-a="floor-mv" data-f="${g.id}" data-v="1" ${i === groups.length - 1 ? "disabled" : ""}>${icon("chevron-down")}</button>` : ""}</div>` : "";
         return `<section class="floor">${head}<div class="grid ${this._layout.compact ? "compact" : ""}" data-floor="${g.id}">${g.zones.map((z) => this._roomCard(z, g.id)).join("")}</div></section>`;
       }).join("");
-    return `<div class="chips">${chips}</div>${boiler}${body}`;
+    return `${chips}${boiler}${body}`;
   }
 
   // Toggles between full and compact cards on the Rooms and TRV tabs (kept with the user's layout).
   _compactChip() {
-    return chip("compact", "Compact", "", `push ${this._layout.compact ? "on" : ""}`, `data-a="compact" title="Smaller cards, so more fit on the screen"`);
+    return chip("compact", "Compact", "", `act ${this._layout.compact ? "on" : ""}`, `data-a="compact" title="Smaller cards, so more fit on the screen"`);
   }
 
   // Is any heating room calling for heat? Inferred from the rooms: Tado CE has no burner or flame
@@ -1118,7 +1207,7 @@ class TadoDashPanel extends HTMLElement {
 
   // The settings pill: opens a small modal with what the current tab can show.
   _settingsChip() {
-    return chip("settings", "Settings", "", this._settingsOpen ? "on" : "", `data-a="settings" title="Choose what this page shows"`);
+    return chip("settings", "Settings", "", `act ${this._settingsOpen ? "on" : ""}`, `data-a="settings" title="Choose what this page shows"`);
   }
 
   // Tado CE owns the polling settings (Settings -> Devices & services -> Tado CE -> Configure -> Advanced
@@ -1164,6 +1253,7 @@ class TadoDashPanel extends HTMLElement {
   }
 
   _settingsModal() {
+    if (this._tab === "system") return this._systemSettings();
     if (this._tab === "analytics") {
       return `<div class="modal-back"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Settings">
         <div class="mhead"><h3>Settings</h3><small>Analytics tab</small><span class="sp"></span>
@@ -1335,7 +1425,8 @@ class TadoDashPanel extends HTMLElement {
       const widest = Math.max(...need);
       let rows = 2;
       const cols = () => Math.ceil(n / rows);
-      while (rows < n && cols() * widest + (cols() - 1) * gap > width) rows++;
+      const minCols = Math.min(n, +el.dataset.mincols || 1); // on a phone, two to a line is better than one
+      while (rows < n && cols() > minCols && cols() * widest + (cols() - 1) * gap > width) rows++;
       el.style.gridTemplateColumns = `repeat(${cols()}, minmax(0, 1fr))`;
     }
   }
@@ -1381,13 +1472,10 @@ class TadoDashPanel extends HTMLElement {
     // The same Rooms / Heating chips (and the same filter) as the Rooms tab, counting rooms with a valve.
     const heating = all.filter((z) => z.heating).length;
     const f = this._filter;
-    const chips = `<div class="chips">${[
-      chip("home-outline", "Rooms", all.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`),
-      chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
-      this._boilerChip(),
-      this._compactChip(),
-      this._settingsChip(),
-    ].join("")}</div>`;
+    const chips = chipBar(
+      chip("home-outline", "Rooms", all.length, f === "all" ? "on" : "", `data-a="filter" data-v="all"`)
+        + chip("fire", "Heating", heating, (heating ? "heat " : "") + (f === "heating" ? "on" : ""), `data-a="filter" data-v="heating"`),
+      this._boilerChip(), this._compactChip() + this._settingsChip());
     const boiler = this._layout.show.boilerTrvs ? `<div class="grid trvs boilerrow bc${this._layout.boilerCols} ${this._layout.compact ? "compact" : ""}">${this._boilerCard(all)}</div>` : "";
     const zones = f === "heating" ? all.filter((z) => z.heating) : all;
     if (!zones.length) {
@@ -1543,11 +1631,7 @@ class TadoDashPanel extends HTMLElement {
     const all = this._zones.filter((z) => z.type === "ac");
     if (!all.length) return `<div class="card">${this._empty("air-conditioner", "No air conditioning found", "Tado Dash shows rooms that Tado CE reports as an air conditioning zone. None were found.")}</div>`;
     const on = all.filter((z) => !z.off && AC_ACTIONS[z.mainState?.attributes?.hvac_action]).length;
-    const chips = `<div class="chips">${[
-      chip("air-conditioner", "Units", all.length),
-      chip("power", "Running", on, on ? "cool" : ""),
-      this._compactChip(),
-    ].join("")}</div>`;
+    const chips = chipBar(chip("air-conditioner", "Units", all.length) + chip("power", "Running", on, on ? "cool" : ""), "", this._compactChip());
     const body = this._groups(all).map((g) => `<section class="floor">
       ${g.titled ? `<div class="floorhead"><h2>${esc(g.name)}</h2><small>${g.zones.length} unit${g.zones.length === 1 ? "" : "s"}</small></div>` : ""}
       <div class="grid trvs ${this._layout.compact ? "compact" : ""}">${g.zones.map((z) => this._acCard(z)).join("")}</div></section>`).join("");
@@ -1794,9 +1878,9 @@ class TadoDashPanel extends HTMLElement {
       [z.ac ? COLD : HEAT, `${z.ac ? "AC on" : "Heating"} (right scale, %)`], ...(z.pair ? [[COLD, "AC on"]] : []), ["var(--out)", "Outside"], ["var(--hum)", "Humidity"]]
       .map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
     return `${tools}
+      ${stats ? `<div class="stats big fit" data-mincols="2" data-sys="stats">${stats}</div>` : ""}
       <div class="card"><h3>History</h3><div class="chart" id="an">${this._chartSVG("an", { hours: this._range, panels })}</div>
-        <div class="legend">${legend}</div><p class="hint">Hover or touch the chart to read values.</p></div>
-      <div class="stats big fit">${stats}</div>`;
+        <div class="legend">${legend}</div><p class="hint">Hover or touch the chart to read values.</p></div>`;
   }
 
   // Every figure the Analytics page can show, in order, whether or not it is reported (v is null when it isn't).
@@ -1863,10 +1947,18 @@ class TadoDashPanel extends HTMLElement {
   }
 
   // The figures shown: the ones reported, minus any hidden in Settings, in the colour chosen there (or the one that fits the value).
+  // Every figure's key in the order the user has dragged them into (the ones never moved follow in the usual order).
+  _statOrder() {
+    const saved = this._layout.statsCfg.order;
+    return [...saved, ...STAT_KEYS.filter((k) => !saved.includes(k))];
+  }
+
+  // Clicking a figure copies the ID of the entity it comes from, like the System page; the figures drag to reorder.
   _stats(z, d) {
-    const cfg = this._layout.statsCfg;
-    return this._statList(z, d).filter((x) => x.v != null && !cfg.hidden.includes(x.key)).map((x) =>
-      `<div class="stat tone" style="--tone:${cfg.colors[x.key] || x.tone}"${x.tip ? ` title="${esc(x.tip)}"` : ""}>${icon(x.ic)}<span>${x.label}</span><b>${x.v}</b></div>`).join("");
+    const cfg = this._layout.statsCfg, order = this._statOrder();
+    const entity = (k) => { const e = STAT_ENTITY[k], id = e === "heating" ? z.ents.heating || z.ents.ac : z.ents[e]; return id || ""; };
+    return this._statList(z, d).filter((x) => x.v != null && !cfg.hidden.includes(x.key)).sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key)).map((x) =>
+      `<div class="stat tone" draggable="true" data-sk="${x.key}" style="--tone:${cfg.colors[x.key] || x.tone}" ${entity(x.key) ? `data-a="copy" data-v="${esc(entity(x.key))}" role="button" tabindex="0"` : ""} title="${esc(x.tip ? x.tip + " " : "")}${entity(x.key) ? "Click to copy the entity ID" : ""}">${icon(x.ic)}<span>${both(x.label, STAT_SHORT[x.key])}</span><b>${x.v}</b></div>`).join("");
   }
 
   // The room pills, in card order. With more than one floor they are split into groups, each led by a
@@ -1875,7 +1967,11 @@ class TadoDashPanel extends HTMLElement {
   _picker(sel) {
     const pill = (z) => `<span class="chip ${z.id === sel ? "on" : ""}" role="button" data-a="pick" data-z="${z.id}">${esc(z.name)}</span>`;
     const groups = this._groups(this._roomZones());
-    if (groups.length < 2) return `<div class="chips pickers">${groups.flatMap((g) => g.zones).map(pill).join("")}</div>`;
+    // On a narrow page the pills give way to a dropdown, with the rooms grouped under their floor.
+    const option = (z) => `<option value="${z.id}" ${z.id === sel ? "selected" : ""}>${esc(z.name)}</option>`;
+    const drop = `<select class="pick pickselect" data-c="pick" aria-label="Room">${groups.map((g) => g.titled && groups.length > 1
+      ? `<optgroup label="${esc(g.name || "Other rooms")}">${g.zones.map(option).join("")}</optgroup>` : g.zones.map(option).join("")).join("")}</select>`;
+    if (groups.length < 2) return `<div class="chips pickers">${groups.flatMap((g) => g.zones).map(pill).join("")}</div>${drop}`;
     const floors = new Map((this._map?.floors || []).map((f) => [f.id, f]));
     const levels = [...new Set(groups.map((g) => floors.get(g.id)?.level).filter((l) => l != null))].sort((a, b) => a - b);
     const marker = (g) => {
@@ -1885,7 +1981,7 @@ class TadoDashPanel extends HTMLElement {
       const badge = levels.length > 2 ? rank : rank === levels.length - 1 ? icon("trend-up") : icon("trend-down");
       return `<span class="floorico" title="${esc(g.name)}">${icon("house")}<span class="fbadge">${badge}</span></span>`;
     };
-    return `<div class="chips pickers grouped">${groups.map((g) => `<div class="pgroup">${marker(g)}${g.zones.map(pill).join("")}</div>`).join("")}</div>`;
+    return `<div class="chips pickers grouped">${groups.map((g) => `<div class="pgroup">${marker(g)}${g.zones.map(pill).join("")}</div>`).join("")}</div>${drop}`;
   }
 
   /* chart builder: returns SVG markup, registers hover metadata */
@@ -2092,11 +2188,12 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const lists = [["actions_needed", "Actions needed", "clipboard-check-outline", "warn"], ["persistent_insights", "Ongoing", "history", "cold"], ["cross_zone_insights", "Whole house", "home-analytics", "go"]]
       .filter(([k]) => Array.isArray(ha[k]) && ha[k].length)
       .map(([k, l, ic, tone]) => `<div class="card"><h3>${icon(ic)} ${l}</h3>${insRows(ha[k], ic, tone)}</div>`).join("");
-    return `<div class="card explain"><h3>How the confidence score works</h3>
-      <p>Tado CE watches every heating cycle in each room: how long the room takes to start responding, and how quickly it then warms. The confidence score says how far those learned numbers can be trusted for preheat estimates.</p>
+    const open = !!this._explainOpen; // collapsed to a heading until you open it
+    return `<div class="card explain entgroup ${open ? "" : "shut"}"><h3 role="button" tabindex="0" data-a="explain" aria-expanded="${open}">How the confidence score works${icon(open ? "chevron-up" : "chevron-down")}</h3>
+      ${open ? `<p>Tado CE watches every heating cycle in each room: how long the room takes to start responding, and how quickly it then warms. The confidence score says how far those learned numbers can be trusted for preheat estimates.</p>
       <div class="two"><div><b>Up to 60% from experience</b><small>10% for each completed heating cycle, reaching the cap at 6 cycles.</small></div>
       <div><b>Up to 40% from consistency</b><small>Awarded when cycles give similar heating-rate and inertia results. Very uneven cycles score nothing here.</small></div></div>
-      <p class="hint">A room stuck at 60% has plenty of cycles but inconsistent ones, often from open doors or windows, a changing outside temperature, or interrupted heating. Tado CE's docs suggest waiting for 70%+ before trusting preheat times.</p></div>
+      <p class="hint">A room stuck at 60% has plenty of cycles but inconsistent ones, often from open doors or windows, a changing outside temperature, or interrupted heating. Tado CE's docs suggest waiting for 70%+ before trusting preheat times.</p>` : ""}</div>
       <div class="lgrid">${rows}</div>
       ${hub.val("home_insights") != null ? `<h2 class="sect">Home insights${ha.top_priority ? ` <span class="pill ${/crit|high/i.test(ha.top_priority) ? "heating" : "preheat"}">${esc(ha.top_priority)}</span>` : ""}</h2>
         ${ha.summary ? `<div class="card"><p class="sumtxt">${esc(ha.summary)}</p></div>` : ""}${lists}` : ""}`;
@@ -2127,21 +2224,86 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
       ${closed.has(name) ? "" : `<div class="ents">${ks.map(row).join("")}</div>`}</div>`).join("");
   }
 
+  get _sysLists() {
+    const sys = this._layout.sys;
+    return { cloud: sys?.cloud || SYS_DEFAULTS.cloud, second: sys?.second || SYS_DEFAULTS.second };
+  }
+
+  // Everything the System page can show as a tile, by hub key: the ones with their own wording, then every other sensor the
+  // hub has. text is null when there is nothing to show (the entity is missing or has no value).
+  _sysTiles() {
+    const h = this._hub, ids = h.ids, state = (k) => h.val(k);
+    const okCls = (v) => (/^(ok|good|valid|on|connected|active|healthy)$/i.test(v) ? "ok" : "bad");
+    const cap = (v) => (v == null ? v : String(v).replace(/^./, (c) => c.toUpperCase()));
+    const bin = (k) => { const x = h.get(k)?.state; return x == null ? null : x === "on" ? "Connected" : "Off"; };
+    const binCls = (k) => { const x = h.get(k)?.state; return x == null ? "" : x === "on" ? "ok" : "bad"; };
+    const when = (k) => { const v = state(k); return v ? ago(v) : null; };
+    const apiStatus = cap(state("api_status")), token = cap(state("token_status"));
+    // A sync that is more than three polling intervals old means Tado CE has stopped reading the cloud.
+    const poll = h.n("polling_interval") || 10;
+    const lastAge = state("last_sync") ? (Date.now() - Date.parse(state("last_sync"))) / 60000 : null;
+    const syncCls = lastAge == null || isNaN(lastAge) ? "" : lastAge <= 3 * poll ? "ok" : "bad";
+    // Tado CE 5's Cloud Data Freshness: how old the room readings it is showing are.
+    const age = h.n("data_age"), fa = h.get("data_age")?.attributes || {};
+    const tiles = new Map();
+    const add = (key, label, ic, text, cls = "", attrs = "", tip = "") => tiles.set(key, { key, label, ic, text, cls, attrs, tip });
+    add("bridge_connected", "Internet bridge", "router-wireless", bin("bridge_connected"), binCls("bridge_connected"));
+    add("token_status", "Token", "key-outline", token, token ? okCls(token) : "");
+    add("homekit_connected", "HomeKit", "apple", bin("homekit_connected"), binCls("homekit_connected"));
+    add("api_status", "API status", "cloud-check-outline", apiStatus, apiStatus ? okCls(apiStatus) : "");
+    add("home", "Geofencing", "home-map-marker", bin("home"), binCls("home"));
+    add("polling_interval", "Polling", "timer-cog-outline", state("polling_interval") ? `${state("polling_interval")} min` : null, "tap", 'data-a="polling" role="button" tabindex="0" title="About polling and how to change it"');
+    add("last_sync", "Last sync", "sync", when("last_sync"), syncCls);
+    add("next_sync", "Next sync", "sync-circle", when("next_sync"));
+    add("data_age", "Data freshness", "history", age == null ? null : age < 1 ? "Just now" : `${f0(age)} min old`, age == null ? "" : age <= 3 * poll ? "ok" : "bad", "",
+      `How old the room readings are.${fa.full_sync_age_minutes != null ? ` The last full sync was ${f0(fa.full_sync_age_minutes)} min ago.` : ""}`);
+    for (const k of Object.keys(ids)) {
+      if (tiles.has(k) || SYS_CONTROLS.includes(k) || !/^(sensor|binary_sensor)\./.test(ids[k])) continue;
+      const st = this._st(ids[k]), raw = state(k);
+      const [name, ic, defUnit] = SYS_NAMES[k] || [niceName(st?.attributes?.friendly_name || k), /^binary_sensor\./.test(ids[k]) ? "power" : "settings"];
+      let text = null;
+      if (raw != null) {
+        const unit = st?.attributes?.unit_of_measurement || defUnit, n = Number(raw);
+        text = /^\d{4}-\d\d-\d\dT/.test(raw) ? ago(raw) : /^binary_sensor\./.test(ids[k]) ? (raw === "on" ? "On" : "Off")
+          : unit && Number.isFinite(n) ? `${Number.isInteger(n) ? n : n.toFixed(1)} ${unit}` : unit ? `${raw} ${unit}` : raw;
+      }
+      add(k, name, ic, text);
+    }
+    return tiles;
+  }
+
+  // One group of tiles in the user's order, leaving out the ones with nothing to show. Each can be dragged within its group.
+  _sysGroup(group, tiles) {
+    const shown = this._sysLists[group].map((k) => tiles.get(k)).filter((t) => t && t.text != null);
+    // Clicking a box copies its entity ID, like the rows in the lists at the bottom (Polling opens its own explanation instead).
+    const act = (t) => t.attrs || `data-a="copy" data-v="${esc(this._hub.ids[t.key] || "")}" role="button" tabindex="0" title="${esc(t.tip ? t.tip + " " : "")}Click to copy the entity ID"`;
+    return { keys: shown.map((t) => t.key), html: shown.length ? `<div class="stats cloud fit" data-mincols="2" data-sys="${group}">${shown.map((t) =>
+      `<div class="stat ${t.cls}" draggable="true" data-sk="${t.key}" ${act(t)}>${icon(t.ic)}<span>${both(esc(t.label), SYS_SHORT[t.key])}</span><b>${both(esc(t.text), /^Connected$/.test(t.text) ? "On" : t.key === "data_age" ? t.text.replace(" old", "") : "")}</b></div>`).join("")}</div>` : "" };
+  }
+
+  // Settings for this page: where each tile shows (Off, the Tado cloud group or the Tado CE group). Off ones are in the lists at the
+  // bottom of the page. This list is always A to Z; the order of the boxes is set by dragging them.
+  _systemSettings() {
+    const tiles = this._sysTiles(), lists = this._sysLists;
+    const order = [...tiles.keys()].sort((a, b) => tiles.get(a).label.localeCompare(tiles.get(b).label)); // A to Z, whatever the order of the boxes
+    const where = (k) => (lists.cloud.includes(k) ? "cloud" : lists.second.includes(k) ? "second" : "off");
+    const three = (k) => `<span class="tri" role="radiogroup" aria-label="${esc(tiles.get(k).label)}">${[["off", "Off"], ["cloud", "Cloud"], ["second", "CE"]].map(([v, l]) =>
+      `<button class="${where(k) === v ? "on" : ""}" role="radio" aria-checked="${where(k) === v}" title="${v === "off" ? "Not a box: listed at the bottom of the page" : v === "cloud" ? "In the Tado cloud group" : "In the Tado CE group"}" data-a="sys-set" data-k="${k}" data-v="${v}">${l}</button>`).join("")}</span>`;
+    const row = (k) => { const t = tiles.get(k); return `<div class="sysrow ${t.text == null ? "dim" : ""}"><span class="lv"><b>${esc(t.label)}</b><small>${t.text == null ? "Not reported" : esc(t.text)}</small></span>${three(k)}</div>`; };
+    const half = Math.ceil(order.length / 2);
+    return `<div class="modal-back"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="mhead"><h3>Settings</h3><small>System tab</small><span class="sp"></span>
+        <button class="icon-btn" data-a="settings-close" title="Close">${icon("close")}</button></div>
+      <p class="hint">Choose where each figure shows: in the Tado cloud group, the Tado CE group, or off (then it is in the lists at the bottom of the page). Drag the boxes on the page to reorder them.</p>
+      <div class="mcols"><div class="mcol">${order.slice(0, half).map(row).join("")}</div><div class="mcol">${order.slice(half).map(row).join("")}</div></div>
+      <div class="mfoot"><button class="btn" data-a="settings-close">Done</button></div></div></div>`;
+  }
+
   _viewSystem() {
     const h = this._hub, ids = h.ids;
     const usage = h.n("api_usage"), limit = h.n("api_limit");
     const pctUsed = usage != null && limit ? Math.min(100, (usage / limit) * 100) : null;
     const state = (k) => h.val(k);
-    const tile = (ic, l, v, cls = "", attrs = "") => v == null ? "" : `<div class="stat ${cls}" ${attrs}>${icon(ic)}<span>${l}</span><b>${esc(v)}</b></div>`;
-    const okCls = (v) => (/^(ok|good|valid|on|connected|active|healthy)$/i.test(v) ? "ok" : "bad");
-    const cap = (v) => (v == null ? v : String(v).replace(/^./, (c) => c.toUpperCase()));
-    const apiStatus = cap(state("api_status")), token = cap(state("token_status"));
-    const bin = (k) => { const s = h.get(k)?.state; return s == null ? null : s === "on" ? "Connected" : "Off"; };
-    const when = (k) => { const v = state(k); return v ? ago(v) : null; };
-    const binCls = (k) => { const s = h.get(k)?.state; return s == null ? "" : s === "on" ? "ok" : "bad"; };
-    // A sync that is more than three polling intervals old means Tado CE has stopped reading the cloud.
-    const lastAge = state("last_sync") ? (Date.now() - Date.parse(state("last_sync"))) / 60000 : null;
-    const syncCls = lastAge == null || isNaN(lastAge) ? "" : lastAge <= 3 * (h.n("polling_interval") || 10) ? "ok" : "bad";
     const selects = ["presence_mode", "overlay_mode", "overlay_timer"].filter((k) => ids[k]).map((k) => {
       const s = h.get(k), opts = s?.attributes?.options || [];
       const label = { presence_mode: "Presence mode", overlay_mode: "Override duration", overlay_timer: "Override timer" }[k];
@@ -2162,17 +2324,15 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override, or fetch the schedules from Tado again</small></div>
       <div class="btns"><button class="btn ghost" data-a="tado-refresh-all" ${this._schedBusy ? "disabled" : ""}>${icon("cloud-arrow")}${this._schedBusy ? "Refreshing…" : "Refresh schedules"}</button>
         <button class="btn ${offSchedule ? "" : "idle"}" data-a="press" data-v="${ids.resume_all}" ${offSchedule ? "" : "disabled"} title="${offSchedule ? "" : "Every room is already following its schedule"}">Resume all</button></div></div>` : "";
-    const bridge = [["boiler_flow_temp", "Boiler flow"], ["wc_target_flow_temp", "Weather comp. target"]]
-      .map(([k, l]) => { const v = h.n(k) ?? (k === "boiler_flow_temp" ? h.n("boiler_output_temperature") : null); return v == null ? "" : tile("fire-burner", l, `${f1(v)} °C`); }).join("");
-    const known = new Set(["api_usage", "api_limit", "api_reset", "api_status", "token_status", "last_sync", "next_sync", "polling_interval", "bridge_connected", "homekit_connected", "home",
-      "resume_all", "presence_mode", "overlay_mode", "overlay_timer", "quota_reserve_enabled"]); // shown in the cards above
-    return `<div class="card"><h3>Tado cloud</h3>
+    const tiles = this._sysTiles(), cloud = this._sysGroup("cloud", tiles), second = this._sysGroup("second", tiles);
+    // What is not shown as a tile is in the lists at the bottom.
+    const known = new Set([...SYS_CONTROLS, ...cloud.keys, ...second.keys]);
+    return `<div class="toolbar end">${this._settingsChip()}</div>
+      <div class="card"><h3>Tado cloud</h3>
         ${pctUsed != null ? `<div class="meter"><div class="mhead"><span>API calls today</span><b>${f0(usage)} / ${f0(limit)}</b></div><div class="bar"><i style="width:${pctUsed}%" class="${pctUsed > 85 ? "bad" : pctUsed > 60 ? "warn" : ""}"></i></div>
           ${state("api_reset") ? `<small>Resets ${ago(state("api_reset"))}</small>` : ""}</div>` : ""}
-        <div class="stats cloud">${tile("router-wireless", "Internet bridge", bin("bridge_connected"), binCls("bridge_connected"))}${tile("key-outline", "Token", token, token ? okCls(token) : "")}
-          ${tile("apple", "HomeKit", bin("homekit_connected"), binCls("homekit_connected"))}${tile("cloud-check-outline", "API status", apiStatus, apiStatus ? okCls(apiStatus) : "")}
-          ${tile("home-map-marker", "Geofencing", bin("home"), binCls("home"))}${tile("timer-cog-outline", "Polling", state("polling_interval") ? `${state("polling_interval")} min` : null, "tap", 'data-a="polling" role="button" tabindex="0" title="About polling and how to change it"')}
-          ${tile("sync", "Last sync", when("last_sync"), syncCls)}${tile("sync-circle", "Next sync", when("next_sync"))}${bridge}</div></div>
+        ${cloud.html}</div>
+      ${second.html ? `<div class="card"><h3>Tado CE</h3>${second.html}</div>` : ""}
       <div class="card"><h3>Controls</h3>${resume}${selects}${quota}</div>
       ${this._hubEntities(ids, known)}
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
@@ -2192,8 +2352,15 @@ function insRows(list, ic, tone = "") {
   }).join("")}</div>`;
 }
 
+// The chips at the top of a page, in three groups: what the page is about (its filters), facts about the home, and the buttons
+// for how it looks. On a narrow page the buttons sit at the top right and the facts get a tidy row of their own.
+function chipBar(filters, info, acts) {
+  const group = (cls, html) => (html ? `<div class="chipgrp ${cls}">${html}</div>` : "");
+  return `<div class="chipbar">${group("filters", filters)}${group("info", info)}${group("acts", acts)}</div>`;
+}
+
 function chip(ic, label, value, cls = "", attrs = "") {
-  return `<span class="chip ${cls}" ${attrs}${attrs.includes("data-a") ? ' role="button"' : ""}>${icon(ic)}${label} <b>${esc(value)}</b></span>`;
+  return `<span class="chip ${cls}" ${attrs}${attrs.includes("data-a") ? ' role="button"' : ""}>${icon(ic)}<span class="cl">${label}</span> <b>${esc(value)}</b></span>`;
 }
 
 function ringSVG(pct, color, size = 72) {
@@ -2444,7 +2611,7 @@ button{font:inherit;color:inherit}
 .ring .rt{fill:var(--fg);font-size:20px;font-weight:500}
 .entgroup h3{display:flex;align-items:center;gap:8px;cursor:pointer;margin:0}.entgroup h3 .i{margin-left:auto;color:var(--mut);font-size:12px}
 .entgroup .count{font-size:11px;font-weight:500;color:var(--mut);background:var(--chip,rgba(128,128,128,.18));border-radius:9px;padding:1px 7px}.entgroup.shut h3{margin-bottom:0}
-.kv.copy{cursor:pointer;border-radius:6px}.kv.copy:hover{background:color-mix(in srgb,var(--mut) 10%,transparent)}
+.kv.copy{cursor:pointer}.kv.copy:hover{background:color-mix(in srgb,var(--mut) 10%,transparent)}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
 .kv span small{display:block;color:var(--mut);font-size:12px;word-break:break-all}.kv b{font-weight:500;white-space:nowrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
@@ -2471,6 +2638,37 @@ button{font:inherit;color:inherit}
 .btn .i{margin-right:7px}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.toolbar.end{justify-content:flex-end}
+.chipbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px}
+.chip b:empty{display:none} /* a chip with no value, such as Compact, has no gap after its label */
+.chipgrp{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.chipgrp.acts{margin-left:auto}
+.ls{display:none}
+.pickselect{display:none;min-width:0;border-radius:999px;padding:9px 16px;font-size:14px}
+/* Pages up to a tablet's width: the buttons sit at the top right, and the facts about the home get a tidy row of their own. */
+@container (max-width:640px){
+  .chipbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 8px}.chipgrp.acts{margin-left:0}
+  .chipgrp.info{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+  .chipgrp.info .chip{justify-content:center;padding:7px 8px;font-size:12px;white-space:nowrap}
+}
+/* Narrow pages: the Compact and Settings chips shrink to their icons, and the room pills become a dropdown, grouped by floor,
+   with the range buttons and Settings under it. */
+@container (max-width:520px){
+  .chip.act .cl{display:none}.chip.act{width:32px;height:32px;padding:0;gap:0;justify-content:center;box-sizing:border-box}
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}.toolbar.end{display:flex}
+  .toolbar>.chips.pickers{display:none}.toolbar>.pickselect{display:block;grid-column:1/-1}.toolbar>.seg.small{min-width:0}
+  /* The figures become one line each (name, then value), two to a row, so they take about half the height. */
+  .stats.fit{gap:8px}
+  .stats.fit .stat{grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:6px;padding:7px 10px}
+  .stats.fit .stat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stats.fit .stat b{grid-column:auto;font-size:13px;white-space:nowrap}
+  .stats.fit .ll{display:none}.stats.fit .ls{display:inline}
+}
+.stat[draggable]{cursor:pointer}.stat.dragging{opacity:.4}
+.sysrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.sysrow.dim{opacity:.45}
+.sysrow .lv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}.sysrow .lv b{font-weight:500;font-size:14px}.sysrow .lv small{color:var(--mut);font-size:12px}
+.tri{display:inline-flex;flex:none;padding:2px;border-radius:999px;background:color-mix(in srgb,var(--mut) 24%,var(--card))}
+.tri button{border:0;background:none;color:var(--mut);font:inherit;font-size:12px;font-weight:600;padding:4px 11px;border-radius:999px;cursor:pointer;min-width:42px}
+.tri button.on{background:var(--heat);color:#fff}.tri button:not(.on):hover{color:var(--fg)}
 .strow{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:9px 0;border-top:1px solid var(--line)}.strow.dim{opacity:.45}
 .strow .lv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}.strow .sl small{margin-top:0;display:inline}
 .strow .sl{display:flex;gap:12px;align-items:center;justify-content:space-between;flex:1;min-width:0;cursor:pointer}
