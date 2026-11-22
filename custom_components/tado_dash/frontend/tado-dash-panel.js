@@ -5,6 +5,12 @@
  * standard climate services plus Tado CE's own services.
  */
 
+// The whole file runs inside a function. Home Assistant can load a panel's script a second time in the same page (after an
+// update, or when Tado Dash is set up again), and a second run of top-level `const` and `let` would throw "has already been
+// declared". If the panel is already defined, the second run stops here.
+(() => {
+if (customElements.get("tado-dash-panel")) return;
+
 const TCE = "tado_ce";
 // Flat UI "Default" palette (flatuicolors.com/palette/defo)
 const C = {
@@ -2754,3 +2760,4 @@ button{font:inherit;color:inherit}
 `;
 
 customElements.define("tado-dash-panel", TadoDashPanel);
+})();
