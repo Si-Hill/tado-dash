@@ -28,10 +28,10 @@ If Tado CE works for you, Tado Dash works the moment you add it, and removing it
 | **Room page** | Large temperature and trend, a 24-hour chart of temperature, targets and heating or AC power, target stepper, hold for 30 min / 1 h / 2 h / until next block / until changed, Boost and Smart boost, what Tado has learned, comfort and air (mold, condensation, dew point), devices with battery and connection, room insights, early start. |
 | **TRV's** | One card per room with a Tado radiator valve: a valve that fills with how far it is open, and three temperatures: the TRV's own reading before any offset (the temperature Tado reports minus the offset applied to it), the external room sensor if there is one, and the offset. |
 | **AC** | Only shown if Tado CE has an air conditioning zone (beta: built from Tado CE's source, so please report anything odd). An animated wall unit per zone that blows in the colour of its mode, with mode, fan and swing controls and the target. |
-| **Analytics** | Pick a room and 6 h to 7 days: temperature, target, heating power, outside temperature and humidity on shared-time charts with hover read-out, plus average, range, heating hours and time on target. |
+| **Analytics** | Pick a room and 6 h to 7 days: temperature, targets, heating and AC power, outside temperature and humidity on shared-time charts with hover read-out. Above the chart are up to 18 figures (lowest, highest and average temperature and humidity, heating hours, time on target, mold risk, comfort level, dew point and what Tado CE has learned). Reorder them by dragging, click one to copy its entity ID, and choose which show and in what colour in Settings. |
 | **Schedules** | Today across every room, plus a week grid for one room, from Tado CE's schedule calendars. Read-only: edit schedules in the Tado app. |
 | **Confidence** | Confidence, cycle count, heating rate, thermal inertia and preheat time for every room, an explanation of how confidence is scored, and Tado CE's home-wide insights. |
-| **System** | API usage against the daily limit, token and sync status, bridge, HomeKit and geofencing, presence mode and override settings, resume-all, and every hub entity. |
+| **System** | API usage against the daily limit, token and sync status, bridge, HomeKit and geofencing, boiler and weather compensation figures, presence mode and override settings, resume-all, and every hub entity. The boxes can be sorted into two groups, Tado cloud and Tado CE, and reordered by dragging, from Settings. Click a box to copy its entity ID. |
 
 ## Prerequisites
 
@@ -60,7 +60,7 @@ Tado CE entity IDs vary between installs (`climate.lounge_2`, `sensor.lounge_tem
 
 ## Screenshots
 
-The screenshots use made-up data: three rooms upstairs, four downstairs, and air conditioning in some of them.
+The screenshots use made-up data: three rooms upstairs, four downstairs, and air conditioning in some of them. Every page is explained in more detail in the [wiki](https://github.com/Si-Hill/tado-dash/wiki).
 
 **Rooms**
 
@@ -91,6 +91,10 @@ The screenshots use made-up data: three rooms upstairs, four downstairs, and air
 **AC** (beta)
 
 <img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/screenshots/ac.png" alt="The AC tab: an animated wall unit per air conditioner with mode, fan and swing controls">
+
+**Schedules**
+
+<img src="https://raw.githubusercontent.com/Si-Hill/tado-dash/main/screenshots/schedules.png" alt="The Schedules tab: today across every room and a week for one room">
 
 **Analytics**, **Confidence** and **System**
 
