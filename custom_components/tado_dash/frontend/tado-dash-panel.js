@@ -2741,16 +2741,19 @@ button{font:inherit;color:inherit}
 .refreshed{font-size:12px;color:var(--mut)}.link:disabled{opacity:.4;cursor:default}
 .explain p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--fg)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.two div{background:color-mix(in srgb,var(--mut) 12%,transparent);border-radius:10px;padding:10px 12px}.two b{display:block;font-weight:500}.two small{color:var(--mut)}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:6px}
-.lrow{display:grid;grid-template-columns:56px 1.3fr repeat(4,1fr);gap:10px;align-items:center;margin:0;cursor:pointer;padding:12px}.lrow:hover{border-color:var(--mut)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(560px,100%),1fr));gap:12px;margin-bottom:6px}
+.lrow{display:grid;grid-template-columns:56px auto repeat(4,minmax(0,1fr));gap:10px;align-items:center;margin:0;cursor:pointer;padding:12px}.lrow:hover{border-color:var(--mut)}
 .lname small,.lm span{display:block;font-size:11px;color:var(--mut)}.lm b{font-size:13px;font-weight:500}
 .lms{display:contents}
-/* On a narrow page the card is the ring and name on top, then the four figures in a two by two block under them. */
+.lm{padding:6px 9px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}.lm span,.lm b{white-space:nowrap}
+/* On a phone the name (with its cycle count beside it) is on top, and under it the ring sits beside the four figures in a two by two
+   block, each with its name above its value. */
 @container (max-width:560px){
-  .lrow{grid-template-columns:56px minmax(0,1fr);gap:10px 12px}
-  .lms{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px}
-  .lm{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 10px;border-radius:8px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
-  .lm span{white-space:nowrap}.lm b{white-space:nowrap}
+  .lrow{grid-template-columns:56px minmax(0,1fr);gap:10px 14px;align-items:center}
+  .lrow .lname{grid-column:1/-1;grid-row:1;display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px}.lname small{display:inline}
+  .lrow>svg{grid-column:1;grid-row:2}
+  .lms{display:grid;grid-column:2;grid-row:2;grid-template-columns:1fr 1fr;gap:6px}
+  .lm{display:block;padding:6px 9px}.lm span{display:block}
 }
 .sect{font-size:18px;font-weight:400;margin:22px 0 12px}.sumtxt{margin:0;font-size:14px;line-height:1.5}
 .meter{margin-bottom:14px}.mhead{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}

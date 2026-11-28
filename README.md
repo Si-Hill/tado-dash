@@ -9,7 +9,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/HOME%20ASSISTANT-2026.11%2B-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white" alt="Home Assistant 2026.11+">
-  <img src="https://img.shields.io/badge/TADO%20CE-4.6-orange?style=for-the-badge" alt="Tado CE 4.6">
+  <img src="https://img.shields.io/badge/TADO%20CE-4.6%20to%205.0.0--beta.1-orange?style=for-the-badge" alt="Tado CE 4.6 to 5.0.0-beta.1">
   <a href="https://github.com/Si-Hill/tado-dash/releases/latest"><img src="https://img.shields.io/github/v/release/Si-Hill/tado-dash?style=for-the-badge&label=STABLE&color=4c1" alt="Latest release"></a>
   <img src="https://img.shields.io/github/license/Si-Hill/tado-dash?style=for-the-badge&label=LICENSE" alt="License">
 </p>
@@ -18,7 +18,7 @@ Tado Dash is a **companion app for [Tado CE](https://github.com/hiall-fyi/tado_c
 
 Everything it shows comes from the entities Tado CE already creates. Tado Dash has no account, no entities and no polling of its own, and it never touches Tado CE's settings. The few controls on the cards (change the target, Schedule, Boost, Manual, Off) are only shortcuts that call Tado CE's existing services and Home Assistant's standard climate services, just as the Home Assistant UI or one of your own automations would, and Tado CE does the actual work. The only thing Tado Dash stores is your layout preferences (floor order, room order and card size), kept in your Home Assistant user data.
 
-If Tado CE works for you, Tado Dash works the moment you add it, and removing it leaves Tado CE exactly as it was. It works with **Tado CE 4.6** (the current stable release). **Tado CE v5, currently in beta, is not supported yet.** That is the next thing being worked on. Not affiliated with Tado or the Tado CE project. The layout is inspired by [RoomMind](https://github.com/snazzybean/roommind), but shares no code with it.
+If Tado CE works for you, Tado Dash works the moment you add it, and removing it leaves Tado CE exactly as it was. This version (0.11.x) works with **Tado CE 4.6** (the current stable release) and the v5 beta up to **5.0.0-beta.1**. From Tado CE 5.0.0-beta.2 the Resume service was renamed, which needs Tado Dash 1.0.0 (beta). Not affiliated with Tado or the Tado CE project. The layout is inspired by [RoomMind](https://github.com/snazzybean/roommind), but shares no code with it.
 
 ## What you get
 
@@ -36,7 +36,7 @@ If Tado CE works for you, Tado Dash works the moment you add it, and removing it
 ## Prerequisites
 
 - Home Assistant 2026.11 or newer, which has the Marketplace built in
-- [Tado CE](https://github.com/hiall-fyi/tado_ce) 4.6 installed and set up (v5 beta is not supported yet)
+- [Tado CE](https://github.com/hiall-fyi/tado_ce) 4.6, or the v5 beta up to 5.0.0-beta.1, installed and set up (5.0.0-beta.2 and later need Tado Dash 1.0.0)
 - For the Confidence tab: enable Tado CE's *Confidence*, *Heating Rate*, *Thermal Inertia* and *Preheat Time* sensors (disabled by default). Missing sensors are simply left out. Outside temperature likewise needs Tado CE's *Outside Temp* sensor.
 
 ## 1. Install from the Marketplace
