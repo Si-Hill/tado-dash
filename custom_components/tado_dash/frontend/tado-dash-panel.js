@@ -1202,7 +1202,7 @@ class TadoDashPanel extends HTMLElement {
           ${inRoom ? `<h1>${esc(title)}</h1>` : `<img class="brand" alt="Tado Dash" src="${BASE}brand/${this.getAttribute("data-theme") === "dark" ? "dark_logo" : "logo"}.png${VERSION_Q}"
             onerror="this.outerHTML='<h1>Tado Dash</h1>'">`}
           ${this._stale ? `<div class="newver" role="status" title="You are viewing a previous version. Refresh the page to see the latest version."><span class="nl">You are viewing a previous version. Refresh the page to see the latest version.</span><span class="ns">Previous version</span><button class="btn" data-a="reload">Refresh</button></div>` : ""}
-          ${inRoom || !this._ceVersion ? "" : `<span class="ceversion" title="The Tado CE version this Home Assistant is running">Tado CE v${esc(this._ceVersion)}</span>`}
+          ${inRoom || (!this._ceVersion && !LOADED_VERSION) ? "" : `<span class="ceversion" title="The Tado Dash version this page loaded, and the Tado CE version this Home Assistant is running">${LOADED_VERSION ? `<span>Tado Dash v${esc(LOADED_VERSION)}</span>` : ""}${this._ceVersion ? `<span>Tado CE v${esc(this._ceVersion)}</span>` : ""}</span>`}
         </header>
         ${inRoom ? "" : `<nav>${tabs.map(([k, l]) => `<button class="${this._tab === k ? "on" : ""}" data-a="tab" data-v="${k}">${l}</button>`).join("")}</nav>`}
         <div class="content"><div class="wrap">${body}</div></div>
@@ -2563,7 +2563,7 @@ header{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;backgr
 header:has(.newver) .ceversion{margin-left:0}
 @media (min-width:900px){header{position:relative}.newver{position:absolute;left:50%;transform:translateX(-50%);margin:0}header:has(.newver) .ceversion{margin-left:auto}}
 @media (max-width:640px){.newver{padding:3px 10px;gap:6px;font-size:11px}.newver .nl{display:none}.newver .ns{display:inline;white-space:nowrap}header:has(.newver) .ceversion{display:none}}
-.ceversion{margin-left:auto;font-size:12px;color:var(--mut);padding:3px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+.ceversion{margin-left:auto;font-size:12px;line-height:1.25;color:var(--mut);padding:3px 12px;border:1px solid var(--line);border-radius:14px;white-space:nowrap;display:flex;flex-direction:column;align-items:center}
 h1{font-size:20px;font-weight:400;margin:0}
 .brand{height:40px;width:auto;display:block}
 nav{display:flex;gap:4px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
