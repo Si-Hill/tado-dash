@@ -53,6 +53,22 @@ const STAT_SHORT = { within: "Within 0.5°", abs_hum: "Abs. hum.", schedule_devi
 const SYS_SHORT = { bridge_connected: "Bridge", home: "Geofence", data_age: "Freshness", boiler_output_temperature: "Boiler out", wc_target_flow_temp: "WC target" };
 // A name or value that has a short form: both are in the page and the style picks one by the page's width.
 const both = (long, short) => (short && short !== long ? `<span class="ll">${long}</span><span class="ls">${esc(short)}</span>` : long);
+// Tado CE's zone services: [the name from 5.0.0-beta.2, the name before it].
+const TCE_SERVICES = {
+  turnOffAll: ["turn_off_all_climate_zones", "turn_off_all_zones"],
+  restoreClimate: ["restore_climate_previous_state", "restore_previous_state"],
+  restoreWater: ["restore_water_heater_previous_state", "restore_previous_state"],
+  windowOn: ["activate_climate_open_window", "activate_open_window"],
+  windowOff: ["deactivate_climate_open_window", "deactivate_open_window"],
+  windowMode: ["set_climate_open_window_mode", "set_open_window_mode"],
+  timetable: ["set_climate_active_timetable", null], // new in 5.0.0-beta.2
+};
+const TIMETABLES = [["one_day", "1 day"], ["three_day", "3 day"], ["seven_day", "7 day"]];
+
+// A small box: an icon and a name, with the value under them. Used for the figures under a room's chart.
+function statTile(ic, label, val, tone = "", tip = "") {
+  return `<div class="stat${tone ? " tone" : ""}"${tone ? ` style="--tone:${tone}"` : ""}${tip ? ` title="${esc(tip)}"` : ""}>${icon(ic)}<span>${label}</span><b>${val}</b></div>`;
+}
 const HUM_HIGH = 60; // above this relative humidity the figure turns pale blue
 const HEAT = C.carrot;
 const COLD = C.peter;
@@ -143,6 +159,7 @@ const FA_ALIAS = {
   "swing-h": "arrows-left-right",
   "arrow-right": "arrow-right",
   "save": "floppy-disk",
+  "window-open": "door-open",
 };
 const FA = {
   "arrow-left": [448, "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"],
@@ -172,6 +189,7 @@ const FA = {
   "clock-rotate-left": [512, "M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"],
   "cloud": [640, "M0 336c0 79.5 64.5 144 144 144l368 0c70.7 0 128-57.3 128-128c0-61.9-44-113.6-102.4-125.4c4.1-10.7 6.4-22.4 6.4-34.6c0-53-43-96-96-96c-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32C167.6 32 96 103.6 96 192c0 2.7 .1 5.4 .2 8.1C40.2 219.8 0 273.2 0 336z"],
   "cloud-arrow-down": [640, "M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39L344 184c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 134.1-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z"],
+  "door-open": [576, "M320 32c0-9.9-4.5-19.2-12.3-25.2S289.8-1.4 280.2 1l-179.9 45C79 51.3 64 70.5 64 92.5L64 448l-32 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 192 0 32 0 0-32 0-448zM256 256c0 17.7-10.7 32-24 32s-24-14.3-24-32s10.7-32 24-32s24 14.3 24 32zm96-128l96 0 0 352c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-32 0 0-320c0-35.3-28.7-64-64-64l-96 0 0 64z"],
   "droplet": [384, "M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0l1.8 0c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"],
   "face-smile": [512, "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM164.1 325.5C182 346.2 212.6 368 256 368s74-21.8 91.9-42.5c5.8-6.7 15.9-7.4 22.6-1.6s7.4 15.9 1.6 22.6C349.8 372.1 311.1 400 256 400s-93.8-27.9-116.1-53.5c-5.8-6.7-5.1-16.8 1.6-22.6s16.8-5.1 22.6 1.6zM144.4 208a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm192-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"],
   "fan": [512, "M258.6 0c-1.7 0-3.4 .1-5.1 .5C168 17 115.6 102.3 130.5 189.3c2.9 17 8.4 32.9 15.9 47.4L32 224l-2.6 0C13.2 224 0 237.2 0 253.4c0 1.7 .1 3.4 .5 5.1C17 344 102.3 396.4 189.3 381.5c17-2.9 32.9-8.4 47.4-15.9L224 480l0 2.6c0 16.2 13.2 29.4 29.4 29.4c1.7 0 3.4-.1 5.1-.5C344 495 396.4 409.7 381.5 322.7c-2.9-17-8.4-32.9-15.9-47.4L480 288l2.6 0c16.2 0 29.4-13.2 29.4-29.4c0-1.7-.1-3.4-.5-5.1C495 168 409.7 115.6 322.7 130.5c-17 2.9-32.9 8.4-47.4 15.9L288 32l0-2.6C288 13.2 274.8 0 258.6 0zM256 224a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"],
@@ -958,6 +976,54 @@ class TadoDashPanel extends HTMLElement {
     setTimeout(() => this._render(), OPT_MS + 500);
   }
 
+  // Tado CE 5.0.0-beta.2 renamed its zone services. Each entry is [the new name, the old one]; Home Assistant says which exists.
+  _tce(key) {
+    const have = this._hass?.services?.[TCE] || {}, [now, before] = TCE_SERVICES[key];
+    return have[now] ? { name: now, renamed: true } : before && have[before] ? { name: before, renamed: false } : null;
+  }
+
+  // A button's answer: say what happened, and if it failed Home Assistant has already said why.
+  async _tceCall(key, data, done) {
+    const svc = this._tce(key);
+    if (!svc) { this._toast("This version of Tado CE doesn't have that action"); return false; }
+    const ok = await this._call(TCE, svc.name, data);
+    if (ok && done) this._toast(done);
+    return ok;
+  }
+
+  // Back to how a room was before the last change Tado CE made (or on its schedule, if nothing was saved).
+  _restore(z) {
+    this._tceCall(z.type === "hot_water" ? "restoreWater" : "restoreClimate", { entity_id: z.main }, `${z.name} put back to how it was before the last change`);
+  }
+
+  // Open window: confirm or cancel one Tado found itself, or start open window mode (frost protection) for a while.
+  _windowAction(z, a) {
+    this._tceCall(a === "window-on" ? "windowOn" : "windowOff", { entity_id: z.main }, a === "window-on" ? "Open window confirmed" : "Back to normal heating");
+  }
+
+  _windowMode(z, secs) {
+    const svc = this._tce("windowMode");
+    const hms = `${String(Math.floor(secs / 3600)).padStart(2, "0")}:${String(Math.floor((secs % 3600) / 60)).padStart(2, "0")}:00`;
+    // Tado CE 5 takes the time as text (00:00:00 is until resumed); before it took seconds (0 is until resumed).
+    const data = { entity_id: z.main, ...(svc?.renamed ? { time_period: hms } : { duration: secs }) };
+    this._tceCall("windowMode", data, secs ? `${z.name} on open window mode for ${secs / 60} minutes` : `${z.name} on open window mode until you resume it`);
+  }
+
+  // Switch a room's active timetable (Tado CE 5.0.0-beta.2). The schedule is read again afterwards, as the times change with it.
+  async _setTimetable(zone, v) {
+    this._ttArm = null;
+    const label = TIMETABLES.find(([k]) => k === v)?.[1] || v;
+    const ok = await this._tceCall("timetable", { entity_id: zone.main, timetable: v }, `${zone.name} is now on the ${label} timetable`);
+    this._render();
+    if (ok) for (const wait of [5000, 20000]) setTimeout(() => { this._cal.at = 0; this._loadCalendars(); }, wait);
+  }
+
+  // Every heating and AC room on a manual Off, like the Tado app's button. Two clicks, as it affects the whole house.
+  async _turnOffAll() {
+    this._offAllArm = false;
+    await this._tceCall("turnOffAll", {}, "Every room is turned off. Resume all schedules puts them back");
+  }
+
   // Which Tado CE service puts a room back on its schedule. Tado CE 5.0.0-beta.2 split resume_schedule into one for heating and AC
   // rooms and one for hot water; before that, one service did all three. Ask Home Assistant which exist, so either works.
   _resumeService(z) {
@@ -1000,6 +1066,8 @@ class TadoDashPanel extends HTMLElement {
     if (!el) return;
     const { a, z, v } = el.dataset;
     if (a !== "reset-settings") this._resetArm = null; // anything else disarms the reset
+    if (a !== "off-all") this._offAllArm = false;
+    if (a !== "timetable") this._ttArm = null;
     const zone = z ? this._zoneById(z) : null;
     switch (a) {
       case "more-info":
@@ -1025,6 +1093,13 @@ class TadoDashPanel extends HTMLElement {
       case "hold": if (zone) this._hold(zone, v); return;
       case "acmode": if (zone) this._call("climate", "set_hvac_mode", { entity_id: zone.main, hvac_mode: v }); return;
       case "noop": return;
+      case "timetable":
+        if (zone && v !== zone.attrs?.active_timetable) { if (this._ttArm?.z === z && this._ttArm.v === v) this._setTimetable(zone, v); else this._ttArm = { z, v }; }
+        break;
+      case "restore": if (zone) this._restore(zone); return;
+      case "window-on": case "window-off": if (zone) this._windowAction(zone, a); return;
+      case "window-mode": if (zone) this._windowMode(zone, parseInt(v, 10)); return;
+      case "off-all": if (this._offAllArm) this._turnOffAll(); else this._offAllArm = true; break;
       case "reset-settings":
         if (this._resetArm === this._tab) this._resetSettings(); else this._resetArm = this._tab;
         break;
@@ -1549,7 +1624,7 @@ class TadoDashPanel extends HTMLElement {
     // Tapping the valve opens Home Assistant's own history for the room's climate entity.
     const valve = `<span class="valvetap" ${z.main ? `data-a="more-info" data-e="${z.main}" title="Show history"` : ""}>${trvSVG(pct, calling)}</span>`;
     const rawTip = reported != null ? `Reported ${f1(reported)} °C − offset ${f1(offset ?? 0)} °C` : "No reading from Tado";
-    const head = `<div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? `<span class="vl">Valve open</span><span class="vs">Open</span>` : `<span class="vl">Valve closed</span><span class="vs">Closed</span>`}</span>`}</div>`;
+    const head = `<div class="row top"><span class="name">${icon("radiator")}${esc(z.name)}${this._windowIcon(z)}</span>${flag || `<span class="pill ${pct ? "heating" : ""}">${pct ? `<span class="vl">Valve open</span><span class="vs">Open</span>` : `<span class="vl">Valve closed</span><span class="vs">Closed</span>`}</span>`}</div>`;
     if (this._layout.compact) {
       // Compact: a small valve beside the three temperatures as one-line rows.
       return `<div class="card trvcard compact" data-a="open" data-z="${z.id}">${head}
@@ -1578,7 +1653,7 @@ class TadoDashPanel extends HTMLElement {
     const hum = z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}%</span>` : "";
     const pillText = this._infoPill(z).replace(/<[^>]+>/g, "");
     return `<div class="card room compact ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${p.id}" title="${pillText}">
-      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}</span>${this._sideToggle(p)}
+      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}${this._windowIcon(p)}</span>${this._sideToggle(p)}
         <span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="cmid">
         <div class="ctemp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
@@ -1590,6 +1665,10 @@ class TadoDashPanel extends HTMLElement {
       ${hasTemp ? sparkline(t, g, z.heating) : ""}
       ${this._acRow(z, !!p.pair)}
       ${this._controls(z, true)}</div>`;
+  }
+
+  _windowIcon(z) {
+    return z.window ? `<span class="winico" title="A window is open">${icon("window-open")}</span>` : "";
   }
 
   // Heat / Cool switch on a room that has both radiators and an air conditioner. A dot shows the other side is running.
@@ -1607,7 +1686,7 @@ class TadoDashPanel extends HTMLElement {
     const t = this._spark?.[z.ents.temp] || [], g = this._spark?.[z.ents.target] || [];
     const hasTemp = z.type !== "hot_water";
     return `<div class="card room ${z.status}" draggable="true" data-floor="${floor}" data-a="open" data-z="${p.id}">
-      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}</span>${this._sideToggle(p)}
+      <div class="row top"><span class="name">${icon(p.type === "hot_water" ? "water-boiler" : p.type === "ac" ? "air-conditioner" : "radiator")}${esc(p.name)}${this._windowIcon(p)}</span>${this._sideToggle(p)}
         <span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="row mid cardmid">
         <div class="temp">${hasTemp ? f1(z.temp) : esc(z.mainState?.state || "–")}${hasTemp ? `<small>°C</small>` : ""}</div>
@@ -1677,6 +1756,16 @@ class TadoDashPanel extends HTMLElement {
     return `${chips}${body}<p class="hint center">Mode, fan and swing are set through Tado CE. The options come from what your unit supports.</p>`;
   }
 
+  // The warming or cooling rate as a box, for under a room's chart.
+  _rateTile(z) {
+    if (z.type === "hot_water") return "";
+    const r = trendPerHour(this._spark?.[z.ents.temp] || [], z.temp);
+    if (r == null) return "";
+    const dir = r >= 0.05 ? "up" : r <= -0.05 ? "down" : "flat";
+    const tip = dir === "flat" ? "Steady over the last hour" : `${dir === "up" ? "Warming" : "Cooling"} at ${Math.abs(r).toFixed(1)} °C an hour (last hour)`;
+    return statTile(`trend-${dir}`, "Change", `${dir === "flat" ? "0.0" : Math.abs(r).toFixed(1)}°/h`, dir === "up" ? "var(--ok)" : dir === "down" ? "var(--bad)" : "", tip);
+  }
+
   // Warming / cooling rate beside the humidity: ▲ orange, ▼ blue, a dash when steady.
   _rateChip(z) {
     if (z.type === "hot_water") return "";
@@ -1705,6 +1794,18 @@ class TadoDashPanel extends HTMLElement {
         <button title="Raise target" data-a="step" data-z="${z.id}" data-v="1">${icon("plus")}</button></div>` : ""}`;
     // Compact: the mode buttons and the - / + buttons share one row.
     return compact ? `<div class="crow">${html}</div>` : html;
+  }
+
+  // Which timetable the room follows (1, 3 or 7 days), with a switch if Tado CE can change it. Switching asks for a second click.
+  _timetableBar(z) {
+    const cur = z.attrs?.active_timetable;
+    if (!cur) return "";
+    const name = (k) => TIMETABLES.find(([x]) => x === k)?.[1] || k;
+    if (!this._tce("timetable")) return `<div class="ttbar"><span class="ttl">Timetable</span><b>${name(cur)}</b></div>`;
+    const arm = this._ttArm?.z === z.id ? this._ttArm.v : null;
+    const buttons = TIMETABLES.map(([k, l]) => `<button class="${cur === k ? "on" : ""} ${arm === k ? "arm" : ""}" data-a="timetable" data-z="${z.id}" data-v="${k}">${arm === k ? "Click again" : l}</button>`).join("");
+    return `<div class="ttbar"><span class="ttl">Timetable</span><div class="seg small" role="group">${buttons}</div>
+      ${arm ? `<small class="ttnote">Switch to the ${name(arm)} timetable? Tado changes which times apply, and it uses Tado API calls.</small>` : ""}</div>`;
   }
 
   // One line of status under the chart, always present: the override if there is one,
@@ -1752,7 +1853,6 @@ class TadoDashPanel extends HTMLElement {
 
     const next = ov.next_change ? new Date(ov.next_change) : null;
     const nextTemp = ov.next_temperature ?? this._n(se.next_sched_temp);
-    const rate = this._rateChip(z);
     const hero = `<div class="card hero">
       <div class="row top">${this._sideToggle(p)}<span class="pill ${z.status}">${pillIcon(z.status)}${esc(z.label)}</span></div>
       <div class="row mid">
@@ -1760,18 +1860,17 @@ class TadoDashPanel extends HTMLElement {
         ${hasTemp ? `<div class="tgt big"><span>Target</span><b>${z.shownTarget != null ? f1(z.shownTarget) + " °C" : "–"}</b></div>` : ""}
       </div>
       ${hasTemp ? sparkline(sp[se.temp] || [], sp[se.target] || [], z.heating) : ""}
-      <div class="facts">
-        ${z.humidity != null ? `<span class="hum ${z.humidity > HUM_HIGH ? "hi" : ""}">${icon("water-percent")}${f0(z.humidity)}% humidity</span>` : ""}
-        ${rate ? `<span>${rate}</span>` : ""}
-        ${outside != null ? `<span>${icon("thermometer")}${f1(outside)} °C outside</span>` : ""}
-        ${surface != null ? `<span>${icon("wall")}wall ${f1(surface)} °C</span>` : ""}
-        ${z.power != null && !z.ac ? `<span>${icon("fire")}${f0(z.power)}% heating</span>` : ""}
-        ${next && nextTemp != null ? `<span>${icon("calendar-clock")}next ${f1(nextTemp)} °C at ${hhmm(next)}</span>` : ""}
+      <div class="stats ftiles">
+        ${z.humidity != null ? statTile("water-percent", "Humidity", `${f0(z.humidity)}%`, z.humidity > HUM_HIGH ? "var(--humhi)" : "") : ""}
+        ${this._rateTile(z)}
+        ${outside != null ? statTile("thermometer", "Outside", `${f1(outside)} °C`) : ""}
+        ${surface != null ? statTile("wall", "Wall", `${f1(surface)} °C`) : ""}
+        ${z.power != null && !z.ac ? statTile("fire", "Heating", `${f0(z.power)}%`, z.power > 0 ? "var(--heat)" : "") : ""}
+        ${next && nextTemp != null ? statTile("calendar-clock", "Next", `${f1(nextTemp)}° · ${hhmm(next)}`) : ""}
       </div>
       ${this._infoPill(z)}
       ${z.ac ? this._acPanel(z) : ""}
       ${this._controls(z)}
-      ${timeline}
     </div>`;
 
     const learn = this._learnPanel(z, adv);
@@ -1782,21 +1881,43 @@ class TadoDashPanel extends HTMLElement {
         <button class="sw ${st("early_start")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${e.early_start}" aria-label="Early start"></button></div>` : "";
 
     const chartId = "room-chart";
-    return `<div class="cols"><div class="col">${hero}${learn}</div>
+    // How long a change lasts, undoing it, open windows, and early start: everything past the buttons in the top card.
+    const settings = timeline || ctrl ? `<div class="card"><h3>Room controls</h3>${timeline ? `<div class="ctlstack">${timeline}</div>` : ""}${ctrl}</div>` : "";
+    return `<div class="cols"><div class="col">${hero}${settings}${learn}</div>
       <div class="col">
         ${hasTemp ? `<div class="card"><div class="cardhead"><h3>Last 24 hours</h3><button class="link" data-a="tab" data-v="analytics" data-z="${p.id}">Full analytics</button></div>
           <div class="chart" id="${chartId}"></div></div>` : ""}
-        ${ins}${air}${devs}${ctrl ? `<div class="card"><h3>Room settings</h3>${ctrl}</div>` : ""}
+        ${air}${ins}${z.ents.schedule ? this._weekCard(z, true) : ""}
+        ${devs}
       </div></div>${hasTemp ? this._deferRoomChart(p, chartId) : ""}`;
   }
 
   // Extra ways to hold a temperature, on the room page only (the card has Manual for the simple case).
   _holdBar(z) {
-    if (z.type === "hot_water") return "";
+    const undo = this._tce(z.type === "hot_water" ? "restoreWater" : "restoreClimate")
+      ? `<div class="seg hold" role="group"><button data-a="restore" data-z="${z.id}" title="Put the room back to how it was before the last change made through Tado CE">${icon("history")}Undo last change</button></div>` : "";
+    if (z.type === "hot_water") return undo;
     const b = (v, label, ic) => `<button data-a="hold" data-z="${z.id}" data-v="${v}">${icon(ic)}${label}</button>`;
     return `<span class="lbl">Hold the target for</span>
-      <div class="seg hold" role="group">${b("block", "Until next block", "calendar-arrow-right")}${b("30", "30 min", "timer-outline")}${b("60", "1 hour", "timer-outline")}${b("120", "2 hours", "timer-outline")}${b("manual", "Until changed", "infinity")}</div>
-      ${z.ents.smart_boost ? `<div class="seg hold" role="group"><button data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost: reach the schedule target in the time it needs</button></div>` : ""}`;
+      <div class="seg hold" role="group">${b("30", "30 min", "timer-outline")}${b("60", "1 hour", "timer-outline")}${b("120", "2 hours", "timer-outline")}${b("block", "Until next block", "calendar-arrow-right")}${b("manual", "Until changed", "infinity")}</div>
+      ${z.ents.smart_boost ? `<div class="seg hold" role="group"><button data-a="press" data-v="${z.ents.smart_boost}">${icon("brain")}Smart boost: reach the schedule target in the time it needs</button></div>` : ""}
+      ${undo}${this._windowBar(z)}`;
+  }
+
+  // Open window. If Tado has found an open window you can confirm it or say it is closed; otherwise a button starts open window
+  // mode, which holds the room at frost protection for a while (for a window sensor of your own, say).
+  _windowBar(z) {
+    if (z.type === "hot_water" || z.unavailable) return "";
+    const confirm = this._tce("windowOn") || this._tce("windowOff");
+    if (z.window && confirm) {
+      return `<span class="lbl">A window is open</span>
+        <div class="seg hold" role="group"><button data-a="window-on" data-z="${z.id}" title="Confirm the open window Tado found, as tapping its icon in the Tado app does">${icon("window-open")}Confirm window open</button>
+        <button data-a="window-off" data-z="${z.id}" title="Cancel the open window and go back to normal heating">Window closed</button></div>`;
+    }
+    if (!this._tce("windowMode")) return "";
+    const b = (v, label) => `<button data-a="window-mode" data-z="${z.id}" data-v="${v}">${label}</button>`;
+    return `<span class="lbl">Open window mode: frost protection for</span>
+      <div class="seg hold oneline" role="group">${b(900, "15 min")}${b(1800, "30 min")}${b(3600, "1 hour")}${b(0, "Until resumed")}</div>`;
   }
 
   _learnPanel(z, adv) {
@@ -2161,11 +2282,8 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     if (!failed) this._toast(ids.length > 1 ? "Schedules refreshed from Tado" : "Schedule refreshed from Tado");
   }
 
-  _viewSchedules() {
-    const zones = this._orderedZones().filter((z) => z.ents.schedule && (this._layout.show.hotWater || z.type !== "hot_water"));
-    if (!zones.length) return `<div class="card">${this._empty("calendar-remove-outline", "No schedule calendars", "Tado CE creates one calendar per heating room. None were found.")}</div>`;
-    if (!this._cal.data) return `<div class="card">${this._empty("timer-sand", "Loading schedules…", "")}</div>`;
-    const z = zones.find((x) => x.id === this._sel) || zones[0];
+  // The pieces the schedule views share: the colour scale, a room's blocks on a day, and the hour axis.
+  _schedKit() {
     const monday = this._cal.monday, now = new Date();
     const todayIdx = (now.getDay() + 6) % 7;
     // Blue at 16 °C and below, green at 19 °C, orange at 21 °C and above, fading between. The scale is fixed
@@ -2189,22 +2307,39 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     const nowPct = ((now - new Date(now).setHours(0, 0, 0, 0)) / 86400000) * 100;
     const hours = [0, 3, 6, 9, 12, 15, 18, 21, 24];
     const axis = `<div class="axisrow"><span></span><div class="hours">${hours.map((h) => `<i style="left:${(h / 24) * 100}%">${h}</i>`).join("")}</div></div>`;
+    return { todayIdx, nowPct, blocksFor, axis };
+  }
+
+  // A room's week of schedule blocks, with its timetable and a way to read it from Tado again. On the room page it is just "Schedule".
+  _weekCard(z, room = false) {
+    const title = room ? "Schedule" : `${esc(z.name)} · week`;
+    if (!this._cal.data) return `<div class="card"><h3>${title}</h3>${this._empty("timer-sand", "Loading schedule…", "")}</div>`;
+    const { todayIdx, nowPct, blocksFor, axis } = this._schedKit();
     const week = DAYS.map((dn, i) => `<div class="drow"><span class="dn ${i === todayIdx ? "today" : ""}">${dn}${i === todayIdx ? "<small>today</small>" : ""}</span>
       <div class="track">${blocksFor(z.id, i)}${i === todayIdx ? `<div class="nowline" style="left:${nowPct}%"></div>` : ""}</div></div>`).join("");
-    const all = zones.map((zz) => `<div class="drow"><span class="dn small">${esc(zz.name)}</span><div class="track thin">${blocksFor(zz.id, todayIdx)}<div class="nowline" style="left:${nowPct}%"></div></div></div>`).join("");
     const legend = `<div class="legend grad"><span>16°</span><div class="gscale"><i style="background:linear-gradient(90deg,${C.peter},${C.nephritis} 60%,${C.carrot})"></i><b style="left:60%">19°</b></div><span>21°</span>
       <em>Blocks are periods Tado CE reports in the room's schedule calendar</em></div>`;
+    const busy = this._schedBusy, when = this._val(z.ents.refresh_schedule);
+    const refreshed = z.ents.refresh_schedule ? (when ? `Refreshed from Tado ${ago(when)}` : "Not refreshed from here yet") : "";
+    return `<div class="card"><div class="cardhead"><h3>${title}</h3>
+        ${z.ents.refresh_schedule ? `<span class="refreshed">${esc(refreshed)} · <button class="link" data-a="tado-refresh-one" data-z="${z.id}" ${busy ? "disabled" : ""}>Refresh this room</button></span>` : ""}</div>
+        ${this._timetableBar(z)}${axis}${week}${legend}
+        ${room ? "" : `<p class="hint">Read-only view of the Tado schedule. Tado CE keeps its own copy of each schedule and does not re-read it by itself, so after you edit one in the Tado app, press Refresh schedules (or Refresh this room) here.</p>`}</div>`;
+  }
+
+  _viewSchedules() {
+    const zones = this._orderedZones().filter((z) => z.ents.schedule && (this._layout.show.hotWater || z.type !== "hot_water"));
+    if (!zones.length) return `<div class="card">${this._empty("calendar-remove-outline", "No schedule calendars", "Tado CE creates one calendar per heating room. None were found.")}</div>`;
+    if (!this._cal.data) return `<div class="card">${this._empty("timer-sand", "Loading schedules…", "")}</div>`;
+    const z = zones.find((x) => x.id === this._sel) || zones[0];
+    const { todayIdx, nowPct, blocksFor, axis } = this._schedKit();
+    const all = zones.map((zz) => `<div class="drow"><span class="dn small">${esc(zz.name)}</span><div class="track thin">${blocksFor(zz.id, todayIdx)}<div class="nowline" style="left:${nowPct}%"></div></div></div>`).join("");
     const busy = this._schedBusy;
     const canRefresh = zones.some((x) => x.ents.refresh_schedule);
-    const when = this._val(z.ents.refresh_schedule);
-    const refreshed = z.ents.refresh_schedule ? (when ? `Refreshed from Tado ${ago(when)}` : "Not refreshed from here yet") : "";
     return `${canRefresh ? `<div class="chips"><span class="chip ${busy ? "on" : ""}" role="button" data-a="tado-refresh-all" title="Fetch every room's schedule from Tado again (uses roughly 2–8 Tado API calls per room)">${icon("cloud-arrow")}${busy ? "Refreshing…" : "Refresh schedules"}</span></div>` : ""}
       <div class="card"><h3>Today across rooms</h3>${axis}${all}</div>
       <div class="toolbar">${this._picker(z.id)}</div>
-      <div class="card"><div class="cardhead"><h3>${esc(z.name)} · week</h3>
-        ${z.ents.refresh_schedule ? `<span class="refreshed">${esc(refreshed)} · <button class="link" data-a="tado-refresh-one" data-z="${z.id}" ${busy ? "disabled" : ""}>Refresh this room</button></span>` : ""}</div>
-        ${axis}${week}${legend}
-        <p class="hint">Read-only view of the Tado schedule. Tado CE keeps its own copy of each schedule and does not re-read it by itself, so after you edit one in the Tado app, press Refresh schedules (or Refresh this room) here.</p></div>`;
+      ${this._weekCard(z)}`;
   }
 
   /* ----- confidence ----- */
@@ -2359,6 +2494,9 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
     }).join("");
     const quota = ids.quota_reserve_enabled ? `<div class="line"><div class="tx"><b>Quota reserve</b><small>Keep some API calls back for manual actions</small></div>
       <button class="sw ${h.get("quota_reserve_enabled")?.state === "on" ? "on" : ""}" data-a="toggle" data-v="${ids.quota_reserve_enabled}" aria-label="Quota reserve"></button></div>` : "";
+    const armed = !!this._offAllArm;
+    const offAll = this._tce("turnOffAll") ? `<div class="line"><div class="tx"><b>Turn off all rooms</b><small>Put every heating and AC room on a manual Off, as the Tado app's button does. Resume all schedules puts them back.</small></div>
+      <div class="btns"><button class="btn ${armed ? "danger" : "ghost"}" data-a="off-all">${icon("power")}${armed ? "Click again to turn off" : "Turn off all"}</button></div></div>` : "";
     const offSchedule = this._zones.some((z) => z.type !== "hot_water" ? (z.overlayType || z.off) : z.overlayType);
     const resume = ids.resume_all ? `<div class="line"><div class="tx"><b>Resume all schedules</b><small>Cancel every manual override, or fetch the schedules from Tado again</small></div>
       <div class="btns"><button class="btn ghost" data-a="tado-refresh-all" ${this._schedBusy ? "disabled" : ""}>${icon("cloud-arrow")}${this._schedBusy ? "Refreshing…" : "Refresh schedules"}</button>
@@ -2372,7 +2510,7 @@ This uses roughly 2–8 Tado API calls for each room.`)) return;
           ${state("api_reset") ? `<small>Resets ${ago(state("api_reset"))}</small>` : ""}</div>` : ""}
         ${cloud.html}</div>
       ${second.html ? `<div class="card"><h3>Tado CE</h3>${second.html}</div>` : ""}
-      <div class="card"><h3>Controls</h3><div class="ctrls">${resume}${selects}${quota}</div></div>
+      <div class="card"><h3>Controls</h3><div class="ctrls">${resume}${offAll}${selects}${quota}</div></div>
       ${this._hubEntities(ids, known)}
       <p class="hint center">Tado Dash is a viewer for Tado CE. All data, learning and control comes from Tado CE.</p>`;
   }
@@ -2605,6 +2743,7 @@ button{font:inherit;color:inherit}
 .insrow{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--mut) 12%,transparent)}
 .insrow .i{margin-top:2px;color:var(--mut)}.insrow.warn .i{color:var(--warn)}.insrow.cold .i{color:var(--cold)}.insrow.go .i{color:var(--go)}
 .seg.hold{flex-wrap:wrap;margin-top:4px}.seg.hold button{flex:1 1 30%;min-width:0;white-space:normal;min-height:36px;padding:8px 10px;font-size:13px}
+.seg.hold.oneline{flex-wrap:nowrap}.seg.hold.oneline button{flex:1 1 0;padding:8px 4px}
 .seg.hold button:hover{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--fg)}
 .optrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.optrow:first-of-type{border-top:0}.optrow b{display:block;font-weight:500;font-size:14px}
 .optrow .seg{margin-top:0;padding:2px;border-radius:999px;flex:none}
@@ -2691,6 +2830,13 @@ button{font:inherit;color:inherit}
 .link{padding:0;font-size:13px}
 .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
 .toolbar.end{justify-content:flex-end}
+.winico{display:inline-flex;margin-left:8px;color:var(--cold)}
+.ctlstack{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}.ctlstack .seg{margin-top:0}.ctlstack .lbl{margin-top:6px}
+.stats.ftiles{grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px;margin:2px 0}
+.stats.ftiles .stat{grid-template-columns:auto minmax(0,1fr) auto;column-gap:5px;padding:7px 8px;font-size:11.5px}.stats.ftiles .stat .i{font-size:12px}
+.stats.ftiles .stat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats.ftiles .stat b{grid-column:auto;font-size:12.5px;white-space:nowrap}
+.ttbar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:2px 0 12px}.ttbar .ttl{font-size:13px;color:var(--mut)}.ttbar b{font-weight:500;font-size:13px}
+.ttbar .ttnote{flex-basis:100%;color:var(--mut);font-size:12px}.seg.small button.arm{background:var(--bad);color:#fff}
 .chipbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px}
 .chip b:empty{display:none} /* a chip with no value, such as Compact, has no gap after its label */
 .chipgrp{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.chipgrp.acts{margin-left:auto}
@@ -2709,6 +2855,7 @@ button{font:inherit;color:inherit}
   .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}.toolbar.end{display:flex}
   .toolbar>.chips.pickers{display:none}.toolbar>.pickselect{display:block;grid-column:1/-1}.toolbar>.seg.small{min-width:0}
   /* The figures become one line each (name, then value), two to a row, so they take about half the height. */
+  .cardhead{flex-wrap:wrap;gap:2px 12px}.cardhead .refreshed{flex-basis:100%}
   .stats.fit{gap:8px}
   .stats.fit .stat{grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:6px;padding:7px 10px}
   .stats.fit .stat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
