@@ -958,6 +958,14 @@ class TadoDashPanel extends HTMLElement {
     setTimeout(() => this._render(), OPT_MS + 500);
   }
 
+  // Which Tado CE service puts a room back on its schedule. Tado CE 5.0.0-beta.2 split resume_schedule into one for heating and AC
+  // rooms and one for hot water; before that, one service did all three. Ask Home Assistant which exist, so either works.
+  _resumeService(z) {
+    const have = this._hass?.services?.[TCE] || {};
+    const [now, before] = z.type === "hot_water" ? ["resume_water_heater_schedule", "resume_schedule"] : ["resume_climate_schedule", "resume_schedule"];
+    return have[now] ? now : before;
+  }
+
   async _hold(z, mode) {
     // A temperature still being adjusted here would otherwise land after this change and undo it.
     // Resume/Off discard it; the others apply it.
@@ -972,8 +980,10 @@ class TadoDashPanel extends HTMLElement {
     this._expect(z.id, { kind, t: kind === "manual" ? t : undefined });
     this._render();
     let ok = true;
-    if (mode === "schedule") ok = await this._call(TCE, "resume_schedule", { entity_id: z.main });
-    else if (mode === "off") ok = await this._call("climate", "turn_off", { entity_id: z.main });
+    if (mode === "schedule") ok = await this._call(TCE, this._resumeService(z), { entity_id: z.main });
+    else if (mode === "off") ok = z.type === "hot_water"
+      ? await this._call("water_heater", "set_operation_mode", { entity_id: z.main, operation_mode: "off" }) // a hot water zone is not a climate entity
+      : await this._call("climate", "turn_off", { entity_id: z.main });
     else if (mode === "block") ok = await this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "next_time_block" });
     else if (mode === "manual") ok = await this._call(TCE, "set_climate_timer", { entity_id: z.main, temperature: t, overlay: "manual" });
     else {
